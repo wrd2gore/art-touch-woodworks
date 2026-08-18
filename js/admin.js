@@ -1768,10 +1768,9 @@ if (typeof module !== 'undefined' && module.exports) {
 
   // Universal Toast Notification
   function showNotification(msg, type = 'info') {
-    if (window.showToast) {
-      window.showToast(msg, type);
-      return;
-    }
+    // Remove any existing toast
+    const existing = document.querySelector('.admin-toast');
+    if (existing) existing.remove();
 
     const toast = document.createElement('div');
     toast.className = 'admin-toast animate-fade-up';
@@ -1791,7 +1790,7 @@ if (typeof module !== 'undefined' && module.exports) {
       align-items: center;
       gap: 10px;
     `;
-    toast.innerHTML = `${type === 'error' ? '<i class="fa-solid fa-circle-exclamation"></i>' : '<i class="fa-solid fa-circle-check"></i>'} <span>${msg}</span>`;
+    toast.innerHTML = `${type === 'error' ? '<i class="fa-solid fa-circle-exclamation"></i>' : '<i class="fa-solid fa-circle-check"></i>'} <span>${escapeHtml(msg)}</span>`;
     document.body.appendChild(toast);
 
     setTimeout(() => {
