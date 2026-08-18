@@ -714,6 +714,10 @@ if (typeof module !== 'undefined' && module.exports) {
     }
   }
 
+  window.publishToGitHub = function() {
+    alert('To publish your latest changes live to https://wrd2gore.github.io/art-touch-woodworks/:\n\n1. Run the "sync_github.bat" file in your project folder, OR\n2. The automated GitHub background publisher will sync your repository automatically within seconds!');
+  };
+
   // 7. Dashboard Stats Counter
   function updateDashboardStats() {
     const countInquiries = document.getElementById('stat-inquiries-count');
