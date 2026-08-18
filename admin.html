@@ -39,16 +39,12 @@
           <i class="fa-solid fa-circle-exclamation"></i> <span id="admin-lock-error-text">Invalid PIN or Passcode.</span>
         </div>
 
-        <div class="admin-lock-input-group">
+        <div class="admin-lock-input-group" style="position: relative;">
           <i class="fa-solid fa-key admin-lock-input-icon"></i>
-          <input type="password" id="admin-lock-input" class="admin-lock-input" placeholder="Enter Master PIN (e.g. 7707)" autocomplete="current-password" autofocus>
-        </div>
-
-        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: rgba(255,255,255,0.75);">
-          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-            <input type="checkbox" id="admin-lock-remember" checked style="accent-color: #E2C974;"> Remember on this app
-          </label>
-          <span style="font-size: 11px; color: rgba(255,255,255,0.45);">Default: 7707</span>
+          <input type="password" id="admin-lock-input" class="admin-lock-input" placeholder="Enter Master PIN" autocomplete="current-password" autofocus style="padding-right: 44px;">
+          <button type="button" onclick="window.togglePinVisibility('admin-lock-input', this)" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer;" title="Show/Hide PIN">
+            <i class="fa-solid fa-eye"></i>
+          </button>
         </div>
 
         <button type="submit" class="admin-lock-submit-btn" id="btn-unlock-admin">

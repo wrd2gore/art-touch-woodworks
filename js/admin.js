@@ -659,7 +659,6 @@
     const lockScreen = document.getElementById('admin-lock-screen');
     const lockForm = document.getElementById('admin-lock-form');
     const lockInput = document.getElementById('admin-lock-input');
-    const lockRemember = document.getElementById('admin-lock-remember');
     const lockError = document.getElementById('admin-lock-error');
     const lockErrorText = document.getElementById('admin-lock-error-text');
     const btnSidebarLock = document.getElementById('btn-sidebar-lock');
@@ -668,29 +667,15 @@
 
     if (!lockScreen) return;
 
-    // Check launch URL parameters for app token or desktop app mode
-    const urlParams = new URLSearchParams(window.location.search);
-    const hasAppToken = (urlParams.get('auth_token') === SECURE_APP_TOKEN) || (urlParams.get('app_mode') === '1');
     const isLocalFile = window.location.protocol === 'file:';
 
-    let isAuthenticated = false;
-
-    try {
-      const sessionAuth = sessionStorage.getItem('arttouch_admin_session_auth');
-      const rememberAuth = localStorage.getItem('arttouch_admin_remember_auth');
-      
-      if (hasAppToken || sessionAuth === 'valid' || rememberAuth === 'valid') {
-        isAuthenticated = true;
-      }
-    } catch (e) {
-      isAuthenticated = hasAppToken;
-    }
-
-    if (isAuthenticated) {
-      grantAccess(false);
-    } else {
-      lockScreen.classList.remove('is-unlocked');
-      if (lockInput) setTimeout(() => lockInput.focus(), 150);
+    // ALWAYS start locked on every app launch so user is prompted with PIN
+    lockScreen.classList.remove('is-unlocked');
+    if (lockInput) {
+      setTimeout(() => {
+        lockInput.value = '';
+        lockInput.focus();
+      }, 150);
     }
 
     // Submit handler for login
@@ -717,16 +702,15 @@
 
       let isMatch = false;
       if (customPinSet) {
-        isMatch = (entered === currentPin) || (entered === DEFAULT_MASTER_PASS) || (entered === SECURE_APP_TOKEN);
+        isMatch = (entered === currentPin) || (entered === DEFAULT_MASTER_PASS);
       } else {
-        isMatch = (entered === DEFAULT_MASTER_PIN) || (entered === DEFAULT_MASTER_PASS) || (entered === 'arttouch') || (entered === SECURE_APP_TOKEN);
+        isMatch = (entered === DEFAULT_MASTER_PIN) || (entered === DEFAULT_MASTER_PASS) || (entered === 'arttouch');
       }
 
       if (isMatch) {
         // Success
         if (lockError) lockError.classList.remove('is-visible');
-        const remember = lockRemember && lockRemember.checked;
-        grantAccess(remember);
+        grantAccess();
       } else {
         // Failure
         if (lockError) {
@@ -742,18 +726,11 @@
       }
     }
 
-    function grantAccess(remember) {
-      try {
-        sessionStorage.setItem('arttouch_admin_session_auth', 'valid');
-        if (remember) {
-          localStorage.setItem('arttouch_admin_remember_auth', 'valid');
-        }
-      } catch (e) {}
-
+    function grantAccess() {
       lockScreen.classList.add('is-unlocked');
 
       if (appmodeText) {
-        if (hasAppToken || isLocalFile) {
+        if (isLocalFile) {
           appmodeText.textContent = 'Desktop App Active';
         } else {
           appmodeText.textContent = 'Authorized Session';
@@ -763,11 +740,6 @@
 
     // Lock listeners
     function lockAdminApp() {
-      try {
-        sessionStorage.removeItem('arttouch_admin_session_auth');
-        localStorage.removeItem('arttouch_admin_remember_auth');
-      } catch (e) {}
-
       lockScreen.classList.remove('is-unlocked');
       if (lockInput) {
         lockInput.value = '';
