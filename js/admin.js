@@ -83,7 +83,20 @@
       if (stored) {
         inquiriesData = JSON.parse(stored);
       } else {
-        inquiriesData = [];
+        inquiriesData = [
+          {
+            id: 'inq-sample-01',
+            type: 'contact',
+            name: 'Sarah Al-Majali',
+            email: 's.majali@example.jo',
+            phone: '+962 7 9123 4567',
+            subject: 'Custom Executive Boardroom Fit-Out',
+            message: 'We are requesting a proposal and shop drawings for our new regional office boardroom tables and architectural wall cladding in Amman.',
+            timestamp: new Date().toISOString(),
+            status: 'new'
+          }
+        ];
+        saveInquiries();
       }
     } catch (e) {
       inquiriesData = [];
