@@ -628,6 +628,15 @@
   const DEFAULT_MASTER_PASS = 'arttouch2026';
   const SECURE_APP_TOKEN = 'arttouch_local_secure_node_7707';
 
+  function hasCustomPin() {
+    try {
+      const pin = localStorage.getItem('arttouch_admin_custom_pin');
+      return !!(pin && pin.trim().length > 0);
+    } catch (e) {
+      return false;
+    }
+  }
+
   function getStoredMasterPin() {
     try {
       return localStorage.getItem('arttouch_admin_custom_pin') || DEFAULT_MASTER_PIN;
@@ -635,6 +644,16 @@
       return DEFAULT_MASTER_PIN;
     }
   }
+
+  window.togglePinVisibility = function(inputId, btnEl) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const isPass = input.type === 'password';
+    input.type = isPass ? 'text' : 'password';
+    if (btnEl) {
+      btnEl.innerHTML = isPass ? '<i class="fa-solid fa-eye-slash" style="color: #A88734;"></i>' : '<i class="fa-solid fa-eye"></i>';
+    }
+  };
 
   function initAuthAndSecurity() {
     const lockScreen = document.getElementById('admin-lock-screen');
@@ -693,9 +712,17 @@
     function attemptUnlock() {
       if (!lockInput) return;
       const entered = lockInput.value.trim();
+      const customPinSet = hasCustomPin();
       const currentPin = getStoredMasterPin();
 
-      if (entered === currentPin || entered === DEFAULT_MASTER_PIN || entered === DEFAULT_MASTER_PASS || entered === 'arttouch' || entered === SECURE_APP_TOKEN) {
+      let isMatch = false;
+      if (customPinSet) {
+        isMatch = (entered === currentPin) || (entered === DEFAULT_MASTER_PASS) || (entered === SECURE_APP_TOKEN);
+      } else {
+        isMatch = (entered === DEFAULT_MASTER_PIN) || (entered === DEFAULT_MASTER_PASS) || (entered === 'arttouch') || (entered === SECURE_APP_TOKEN);
+      }
+
+      if (isMatch) {
         // Success
         if (lockError) lockError.classList.remove('is-visible');
         const remember = lockRemember && lockRemember.checked;
@@ -794,45 +821,103 @@
     const inputCurrentPin = document.getElementById('input-current-pin');
     const inputNewPin = document.getElementById('input-new-pin');
     const btnUpdatePin = document.getElementById('btn-update-pin');
+    const btnResetPin = document.getElementById('btn-reset-pin-default');
     const btnClearSessions = document.getElementById('btn-clear-remembered-sessions');
     const securityAlert = document.getElementById('security-alert-msg');
 
+    function updatePinBadgeStatus() {
+      const badge = document.getElementById('active-pin-badge');
+      if (!badge) return;
+      if (hasCustomPin()) {
+        badge.innerHTML = '<i class="fa-solid fa-key"></i> Custom PIN Active';
+        badge.style.background = '#FEF3C7';
+        badge.style.borderColor = '#FDE68A';
+        badge.style.color = '#92400E';
+      } else {
+        badge.innerHTML = '<i class="fa-solid fa-lock"></i> Default PIN (7707) Active';
+        badge.style.background = '#ECFDF5';
+        badge.style.borderColor = '#A7F3D0';
+        badge.style.color = '#047857';
+      }
+    }
+    updatePinBadgeStatus();
+
+    if (btnResetPin) {
+      btnResetPin.addEventListener('click', () => {
+        if (confirm('Reset master passcode back to default (7707)?')) {
+          localStorage.removeItem('arttouch_admin_custom_pin');
+          updatePinBadgeStatus();
+          if (securityAlert) {
+            securityAlert.style.display = 'block';
+            securityAlert.style.background = '#ECFDF5';
+            securityAlert.style.color = '#047857';
+            securityAlert.style.border = '1px solid #A7F3D0';
+            securityAlert.innerHTML = '<i class="fa-solid fa-circle-check"></i> Master PIN reset back to default: <strong>7707</strong>';
+          }
+          alert('PIN successfully reset to default: 7707');
+        }
+      });
+    }
+
+    function handlePinUpdate() {
+      if (!inputCurrentPin || !inputNewPin || !securityAlert) return;
+      const currentVal = inputCurrentPin.value.trim();
+      const newVal = inputNewPin.value.trim();
+      const activeMaster = getStoredMasterPin();
+
+      const currentMatches = (currentVal === activeMaster) || 
+                             (!hasCustomPin() && (currentVal === DEFAULT_MASTER_PIN || currentVal === DEFAULT_MASTER_PASS || currentVal === 'arttouch')) ||
+                             (currentVal === DEFAULT_MASTER_PASS);
+
+      if (!currentMatches) {
+        securityAlert.style.display = 'block';
+        securityAlert.style.background = '#FEE2E2';
+        securityAlert.style.color = '#B91C1C';
+        securityAlert.style.border = '1px solid #FCA5A5';
+        securityAlert.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Current PIN is incorrect. (Default PIN is 7707)';
+        inputCurrentPin.focus();
+        return;
+      }
+
+      if (newVal.length < 2) {
+        securityAlert.style.display = 'block';
+        securityAlert.style.background = '#FEF3C7';
+        securityAlert.style.color = '#92400E';
+        securityAlert.style.border = '1px solid #FDE68A';
+        securityAlert.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Please enter a new PIN or password.';
+        inputNewPin.focus();
+        return;
+      }
+
+      try {
+        localStorage.setItem('arttouch_admin_custom_pin', newVal);
+        updatePinBadgeStatus();
+        securityAlert.style.display = 'block';
+        securityAlert.style.background = '#ECFDF5';
+        securityAlert.style.color = '#047857';
+        securityAlert.style.border = '1px solid #A7F3D0';
+        securityAlert.innerHTML = `<i class="fa-solid fa-circle-check"></i> Master Passcode successfully updated to: <strong>${escapeHtml(newVal)}</strong>!`;
+        inputCurrentPin.value = '';
+        inputNewPin.value = '';
+        alert(`Master PIN successfully updated to: "${newVal}"\n\nYou can click "Test Lock Now" to test unlocking with your new PIN.`);
+      } catch (e) {
+        alert('Error saving new PIN: ' + e.message);
+      }
+    }
+
     if (btnUpdatePin) {
-      btnUpdatePin.addEventListener('click', () => {
-        if (!inputCurrentPin || !inputNewPin || !securityAlert) return;
-        const currentVal = inputCurrentPin.value.trim();
-        const newVal = inputNewPin.value.trim();
-        const activeMaster = getStoredMasterPin();
-
-        if (currentVal !== activeMaster && currentVal !== DEFAULT_MASTER_PASS && currentVal !== 'arttouch') {
-          securityAlert.style.display = 'block';
-          securityAlert.style.background = '#FEE2E2';
-          securityAlert.style.color = '#B91C1C';
-          securityAlert.style.border = '1px solid #FCA5A5';
-          securityAlert.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Current PIN is incorrect. Could not update.';
-          return;
-        }
-
-        if (newVal.length < 4) {
-          securityAlert.style.display = 'block';
-          securityAlert.style.background = '#FEF3C7';
-          securityAlert.style.color = '#92400E';
-          securityAlert.style.border = '1px solid #FDE68A';
-          securityAlert.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> New PIN / Passcode must be at least 4 characters.';
-          return;
-        }
-
-        try {
-          localStorage.setItem('arttouch_admin_custom_pin', newVal);
-          securityAlert.style.display = 'block';
-          securityAlert.style.background = '#ECFDF5';
-          securityAlert.style.color = '#047857';
-          securityAlert.style.border = '1px solid #A7F3D0';
-          securityAlert.innerHTML = '<i class="fa-solid fa-circle-check"></i> Master Passcode successfully updated!';
-          inputCurrentPin.value = '';
-          inputNewPin.value = '';
-        } catch (e) {
-          alert('Error saving new PIN.');
+      btnUpdatePin.addEventListener('click', handlePinUpdate);
+    }
+    if (inputNewPin) {
+      inputNewPin.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handlePinUpdate();
+      });
+    }
+    if (inputCurrentPin) {
+      inputCurrentPin.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          if (!inputNewPin.value) inputNewPin.focus();
+          else handlePinUpdate();
         }
       });
     }
