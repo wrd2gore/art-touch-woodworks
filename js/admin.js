@@ -1225,7 +1225,6 @@ if (typeof module !== 'undefined' && module.exports) {
       /* ---------------- STEP 3: UPDATE GITHUB REPO (MULTI-FILE GIT TREE) ---------------- */
       setStepState(3, 'active');
       const repo = 'wrd2gore/art-touch-woodworks';
-      const commitMessage = `Update website content via Art Touch Control Center [Build: ${targetBuildId}]`;
       const ghHeaders = {
         'Authorization': `token ${token}`,
         'Accept': 'application/vnd.github.v3+json',
