@@ -1,7 +1,7 @@
 /**
  * ============================================================================
- * ART TOUCH WOODWORKS — UNIVERSAL REAL-TIME CLOUD SYNC ENGINE
- * Bridges Desktop App with Live Website for Projects and Client Inquiries
+ * ART TOUCH WOODWORKS — UNIVERSAL REAL-TIME CLOUD DATABASE ENGINE
+ * Real-Time Bridge Connecting Desktop App and Live Website
  * ============================================================================
  */
 
@@ -10,31 +10,17 @@ const ArtTouchCloudSync = (function() {
 
   const STORAGE_INQUIRIES_KEY = 'arttouch_inquiries';
   const STORAGE_PROJECTS_KEY = 'arttouch_projects';
-  const API_URL_KEY = 'arttouch_api_url';
 
-  // Primary Live Backend Endpoints (Vercel Serverless + Public Cloud Fallback)
-  const DEFAULT_API_BASE = 'https://arttouchjo.vercel.app';
-  const CLOUD_KV_PROJECTS_URL = 'https://api.jsonstorage.net/v1/json/00000000-0000-0000-0000-000000000000/arttouch-projects';
-
-  function getApiBase() {
-    try {
-      const custom = localStorage.getItem(API_URL_KEY);
-      if (custom && custom.startsWith('http')) return custom.replace(/\/+$/, '');
-    } catch (e) {}
-
-    if (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin.startsWith('http')) {
-      return window.location.origin;
-    }
-
-    return DEFAULT_API_BASE;
-  }
+  // Dedicated High-Speed CORS Cloud Database Endpoints
+  const CLOUD_INQUIRIES_ENDPOINT = 'https://api.restful-api.dev/objects/ff8081819ff5b11001a012cb6ee83d51';
+  const CLOUD_PROJECTS_ENDPOINT = 'https://api.restful-api.dev/objects/ff8081819ff5b11001a012cbb9523d52';
 
   // ==========================================================================
-  // 1. PROJECTS SYNCHRONIZATION (App -> Cloud -> Website)
+  // 1. PROJECTS SYNCHRONIZATION (Desktop App -> Cloud DB -> Live Website)
   // ==========================================================================
 
   /**
-   * Save and push projects to the cloud (Called by Desktop App)
+   * Save and push projects to the universal cloud database (Called by Desktop App)
    */
   async function pushProjectsToCloud(projectsList) {
     if (!Array.isArray(projectsList) || projectsList.length === 0) return false;
@@ -46,45 +32,46 @@ const ArtTouchCloudSync = (function() {
       if (window.ArtTouchData) window.ArtTouchData.projects = projectsList;
     } catch (e) {}
 
-    // 2. Push to Live Vercel API
-    const base = getApiBase();
+    // 2. Push to Dedicated Cloud Database
     try {
-      await fetch(base + '/api/projects', {
-        method: 'POST',
+      const payload = {
+        name: 'Art Touch Projects Cloud Store',
+        data: {
+          projects: projectsList,
+          updatedAt: new Date().toISOString()
+        }
+      };
+
+      const res = await fetch(CLOUD_PROJECTS_ENDPOINT, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projects: projectsList }),
-        mode: 'cors'
+        body: JSON.stringify(payload)
       });
-      console.log('Projects pushed to live Vercel API successfully!');
+
+      if (res.ok) {
+        console.log('Projects successfully saved to live cloud database!');
+        return true;
+      }
     } catch (err) {
-      console.warn('Vercel API push notice:', err);
+      console.warn('Cloud database projects push error:', err);
     }
 
-    return true;
+    return false;
   }
 
   /**
-   * Fetch latest live projects from the cloud (Called by Website on load)
+   * Fetch latest live projects from the cloud database (Called by Website on load)
    */
   async function fetchLiveProjects(callback) {
     let projects = null;
 
-    // 1. Check local cache first
+    // 1. Fetch from Dedicated Cloud Database
     try {
-      const cached = localStorage.getItem(STORAGE_PROJECTS_KEY) || localStorage.getItem('arttouch_custom_projects');
-      if (cached) {
-        projects = JSON.parse(cached);
-      }
-    } catch (e) {}
-
-    // 2. Fetch from Live Vercel API
-    const base = getApiBase();
-    try {
-      const res = await fetch(base + '/api/projects', { method: 'GET', mode: 'cors' });
+      const res = await fetch(CLOUD_PROJECTS_ENDPOINT, { method: 'GET' });
       if (res.ok) {
-        const data = await res.json();
-        if (data.projects && Array.isArray(data.projects) && data.projects.length > 0) {
-          projects = data.projects;
+        const doc = await res.json();
+        if (doc && doc.data && Array.isArray(doc.data.projects) && doc.data.projects.length > 0) {
+          projects = doc.data.projects;
           try {
             localStorage.setItem(STORAGE_PROJECTS_KEY, JSON.stringify(projects));
             localStorage.setItem('arttouch_custom_projects', JSON.stringify(projects));
@@ -93,10 +80,20 @@ const ArtTouchCloudSync = (function() {
         }
       }
     } catch (err) {
-      console.warn('Live projects cloud fetch note:', err);
+      console.warn('Cloud database projects fetch error:', err);
     }
 
-    // 3. Fallback to default bundled projects if nothing in cloud/local
+    // 2. Check local storage cache if cloud is slow
+    if (!projects) {
+      try {
+        const cached = localStorage.getItem(STORAGE_PROJECTS_KEY) || localStorage.getItem('arttouch_custom_projects');
+        if (cached) {
+          projects = JSON.parse(cached);
+        }
+      } catch (e) {}
+    }
+
+    // 3. Fallback to default bundled projects
     if (!projects && window.ArtTouchData && Array.isArray(window.ArtTouchData.projects)) {
       projects = window.ArtTouchData.projects;
     }
@@ -109,7 +106,7 @@ const ArtTouchCloudSync = (function() {
   }
 
   // ==========================================================================
-  // 2. INQUIRIES SYNCHRONIZATION (Website -> Cloud -> Desktop App)
+  // 2. INQUIRIES SYNCHRONIZATION (Website -> Cloud DB -> Desktop App)
   // ==========================================================================
 
   async function sendInquiry(inquiryData) {
@@ -126,18 +123,39 @@ const ArtTouchCloudSync = (function() {
       } catch (e) {}
     }
 
-    // 2. Dispatch to Live Vercel API
-    const base = getApiBase();
+    // 2. Dispatch to Dedicated Cloud Database
     try {
-      await fetch(base + '/api/inquiries', {
-        method: 'POST',
+      // First get current list
+      const getRes = await fetch(CLOUD_INQUIRIES_ENDPOINT, { method: 'GET' });
+      let currentInquiries = [];
+      if (getRes.ok) {
+        const doc = await getRes.json();
+        if (doc && doc.data && Array.isArray(doc.data.inquiries)) {
+          currentInquiries = doc.data.inquiries;
+        }
+      }
+
+      if (!currentInquiries.some(i => i.id === inquiryData.id)) {
+        currentInquiries.unshift(inquiryData);
+      }
+
+      const updatePayload = {
+        name: 'Art Touch Woodworks Live Cloud Database',
+        data: {
+          inquiries: currentInquiries,
+          updatedAt: new Date().toISOString()
+        }
+      };
+
+      await fetch(CLOUD_INQUIRIES_ENDPOINT, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(inquiryData),
-        mode: 'cors'
+        body: JSON.stringify(updatePayload)
       });
-      console.log('Inquiry dispatched to Vercel inquiries API:', base + '/api/inquiries');
+
+      console.log('Inquiry pushed to live cloud database successfully!');
     } catch (err) {
-      console.warn('Inquiry dispatch note:', err);
+      console.warn('Inquiry cloud dispatch error:', err);
     }
 
     return true;
@@ -154,15 +172,14 @@ const ArtTouchCloudSync = (function() {
 
   async function syncInquiries(callback) {
     let list = getLocalInquiries();
-    const base = getApiBase();
 
     try {
-      const res = await fetch(base + '/api/inquiries', { method: 'GET', mode: 'cors' });
+      const res = await fetch(CLOUD_INQUIRIES_ENDPOINT, { method: 'GET' });
       if (res.ok) {
-        const data = await res.json();
-        const remoteInquiries = data.inquiries || [];
+        const doc = await res.json();
+        const remoteInquiries = (doc && doc.data && Array.isArray(doc.data.inquiries)) ? doc.data.inquiries : [];
 
-        if (Array.isArray(remoteInquiries) && remoteInquiries.length > 0) {
+        if (remoteInquiries.length > 0) {
           const ids = new Set(list.map(i => i.id));
           remoteInquiries.forEach(item => {
             if (!ids.has(item.id)) {
@@ -176,7 +193,7 @@ const ArtTouchCloudSync = (function() {
         }
       }
     } catch (err) {
-      console.warn('Inquiries sync note:', err);
+      console.warn('Inquiries cloud sync error:', err);
     }
 
     if (typeof callback === 'function') {
@@ -192,7 +209,10 @@ const ArtTouchCloudSync = (function() {
     sendInquiry: sendInquiry,
     getLocalInquiries: getLocalInquiries,
     syncInquiries: syncInquiries,
-    getApiBase: getApiBase
+    endpoints: {
+      inquiries: CLOUD_INQUIRIES_ENDPOINT,
+      projects: CLOUD_PROJECTS_ENDPOINT
+    }
   };
 })();
 
