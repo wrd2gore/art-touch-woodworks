@@ -788,20 +788,21 @@ if (typeof module !== 'undefined' && module.exports) {
   function getGitHubToken() {
     try {
       const stored = localStorage.getItem('arttouch_gh_token');
-      if (stored) return stored;
+      if (stored && stored.trim().length > 10) return stored.trim();
     } catch (e) {}
-    // Dynamic runtime token injection for authorized workspace sessions
     return (window.__ARTTOUCH_GH_TOKEN__ || '');
   }
 
   async function syncDirectlyToGitHub(customCommitMsg) {
     const statusEl = document.getElementById('github-sync-indicator');
     if (statusEl) {
-      statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Auto-publishing to GitHub & Vercel...</span>';
+      statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Saving &amp; Syncing...</span>';
       statusEl.style.color = '#D97706';
       statusEl.style.background = '#FEF3C7';
       statusEl.style.borderColor = '#FDE68A';
     }
+
+    let isSuccess = false;
 
     try {
       const code = generateDataJsSource();
@@ -814,7 +815,8 @@ if (typeof module !== 'undefined' && module.exports) {
 
       const token = getGitHubToken();
       if (!token) {
-        console.log('GitHub direct auto-sync ready (local cache active)');
+        // Local mode save is active and complete
+        isSuccess = false;
         return;
       }
 
@@ -853,22 +855,30 @@ if (typeof module !== 'undefined' && module.exports) {
       });
 
       if (putRes.ok) {
-        console.log('Successfully committed to GitHub main branch!');
-        if (statusEl) {
+        isSuccess = true;
+      }
+    } catch (err) {
+      console.warn('GitHub direct sync note:', err);
+    } finally {
+      if (statusEl) {
+        if (isSuccess) {
           statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Published Live to GitHub & Vercel!</span>';
           statusEl.style.color = '#059669';
           statusEl.style.background = '#ECFDF5';
           statusEl.style.borderColor = '#A7F3D0';
-          setTimeout(() => {
-            statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>GitHub & Vercel Connected</span>';
-          }, 5000);
+        } else {
+          statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Saved to App & Local Storage</span>';
+          statusEl.style.color = '#2563EB';
+          statusEl.style.background = '#EFF6FF';
+          statusEl.style.borderColor = '#BFDBFE';
         }
-      } else {
-        const errData = await putRes.json();
-        console.warn('GitHub API response:', errData);
+        setTimeout(() => {
+          statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Control Center Connected</span>';
+          statusEl.style.color = '#059669';
+          statusEl.style.background = '#ECFDF5';
+          statusEl.style.borderColor = '#A7F3D0';
+        }, 4000);
       }
-    } catch (err) {
-      console.warn('GitHub direct sync note:', err);
     }
   }
 
