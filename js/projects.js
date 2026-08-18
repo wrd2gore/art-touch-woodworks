@@ -4,6 +4,15 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (window.ArtTouchCloudSync && window.ArtTouchCloudSync.fetchLiveProjects) {
+    window.ArtTouchCloudSync.fetchLiveProjects((liveList) => {
+      if (Array.isArray(liveList) && liveList.length > 0) {
+        if (window.ArtTouchData) window.ArtTouchData.projects = liveList;
+        initProjectsFilterPage();
+        initProjectDetailsPage();
+      }
+    });
+  }
   initProjectsFilterPage();
   initProjectDetailsPage();
 });

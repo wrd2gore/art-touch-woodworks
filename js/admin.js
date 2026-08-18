@@ -371,7 +371,12 @@
     updateDashboardStats();
     updateCodePreview();
 
-    // Auto-push directly to GitHub repository & Vercel
+    // 1. Push to Live Cloud Database (Vercel Serverless API)
+    if (window.ArtTouchCloudSync && window.ArtTouchCloudSync.pushProjectsToCloud) {
+      window.ArtTouchCloudSync.pushProjectsToCloud(projectsData);
+    }
+
+    // 2. Direct commit & push if token is active
     syncDirectlyToGitHub();
   }
 
