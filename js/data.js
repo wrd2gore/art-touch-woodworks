@@ -8,9 +8,9 @@
 
 const ArtTouchData = {
   // Master Version & Build Signature for CDN Verification
-  version: "2026.08.18.1922",
-  buildId: "build-at-msyvesvc-pufh",
-  publishedAt: "2026-08-18T16:22:04.516Z",
+  version: "2026.08.18.1930",
+  buildId: "build-at-msyvpogr-uw45",
+  publishedAt: "2026-08-18T16:30:32.007Z",
   totalProjects: 13,
   totalServices: 6,
   totalFaqs: 5,
