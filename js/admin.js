@@ -579,12 +579,40 @@
   // 5. Business Settings UI
   function initSettingsUI() {
     const form = document.getElementById('form-business-settings');
-    if (!form) return;
+    const inputApiUrl = document.getElementById('input-api-url');
+    const btnSaveApi = document.getElementById('btn-save-api-url');
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      alert('Business settings updated in runtime configuration!');
-    });
+    if (inputApiUrl) {
+      try {
+        const savedUrl = localStorage.getItem('arttouch_api_url');
+        if (savedUrl) inputApiUrl.value = savedUrl;
+      } catch (e) {}
+    }
+
+    if (btnSaveApi && inputApiUrl) {
+      btnSaveApi.addEventListener('click', () => {
+        const val = inputApiUrl.value.trim();
+        if (val) {
+          try {
+            localStorage.setItem('arttouch_api_url', val);
+            alert('Live API URL connected! Syncing inquiries from: ' + val);
+            loadInquiries();
+          } catch (e) {}
+        } else {
+          try {
+            localStorage.removeItem('arttouch_api_url');
+            alert('Reset to local mode.');
+          } catch (e) {}
+        }
+      });
+    }
+
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Business settings updated in runtime configuration!');
+      });
+    }
   }
 
   // 6. Website Sync & Export (data.js Generator)
