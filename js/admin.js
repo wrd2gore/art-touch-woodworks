@@ -1100,16 +1100,115 @@ if (typeof module !== 'undefined' && module.exports) {
     return (window.__ARTTOUCH_GH_TOKEN__ || '');
   }
 
-  async function syncDirectlyToGitHub(customCommitMsg) {
+  async function testGitHubTokenConnection() {
+    const inputEl = document.getElementById('input-gh-token');
+    const token = inputEl ? inputEl.value.trim() : getGitHubToken();
+    const resultBox = document.getElementById('gh-token-test-result');
+
+    if (!token) {
+      if (resultBox) {
+        resultBox.style.display = 'block';
+        resultBox.style.background = '#FEF3C7';
+        resultBox.style.color = '#92400E';
+        resultBox.style.border = '1px solid #FDE68A';
+        resultBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Please paste your GitHub Personal Access Token into the box above.';
+      }
+      return;
+    }
+
+    if (resultBox) {
+      resultBox.style.display = 'block';
+      resultBox.style.background = '#EFF6FF';
+      resultBox.style.color = '#1E40AF';
+      resultBox.style.border = '1px solid #BFDBFE';
+      resultBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying token permissions with GitHub API...';
+    }
+
+    try {
+      const authHeader = (token.startsWith('gh') || token.startsWith('github_pat')) ? `Bearer ${token}` : `token ${token}`;
+      const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/js/data.js?ref=${GITHUB_BRANCH}`, {
+        headers: {
+          'Authorization': authHeader,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+
+      if (res.ok) {
+        localStorage.setItem('arttouch_gh_token', token);
+        if (resultBox) {
+          resultBox.style.background = '#ECFDF5';
+          resultBox.style.color = '#047857';
+          resultBox.style.border = '1px solid #A7F3D0';
+          resultBox.innerHTML = '<strong><i class="fa-solid fa-circle-check"></i> Connection Successful!</strong><br><small>Token is verified. 1-Click Publishing to GitHub Pages is active.</small>';
+        }
+        alert('✅ GitHub Token Verified Successfully!\n\nYou can now publish changes live directly with 1-click.');
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        if (resultBox) {
+          resultBox.style.background = '#FEE2E2';
+          resultBox.style.color = '#B91C1C';
+          resultBox.style.border = '1px solid #FCA5A5';
+          resultBox.innerHTML = `<strong><i class="fa-solid fa-circle-xmark"></i> Connection Error (${res.status}):</strong><br><small>${errData.message || 'Authentication failed'}. Ensure token has <code>repo</code> scope (Classic) or <code>Contents: Read and write</code> (Fine-Grained) on <code>wrd2gore/art-touch-woodworks</code>.</small>`;
+        }
+        alert(`❌ GitHub Connection Failed (${res.status}):\n${errData.message || 'Invalid token or insufficient permissions'}\n\nPlease check token scopes.`);
+      }
+    } catch (e) {
+      if (resultBox) {
+        resultBox.style.background = '#FEE2E2';
+        resultBox.style.color = '#B91C1C';
+        resultBox.style.border = '1px solid #FCA5A5';
+        resultBox.innerHTML = `<strong><i class="fa-solid fa-circle-xmark"></i> Network Error:</strong> ${e.message}`;
+      }
+    }
+  }
+
+  window.testGitHubTokenConnection = testGitHubTokenConnection;
+
+  async function syncDirectlyToGitHub(customCommitMsg, isManualTrigger = false) {
     const statusEl = document.getElementById('github-sync-indicator');
+    let token = getGitHubToken();
+
+    if (!token) {
+      const inputEl = document.getElementById('input-gh-token');
+      if (inputEl && inputEl.value.trim()) {
+        token = inputEl.value.trim();
+        localStorage.setItem('arttouch_gh_token', token);
+      }
+    }
+
+    if (!token) {
+      if (isManualTrigger) {
+        const userEnteredToken = prompt('Please enter your GitHub Personal Access Token (PAT) with "repo" or "Contents: Read & Write" permissions to publish live:');
+        if (userEnteredToken && userEnteredToken.trim().length > 10) {
+          token = userEnteredToken.trim();
+          localStorage.setItem('arttouch_gh_token', token);
+          const inputEl = document.getElementById('input-gh-token');
+          if (inputEl) inputEl.value = token;
+        } else {
+          alert('Publish cancelled: No GitHub token provided.\n\nTip: You can also double-click sync_github.bat in your project folder to publish without entering a token!');
+          return;
+        }
+      } else {
+        if (statusEl) {
+          statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>Add GitHub Token to Sync</span>';
+          statusEl.style.color = '#D97706';
+          statusEl.style.background = '#FEF3C7';
+          statusEl.style.borderColor = '#FDE68A';
+        }
+        return;
+      }
+    }
+
     if (statusEl) {
-      statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Saving &amp; Syncing...</span>';
+      statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Publishing to GitHub...</span>';
       statusEl.style.color = '#D97706';
       statusEl.style.background = '#FEF3C7';
       statusEl.style.borderColor = '#FDE68A';
     }
 
     let isSuccess = false;
+    let errorDetail = '';
+    let commitSha = '';
 
     try {
       const code = generateDataJsSource();
@@ -1120,78 +1219,87 @@ if (typeof module !== 'undefined' && module.exports) {
       }
       const base64Content = btoa(binary);
 
-      const token = getGitHubToken();
-      if (!token) {
-        // Local mode save is active and complete
-        isSuccess = false;
-        return;
-      }
+      const authHeader = (token.startsWith('gh') || token.startsWith('github_pat')) ? `Bearer ${token}` : `token ${token}`;
 
       // 1. Get current file SHA on main branch
       const getRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/js/data.js?ref=${GITHUB_BRANCH}`, {
         headers: {
-          'Authorization': `token ${token}`,
+          'Authorization': authHeader,
           'Accept': 'application/vnd.github.v3+json'
         }
       });
 
-      let currentSha = null;
-      if (getRes.ok) {
-        const fileData = await getRes.json();
-        currentSha = fileData.sha;
+      if (!getRes.ok) {
+        const errorData = await getRes.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${getRes.status} on SHA retrieval`);
       }
+
+      const fileData = await getRes.json();
+      const currentSha = fileData.sha;
 
       // 2. Commit updated data.js directly to GitHub
       const putBody = {
-        message: customCommitMsg || `Auto-update portfolio via Art Touch Control Center [${new Date().toLocaleTimeString()}]`,
+        message: customCommitMsg || `Update portfolio via Art Touch Control Center [${new Date().toLocaleTimeString()}]`,
         content: base64Content,
+        sha: currentSha,
         branch: GITHUB_BRANCH
       };
-      if (currentSha) {
-        putBody.sha = currentSha;
-      }
 
       const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/js/data.js`, {
         method: 'PUT',
         headers: {
-          'Authorization': `token ${token}`,
+          'Authorization': authHeader,
           'Content-Type': 'application/json',
           'Accept': 'application/vnd.github.v3+json'
         },
         body: JSON.stringify(putBody)
       });
 
-      if (putRes.ok) {
-        isSuccess = true;
+      if (!putRes.ok) {
+        const errorData = await putRes.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${putRes.status} on commit write`);
       }
+
+      const putData = await putRes.json();
+      commitSha = putData.commit ? putData.commit.sha.substring(0, 7) : 'live';
+      isSuccess = true;
     } catch (err) {
-      console.warn('GitHub direct sync note:', err);
+      console.warn('GitHub direct sync error:', err);
+      errorDetail = err.message;
     } finally {
       if (statusEl) {
         if (isSuccess) {
-          statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Published Live to GitHub & Vercel!</span>';
+          statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Published Live (${commitSha})</span>`;
           statusEl.style.color = '#059669';
           statusEl.style.background = '#ECFDF5';
           statusEl.style.borderColor = '#A7F3D0';
         } else {
-          statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Saved to App & Local Storage</span>';
-          statusEl.style.color = '#2563EB';
-          statusEl.style.background = '#EFF6FF';
-          statusEl.style.borderColor = '#BFDBFE';
+          statusEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> <span>Publish Failed</span>';
+          statusEl.style.color = '#DC2626';
+          statusEl.style.background = '#FEE2E2';
+          statusEl.style.borderColor = '#FCA5A5';
         }
         setTimeout(() => {
           statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Control Center Connected</span>';
           statusEl.style.color = '#059669';
           statusEl.style.background = '#ECFDF5';
           statusEl.style.borderColor = '#A7F3D0';
-        }, 4000);
+        }, 5000);
+      }
+
+      if (isManualTrigger) {
+        if (isSuccess) {
+          alert(`🎉 Successfully Published to GitHub Pages!\n\nCommit SHA: ${commitSha}\nLive Website: https://wrd2gore.github.io/art-touch-woodworks/\n\nYour portfolio changes are now live across the world!`);
+        } else {
+          alert(`❌ Publishing Failed:\n${errorDetail}\n\nPlease test your token using the "Test Connection" button in the Website Sync tab, or use sync_github.bat.`);
+        }
       }
     }
   }
 
   window.syncDirectlyToGitHub = syncDirectlyToGitHub;
   window.publishToGitHub = function() {
-    syncDirectlyToGitHub('Manual 1-click publish from Art Touch Control Center');
+    syncDirectlyToGitHub('Manual 1-click publish from Art Touch Control Center', true);
   };
 
   // 7. Dashboard Stats Counter

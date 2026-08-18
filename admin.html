@@ -400,15 +400,19 @@
             </p>
             
             <div style="background: #F3F4F6; padding: 16px; border-radius: 8px; border: 1px solid var(--color-admin-border);">
-              <label class="form-label" style="font-size: 13px; font-weight: 600;">GitHub Access Token (Saved locally on this machine)</label>
+              <label class="form-label" style="font-size: 13px; font-weight: 600;">GitHub Personal Access Token (Saved locally in this app)</label>
               <div style="display: flex; gap: 10px; margin-bottom: 8px;">
-                <input type="password" id="input-gh-token" class="form-control" placeholder="ghp_... or gho_... token" style="font-size: 13px;">
+                <input type="password" id="input-gh-token" class="form-control" placeholder="ghp_... or github_pat_..." style="font-size: 13px;">
                 <button type="button" class="btn btn-secondary btn-sm" id="btn-save-gh-token" style="white-space: nowrap;">
                   <i class="fa-solid fa-floppy-disk"></i> Save Token
                 </button>
+                <button type="button" class="btn btn-outline btn-sm" id="btn-test-gh-token" onclick="window.testGitHubTokenConnection()" style="white-space: nowrap;">
+                  <i class="fa-solid fa-bolt"></i> Test Connection
+                </button>
               </div>
-              <small style="color: var(--color-admin-text-muted); font-size: 11px;">
-                Tip: You can also double-click <code>sync_github.bat</code> in your project directory at any time to instantly push all local changes to GitHub!
+              <div id="gh-token-test-result" style="display: none; padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-top: 10px;"></div>
+              <small style="color: var(--color-admin-text-muted); font-size: 11px; display: block; margin-top: 8px;">
+                <i class="fa-solid fa-circle-info"></i> Token requires <code>repo</code> scope (Classic token) or <code>Contents: Read and write</code> (Fine-Grained token) on repo <code>wrd2gore/art-touch-woodworks</code>.
               </small>
             </div>
           </div>
