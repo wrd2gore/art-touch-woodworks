@@ -861,6 +861,32 @@
     const btnDownload = document.getElementById('btn-download-datajs');
     const btnCopy = document.getElementById('btn-copy-datajs');
     const btnSaveDirect = document.getElementById('btn-save-direct');
+    const inputGhToken = document.getElementById('input-gh-token');
+    const btnSaveGhToken = document.getElementById('btn-save-gh-token');
+
+    if (inputGhToken) {
+      try {
+        const savedToken = localStorage.getItem('arttouch_gh_token');
+        if (savedToken) inputGhToken.value = savedToken;
+      } catch (e) {}
+    }
+
+    if (btnSaveGhToken && inputGhToken) {
+      btnSaveGhToken.addEventListener('click', () => {
+        const val = inputGhToken.value.trim();
+        if (val) {
+          try {
+            localStorage.setItem('arttouch_gh_token', val);
+            alert('GitHub Token saved securely to this app! You can now publish directly with 1-click.');
+          } catch (e) {}
+        } else {
+          try {
+            localStorage.removeItem('arttouch_gh_token');
+            alert('Token removed.');
+          } catch (e) {}
+        }
+      });
+    }
 
     if (btnDownload) {
       btnDownload.addEventListener('click', downloadDataJsFile);

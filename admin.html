@@ -349,6 +349,39 @@
 
       <!-- SECTION 4: WEBSITE SYNC & EXPORT -->
       <section id="section-sync" style="display: none;">
+        <!-- GitHub Direct Publishing Card -->
+        <div class="admin-card" style="margin-bottom: 24px;">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title"><i class="fa-brands fa-github"></i> 1-Click Live Website Publisher</h3>
+            <div style="display: flex; gap: 10px;">
+              <a href="https://wrd2gore.github.io/art-touch-woodworks/" target="_blank" class="btn btn-outline btn-sm">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Website
+              </a>
+              <button type="button" class="btn btn-primary btn-sm" onclick="window.syncDirectlyToGitHub('Manual sync from Admin Control Center')">
+                <i class="fa-brands fa-github"></i> Publish to GitHub &amp; Pages Now
+              </button>
+            </div>
+          </div>
+          <div class="admin-card-body">
+            <p style="font-size: 13px; color: var(--color-admin-text-muted); margin-bottom: 16px;">
+              Your live website is hosted at <a href="https://wrd2gore.github.io/art-touch-woodworks/" target="_blank" style="color: var(--color-brand); font-weight: 600;">https://wrd2gore.github.io/art-touch-woodworks/</a>. You <strong>do not need a VPS</strong> or paid server. Edits can be published in 1 click!
+            </p>
+            
+            <div style="background: #F3F4F6; padding: 16px; border-radius: 8px; border: 1px solid var(--color-admin-border);">
+              <label class="form-label" style="font-size: 13px; font-weight: 600;">GitHub Access Token (Saved locally on this machine)</label>
+              <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+                <input type="password" id="input-gh-token" class="form-control" placeholder="ghp_... or gho_... token" style="font-size: 13px;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-save-gh-token" style="white-space: nowrap;">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Token
+                </button>
+              </div>
+              <small style="color: var(--color-admin-text-muted); font-size: 11px;">
+                Tip: You can also double-click <code>sync_github.bat</code> in your project directory at any time to instantly push all local changes to GitHub!
+              </small>
+            </div>
+          </div>
+        </div>
+
         <div class="admin-card">
           <div class="admin-card-header">
             <h3 class="admin-card-title">Sync Edits to js/data.js</h3>
