@@ -802,6 +802,12 @@ if (typeof module !== 'undefined' && module.exports) {
 
       setStepState(activeStepIndex, 'error');
 
+      const isTokenPermError = err.message.includes('Resource not accessible') || 
+                               err.message.includes('authentication failed') || 
+                               err.message.includes('Bad credentials') ||
+                               err.message.includes('403') ||
+                               err.message.includes('401');
+
       if (modalTitle) modalTitle.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color: #DC2626;"></i> Publishing Failed';
       if (bannerEl) {
         bannerEl.style.display = 'block';
@@ -810,7 +816,16 @@ if (typeof module !== 'undefined' && module.exports) {
         bannerEl.style.border = '1px solid #F87171';
         bannerEl.innerHTML = `
           <strong><i class="fa-solid fa-circle-exclamation"></i> Publishing stopped at Step ${activeStepIndex}:</strong><br>
-          <span style="font-size: 13px;">${escapeHtml(err.message)}</span>
+          <span style="font-size: 13px; display: block; margin: 4px 0 8px 0;">${escapeHtml(err.message)}</span>
+          ${isTokenPermError ? `
+            <div style="background: #FFFFFF; padding: 12px; border-radius: 6px; border: 1px solid #FECACA; margin-top: 8px; color: #1F2428; font-size: 12px; line-height: 1.5;">
+              <strong style="color: #991B1B;"><i class="fa-solid fa-key"></i> How to fix this in 15 seconds:</strong><br>
+              Your token is missing the <strong>repo</strong> write permission.<br>
+              1. <a href="https://github.com/settings/tokens/new?description=Art+Touch+Control+Center&scopes=repo" target="_blank" style="color: #A88734; font-weight: 700; text-decoration: underline;">👉 Click here to generate a token with 'repo' scope pre-selected</a><br>
+              2. Click the green <strong>"Generate token"</strong> button at the bottom.<br>
+              3. Copy your token (starts with <code>ghp_</code>) and paste it into the <strong>Publish to Website</strong> tab &rarr; <strong>Save Token</strong>.
+            </div>
+          ` : ''}
         `;
       }
 
