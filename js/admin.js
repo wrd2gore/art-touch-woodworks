@@ -1500,47 +1500,49 @@ if (typeof module !== 'undefined' && module.exports) {
 
       const authHeader = (token.startsWith('gh') || token.startsWith('github_pat')) ? `Bearer ${token}` : `token ${token}`;
 
-      // 1. Get current file SHA on main branch
-      const getRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/js/data.js?ref=${GITHUB_BRANCH}`, {
-        headers: {
-          'Authorization': authHeader,
-          'Accept': 'application/vnd.github.v3+json'
+      async function pushFileToBranch(branchName) {
+        let sha = null;
+        try {
+          const getRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/js/data.js?ref=${branchName}`, {
+            headers: {
+              'Authorization': authHeader,
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          });
+          if (getRes.ok) {
+            const fileData = await getRes.json();
+            sha = fileData.sha;
+          }
+        } catch (e) {}
+
+        const putBody = {
+          message: customCommitMsg || `Update portfolio via Art Touch Control Center [${new Date().toLocaleTimeString()}]`,
+          content: base64Content,
+          branch: branchName
+        };
+        if (sha) putBody.sha = sha;
+
+        const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/js/data.js`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': authHeader,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          body: JSON.stringify(putBody)
+        });
+
+        if (!putRes.ok) {
+          const errorData = await putRes.json().catch(() => ({}));
+          throw new Error(errorData.message || `HTTP ${putRes.status} on branch ${branchName}`);
         }
-      });
-
-      if (!getRes.ok) {
-        const errorData = await getRes.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP ${getRes.status} on SHA retrieval`);
+        return await putRes.json();
       }
 
-      const fileData = await getRes.json();
-      const currentSha = fileData.sha;
+      const resMain = await pushFileToBranch('main');
+      const resMaster = await pushFileToBranch('master').catch(() => null);
 
-      // 2. Commit updated data.js directly to GitHub
-      const putBody = {
-        message: customCommitMsg || `Update portfolio via Art Touch Control Center [${new Date().toLocaleTimeString()}]`,
-        content: base64Content,
-        sha: currentSha,
-        branch: GITHUB_BRANCH
-      };
-
-      const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/js/data.js`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': authHeader,
-          'Content-Type': 'application/json',
-          'Accept': 'application/vnd.github.v3+json'
-        },
-        body: JSON.stringify(putBody)
-      });
-
-      if (!putRes.ok) {
-        const errorData = await putRes.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP ${putRes.status} on commit write`);
-      }
-
-      const putData = await putRes.json();
-      commitSha = putData.commit ? putData.commit.sha.substring(0, 7) : 'live';
+      commitSha = (resMain && resMain.commit) ? resMain.commit.sha.substring(0, 7) : 'live';
       isSuccess = true;
     } catch (err) {
       console.warn('GitHub direct sync error:', err);

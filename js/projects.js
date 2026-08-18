@@ -188,6 +188,7 @@ function initProjectsFilterPage() {
   const urlParams = new URLSearchParams(window.location.search);
   const initialCategory = urlParams.get('cat') || 'all';
   window.filterProjectsByCategory(initialCategory);
+}
 
 /* 2. Dynamic Project Details & Dedicated Gallery (project-details.html?id=...) */
 function initProjectDetailsPage() {
