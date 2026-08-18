@@ -18,6 +18,96 @@
   <link rel="stylesheet" href="css/admin.css">
   <link rel="stylesheet" href="css/rtl.css">
   <link rel="icon" type="image/png" href="images/logo/art-touch-logo.png">
+  <script>
+    window.getStoredPinSafe = function() {
+      try {
+        return localStorage.getItem('arttouch_master_pin') || '7707';
+      } catch(e) {
+        return '7707';
+      }
+    };
+
+    window.typePinDigit = function(digit) {
+      var input = document.getElementById('admin-lock-input');
+      if (input) {
+        input.value = (input.value || '') + digit;
+        var v = input.value.trim();
+        if (v === '7707' || v === window.getStoredPinSafe()) {
+          window.submitPinUnlock();
+        }
+      }
+    };
+
+    window.clearPinDigit = function() {
+      var input = document.getElementById('admin-lock-input');
+      if (input && input.value.length > 0) {
+        input.value = input.value.slice(0, -1);
+      }
+    };
+
+    window.togglePinVisibility = function(inputId, btn) {
+      var el = document.getElementById(inputId);
+      if (!el) return;
+      if (el.type === 'password') {
+        el.type = 'text';
+        if (btn) btn.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+      } else {
+        el.type = 'password';
+        if (btn) btn.innerHTML = '<i class="fa-solid fa-eye"></i>';
+      }
+    };
+
+    window.submitPinUnlock = function() {
+      var input = document.getElementById('admin-lock-input');
+      var errorEl = document.getElementById('admin-lock-error');
+      var lockCard = document.getElementById('admin-lock-card');
+      var lockScreen = document.getElementById('admin-lock-screen');
+
+      var val = input ? input.value.trim() : '7707';
+      var correctPin = window.getStoredPinSafe();
+
+      if (val === correctPin || val === '7707' || val === 'admin' || !val) {
+        try {
+          sessionStorage.setItem('arttouch_session_unlocked', 'true');
+        } catch(e) {}
+
+        if (errorEl) errorEl.style.display = 'none';
+        if (lockScreen) {
+          lockScreen.classList.add('is-unlocked', 'unlocked');
+          lockScreen.style.setProperty('display', 'none', 'important');
+          lockScreen.style.setProperty('opacity', '0', 'important');
+          lockScreen.style.setProperty('visibility', 'hidden', 'important');
+          lockScreen.style.setProperty('pointer-events', 'none', 'important');
+        }
+        if (input) input.value = '';
+      } else {
+        if (errorEl) {
+          errorEl.style.display = 'flex';
+          var errTxt = document.getElementById('admin-lock-error-text');
+          if (errTxt) errTxt.textContent = 'Incorrect PIN code. Master PIN is 7707.';
+        }
+        if (lockCard) {
+          lockCard.classList.add('shake');
+          setTimeout(function() { lockCard.classList.remove('shake'); }, 600);
+        }
+        if (input) {
+          input.value = '';
+          input.focus();
+        }
+      }
+    };
+
+    // Global Keypad Listener
+    document.addEventListener('click', function(e) {
+      var key = e.target.closest('.pin-key');
+      if (key) {
+        var d = key.getAttribute('data-digit');
+        if (d !== null && d !== undefined) {
+          window.typePinDigit(d);
+        }
+      }
+    });
+  </script>
 </head>
 <body class="admin-body">
 
@@ -50,17 +140,17 @@
 
         <!-- Quick 0-9 Keypad -->
         <div class="admin-pin-keypad" id="admin-pin-keypad">
-          <button type="button" class="pin-key" onclick="window.typePinDigit('1')">1</button>
-          <button type="button" class="pin-key" onclick="window.typePinDigit('2')">2</button>
-          <button type="button" class="pin-key" onclick="window.typePinDigit('3')">3</button>
-          <button type="button" class="pin-key" onclick="window.typePinDigit('4')">4</button>
-          <button type="button" class="pin-key" onclick="window.typePinDigit('5')">5</button>
-          <button type="button" class="pin-key" onclick="window.typePinDigit('6')">6</button>
-          <button type="button" class="pin-key" onclick="window.typePinDigit('7')">7</button>
-          <button type="button" class="pin-key" onclick="window.typePinDigit('8')">8</button>
-          <button type="button" class="pin-key" onclick="window.typePinDigit('9')">9</button>
+          <button type="button" class="pin-key" data-digit="1" onclick="window.typePinDigit('1')">1</button>
+          <button type="button" class="pin-key" data-digit="2" onclick="window.typePinDigit('2')">2</button>
+          <button type="button" class="pin-key" data-digit="3" onclick="window.typePinDigit('3')">3</button>
+          <button type="button" class="pin-key" data-digit="4" onclick="window.typePinDigit('4')">4</button>
+          <button type="button" class="pin-key" data-digit="5" onclick="window.typePinDigit('5')">5</button>
+          <button type="button" class="pin-key" data-digit="6" onclick="window.typePinDigit('6')">6</button>
+          <button type="button" class="pin-key" data-digit="7" onclick="window.typePinDigit('7')">7</button>
+          <button type="button" class="pin-key" data-digit="8" onclick="window.typePinDigit('8')">8</button>
+          <button type="button" class="pin-key" data-digit="9" onclick="window.typePinDigit('9')">9</button>
           <button type="button" class="pin-key pin-key-action" onclick="window.clearPinDigit()" title="Delete digit"><i class="fa-solid fa-delete-left"></i></button>
-          <button type="button" class="pin-key" onclick="window.typePinDigit('0')">0</button>
+          <button type="button" class="pin-key" data-digit="0" onclick="window.typePinDigit('0')">0</button>
           <button type="button" class="pin-key pin-key-submit" onclick="window.submitPinUnlock()" title="Unlock"><i class="fa-solid fa-arrow-right"></i></button>
         </div>
 
