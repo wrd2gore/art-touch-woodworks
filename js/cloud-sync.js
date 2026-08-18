@@ -65,9 +65,13 @@ const ArtTouchCloudSync = (function() {
   async function fetchLiveProjects(callback) {
     let projects = null;
 
-    // 1. Fetch from Dedicated Cloud Database
+    // 1. Fetch from Dedicated Cloud Database (bypassing any browser cache)
     try {
-      const res = await fetch(CLOUD_PROJECTS_ENDPOINT, { method: 'GET' });
+      const res = await fetch(CLOUD_PROJECTS_ENDPOINT, { 
+        method: 'GET',
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
       if (res.ok) {
         const doc = await res.json();
         if (doc && doc.data && Array.isArray(doc.data.projects) && doc.data.projects.length > 0) {
@@ -126,7 +130,11 @@ const ArtTouchCloudSync = (function() {
     // 2. Dispatch to Dedicated Cloud Database
     try {
       // First get current list
-      const getRes = await fetch(CLOUD_INQUIRIES_ENDPOINT, { method: 'GET' });
+      const getRes = await fetch(CLOUD_INQUIRIES_ENDPOINT, { 
+        method: 'GET',
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
       let currentInquiries = [];
       if (getRes.ok) {
         const doc = await getRes.json();
@@ -174,7 +182,11 @@ const ArtTouchCloudSync = (function() {
     let list = getLocalInquiries();
 
     try {
-      const res = await fetch(CLOUD_INQUIRIES_ENDPOINT, { method: 'GET' });
+      const res = await fetch(CLOUD_INQUIRIES_ENDPOINT, { 
+        method: 'GET',
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
       if (res.ok) {
         const doc = await res.json();
         const remoteInquiries = (doc && doc.data && Array.isArray(doc.data.inquiries)) ? doc.data.inquiries : [];
