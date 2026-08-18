@@ -1,43 +1,25 @@
 function getActiveProjectsList() {
-  try {
-    const cached = localStorage.getItem('arttouch_projects') || localStorage.getItem('arttouch_custom_projects');
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        if (window.ArtTouchData) window.ArtTouchData.projects = parsed;
-        return parsed;
-      } else {
-        // Clear corrupted empty cache
-        localStorage.removeItem('arttouch_projects');
-        localStorage.removeItem('arttouch_custom_projects');
-      }
-    }
-  } catch (e) {}
-
   if (window.ArtTouchData && Array.isArray(window.ArtTouchData.projects) && window.ArtTouchData.projects.length > 0) {
     return window.ArtTouchData.projects;
   }
   if (window.ArtTouchData && Array.isArray(window.ArtTouchData.defaultProjects) && window.ArtTouchData.defaultProjects.length > 0) {
     return window.ArtTouchData.defaultProjects;
   }
+  try {
+    const cached = localStorage.getItem('arttouch_projects') || localStorage.getItem('arttouch_custom_projects');
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (e) {}
   return [];
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Initial immediate render from current available data
   initProjectsFilterPage();
   initProjectDetailsPage();
-
-  // 2. Fetch live updates in background if cloud sync is enabled
-  if (window.ArtTouchCloudSync && window.ArtTouchCloudSync.fetchLiveProjects) {
-    window.ArtTouchCloudSync.fetchLiveProjects((liveList) => {
-      if (Array.isArray(liveList) && liveList.length > 0) {
-        if (window.ArtTouchData) window.ArtTouchData.projects = liveList;
-        initProjectsFilterPage();
-        initProjectDetailsPage();
-      }
-    });
-  }
 });
 
 /* 1. Projects Portfolio Archive (projects.html) */
