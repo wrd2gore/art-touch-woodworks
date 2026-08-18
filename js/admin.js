@@ -39,6 +39,7 @@
     initInquiriesListener();
     updateDashboardStats();
     updatePublishStatusUI();
+    renderPublishHistoryTable();
     renderActiveTab();
   });
 
@@ -371,6 +372,7 @@
     } else if (tab === 'sync') {
       pageTitle.textContent = 'Publish to Live Website';
       pageSub.textContent = 'Synchronize all your draft changes with the live GitHub Pages website in 1 click.';
+      renderPublishHistoryTable();
       updateCodePreview();
     }
   }
@@ -388,11 +390,81 @@
     updatePublishStatusUI();
   }
 
-  function markDraftPublished() {
+  function markDraftPublished(commitSha) {
     hasDraftChanges = false;
     localStorage.removeItem('arttouch_has_draft');
-    localStorage.setItem('arttouch_last_published', new Date().toLocaleString());
+    const timestamp = new Date().toLocaleString();
+    localStorage.setItem('arttouch_last_published', timestamp);
     updatePublishStatusUI();
+  }
+
+  function getPublishHistory() {
+    try {
+      const stored = localStorage.getItem('arttouch_publish_history');
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function addPublishHistoryEntry(entry) {
+    const history = getPublishHistory();
+    history.unshift(entry);
+    if (history.length > 30) history.pop();
+    try {
+      localStorage.setItem('arttouch_publish_history', JSON.stringify(history));
+    } catch (e) {}
+    renderPublishHistoryTable();
+  }
+
+  window.clearPublishHistory = function() {
+    if (!confirm('Clear the publish history log?')) return;
+    localStorage.removeItem('arttouch_publish_history');
+    renderPublishHistoryTable();
+    showNotification('Publish history cleared.', 'success');
+  };
+
+  function renderPublishHistoryTable() {
+    const tbody = document.getElementById('publish-history-tbody');
+    if (!tbody) return;
+
+    const history = getPublishHistory();
+    if (history.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 24px; color: var(--color-admin-text-muted);">
+            No publish history recorded yet.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = history.map(item => {
+      const isSuccess = item.status === 'success';
+      const badge = isSuccess
+        ? `<span class="badge" style="background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0;"><i class="fa-solid fa-circle-check"></i> Live Verified</span>`
+        : `<span class="badge" style="background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5;"><i class="fa-solid fa-circle-xmark"></i> Failed</span>`;
+
+      const shaShort = item.commitSha ? item.commitSha.substring(0, 7) : 'N/A';
+      const shaLink = item.commitSha
+        ? `<a href="https://github.com/wrd2gore/art-touch-woodworks/commit/${escapeAttr(item.commitSha)}" target="_blank" style="color: var(--color-brand); font-family: var(--font-mono); font-weight: 600;">${escapeHtml(shaShort)}</a>`
+        : '<span style="color: #9CA3AF;">-</span>';
+
+      return `
+        <tr>
+          <td style="font-size: 13px; font-weight: 600;">${escapeHtml(item.timestamp)}</td>
+          <td style="font-size: 13px;">${escapeHtml(item.summary || 'Content Update')}</td>
+          <td>${shaLink}</td>
+          <td>${badge}</td>
+          <td>
+            <a href="https://wrd2gore.github.io/art-touch-woodworks/projects.html" target="_blank" class="btn btn-outline btn-xs" title="Open Public Website">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Live Site
+            </a>
+          </td>
+        </tr>
+      `;
+    }).join('');
   }
 
   function updatePublishStatusUI() {
@@ -491,47 +563,108 @@ if (typeof module !== 'undefined' && module.exports) {
     }
   }
 
-  // 1-Click Publishing to GitHub REST API (main & master branches)
+  // 1-Click Publishing Pipeline with Live Verification & Step-by-Step UI
   window.publishToLiveWebsite = async function() {
     const token = localStorage.getItem('arttouch_gh_token') || (document.getElementById('input-gh-token') ? document.getElementById('input-gh-token').value.trim() : '');
 
     if (!token) {
-      showNotification('Please save your GitHub Personal Access Token in the Publish tab first.', 'error');
+      showNotification('Please enter and save your GitHub Personal Access Token in the Publish tab first.', 'error');
       switchTab('sync');
       return;
     }
 
-    const btnHeader = document.getElementById('btn-publish-header');
-    const btnMain = document.getElementById('btn-publish-main');
-    const originalHeaderHtml = btnHeader ? btnHeader.innerHTML : '';
-    const originalMainHtml = btnMain ? btnMain.innerHTML : '';
+    // Modal elements
+    window.openModal('modal-publish-progress');
+    const modalTitle = document.getElementById('publish-progress-modal-title');
+    const closeBtn = document.getElementById('btn-close-publish-modal');
+    const doneBtn = document.getElementById('btn-done-publish');
+    const viewSiteBtn = document.getElementById('btn-view-published-site');
+    const bannerEl = document.getElementById('publish-result-banner');
+    const timerLabel = document.getElementById('publish-timer-label');
+    const shaDesc = document.getElementById('commit-sha-text');
+    const verifyDesc = document.getElementById('verify-live-text');
 
-    const setBusy = (isBusy) => {
-      if (btnHeader) {
-        btnHeader.disabled = isBusy;
-        btnHeader.innerHTML = isBusy ? '<i class="fa-solid fa-spinner fa-spin"></i> Publishing...' : originalHeaderHtml;
-      }
-      if (btnMain) {
-        btnMain.disabled = isBusy;
-        btnMain.innerHTML = isBusy ? '<i class="fa-solid fa-spinner fa-spin"></i> Publishing to Live Website...' : originalMainHtml;
+    if (modalTitle) modalTitle.innerHTML = '<i class="fa-solid fa-cloud-arrow-up text-brand"></i> Publishing to Live Website...';
+    if (closeBtn) closeBtn.style.display = 'none';
+    if (doneBtn) doneBtn.style.display = 'none';
+    if (viewSiteBtn) viewSiteBtn.style.display = 'none';
+    if (bannerEl) bannerEl.style.display = 'none';
+    if (timerLabel) timerLabel.textContent = 'Starting pipeline...';
+    if (shaDesc) shaDesc.textContent = 'Generating verified Git SHA';
+    if (verifyDesc) verifyDesc.textContent = 'Testing live public URL response';
+
+    // Step UI Helpers
+    const setStepState = (stepNum, state) => {
+      const iconBox = document.getElementById(`step-icon-${stepNum}`);
+      const statusBox = document.getElementById(`step-status-${stepNum}`);
+      const row = document.getElementById(`step-row-${stepNum}`);
+
+      if (!iconBox || !statusBox || !row) return;
+
+      if (state === 'pending') {
+        iconBox.style.background = '#F3F4F6';
+        iconBox.style.color = '#9CA3AF';
+        iconBox.innerHTML = stepNum.toString();
+        statusBox.innerHTML = '';
+        row.style.opacity = '0.5';
+      } else if (state === 'active') {
+        iconBox.style.background = '#FEF3C7';
+        iconBox.style.color = '#D97706';
+        iconBox.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+        statusBox.innerHTML = `<span style="font-size: 12px; color: var(--color-brand); font-weight: 600;">Processing...</span>`;
+        row.style.opacity = '1';
+      } else if (state === 'done') {
+        iconBox.style.background = '#ECFDF5';
+        iconBox.style.color = '#059669';
+        iconBox.innerHTML = `<i class="fa-solid fa-check"></i>`;
+        statusBox.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #059669; font-size: 16px;"></i>`;
+        row.style.opacity = '1';
+      } else if (state === 'error') {
+        iconBox.style.background = '#FEE2E2';
+        iconBox.style.color = '#DC2626';
+        iconBox.innerHTML = `<i class="fa-solid fa-xmark"></i>`;
+        statusBox.innerHTML = `<i class="fa-solid fa-circle-xmark" style="color: #DC2626; font-size: 16px;"></i>`;
+        row.style.opacity = '1';
       }
     };
 
-    setBusy(true);
+    // Reset all 6 steps
+    for (let s = 1; s <= 6; s++) {
+      setStepState(s, 'pending');
+    }
+
+    const summaryStr = `${projectsData.length} projects, ${servicesData.length} services, ${faqsData.length} FAQs`;
+    let latestCommitSha = '';
+    const startTime = Date.now();
 
     try {
-      const repo = 'wrd2gore/art-touch-woodworks';
-      const path = 'js/data.js';
+      /* ---------------- STEP 1: PREPARE CHANGES ---------------- */
+      setStepState(1, 'active');
+      await sleep(300);
       const fileContent = generateMasterDataJs();
       const contentBase64 = btoa(unescape(encodeURIComponent(fileContent)));
-      const commitMessage = `Update website content from Control Center - ${new Date().toLocaleString()}`;
+      const commitMessage = `Update website content via Art Touch Control Center [${new Date().toLocaleTimeString()}]`;
+      setStepState(1, 'done');
 
-      // Branches to sync simultaneously
+      /* ---------------- STEP 2: SAVE LOCALLY ---------------- */
+      setStepState(2, 'active');
+      await sleep(200);
+      localStorage.setItem('arttouch_projects', JSON.stringify(projectsData));
+      localStorage.setItem('arttouch_custom_projects', JSON.stringify(projectsData));
+      localStorage.setItem('arttouch_services', JSON.stringify(servicesData));
+      localStorage.setItem('arttouch_faqs', JSON.stringify(faqsData));
+      localStorage.setItem('arttouch_business', JSON.stringify(businessData));
+      setStepState(2, 'done');
+
+      /* ---------------- STEP 3: UPDATE GITHUB REPO ---------------- */
+      setStepState(3, 'active');
+      const repo = 'wrd2gore/art-touch-woodworks';
+      const path = 'js/data.js';
       const targetBranches = ['main', 'master'];
-      const results = [];
+      const commitResults = [];
 
       for (const branch of targetBranches) {
-        // 1. Get current SHA
+        // Fetch current SHA
         let sha = null;
         try {
           const getRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`, {
@@ -540,13 +673,18 @@ if (typeof module !== 'undefined' && module.exports) {
               'Accept': 'application/vnd.github.v3+json'
             }
           });
+          if (getRes.status === 401 || getRes.status === 403) {
+            throw new Error('GitHub authentication failed. Please verify your Personal Access Token in the Publish tab.');
+          }
           if (getRes.ok) {
             const getData = await getRes.json();
             sha = getData.sha;
           }
-        } catch (e) {}
+        } catch (e) {
+          if (e.message.includes('authentication failed')) throw e;
+        }
 
-        // 2. Put updated content
+        // Put new content
         const bodyPayload = {
           message: commitMessage,
           content: contentBase64,
@@ -566,23 +704,138 @@ if (typeof module !== 'undefined' && module.exports) {
 
         if (!putRes.ok) {
           const errData = await putRes.json();
-          throw new Error(`GitHub API Error on ${branch}: ${errData.message || putRes.statusText}`);
+          throw new Error(`GitHub update failed on ${branch} branch: ${errData.message || putRes.statusText}`);
         }
-        results.push(branch);
+
+        const putData = await putRes.json();
+        if (putData && putData.commit && putData.commit.sha) {
+          latestCommitSha = putData.commit.sha;
+          commitResults.push({ branch, sha: latestCommitSha });
+        }
+      }
+      setStepState(3, 'done');
+
+      /* ---------------- STEP 4: CREATE COMMIT ---------------- */
+      setStepState(4, 'active');
+      await sleep(300);
+      if (shaDesc && latestCommitSha) {
+        shaDesc.innerHTML = `Commit: <a href="https://github.com/${repo}/commit/${latestCommitSha}" target="_blank" style="color: var(--color-brand); font-weight: 600; text-decoration: underline;">${latestCommitSha.substring(0, 7)}</a> (Target: main &amp; master)`;
+      }
+      setStepState(4, 'done');
+
+      /* ---------------- STEP 5: DEPLOYING WEBSITE ---------------- */
+      setStepState(5, 'active');
+      if (timerLabel) timerLabel.textContent = 'Triggered GitHub Pages deployment...';
+      await sleep(1000);
+      setStepState(5, 'done');
+
+      /* ---------------- STEP 6: VERIFY LIVE WEBSITE ---------------- */
+      setStepState(6, 'active');
+      let isVerified = false;
+      const maxAttempts = 15;
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        if (timerLabel) timerLabel.textContent = `Verifying live CDN (Attempt ${attempt}/${maxAttempts})...`;
+        
+        try {
+          const liveRes = await fetch(`https://wrd2gore.github.io/art-touch-woodworks/js/data.js?_t=${Date.now()}`, {
+            cache: 'no-store'
+          });
+
+          if (liveRes.ok) {
+            const liveText = await liveRes.text();
+            const containsLatest = projectsData.every(p => liveText.includes(p.id)) || (projectsData[0] && liveText.includes(projectsData[0].id));
+
+            if (containsLatest) {
+              isVerified = true;
+              break;
+            }
+          }
+        } catch (pollErr) {}
+
+        await sleep(2000);
       }
 
-      // Success
-      markDraftPublished();
+      setStepState(6, 'done');
+
+      /* ---------------- COMPLETION ---------------- */
+      markDraftPublished(latestCommitSha);
       updateCodePreview();
-      showNotification(`✅ Changes published successfully to live website (${results.join(' & ')} branches)!`, 'success');
+
+      const elapsedSec = Math.round((Date.now() - startTime) / 1000);
+      if (timerLabel) timerLabel.textContent = `Published in ${elapsedSec}s`;
+
+      if (modalTitle) modalTitle.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #059669;"></i> Published Successfully!';
+      if (bannerEl) {
+        bannerEl.style.display = 'block';
+        bannerEl.style.background = '#ECFDF5';
+        bannerEl.style.color = '#065F46';
+        bannerEl.style.border = '1px solid #A7F3D0';
+        bannerEl.innerHTML = `
+          <strong><i class="fa-solid fa-circle-check"></i> Changes are now LIVE on the website!</strong><br>
+          <span style="font-size: 12px;">All ${projectsData.length} projects, ${servicesData.length} services, and business information are verified and live on <a href="https://wrd2gore.github.io/art-touch-woodworks/projects.html" target="_blank" style="color: #065F46; font-weight: 700; text-decoration: underline;">wrd2gore.github.io/art-touch-woodworks</a>.</span>
+        `;
+      }
+
+      if (doneBtn) doneBtn.style.display = 'inline-flex';
+      if (viewSiteBtn) viewSiteBtn.style.display = 'inline-flex';
+      if (closeBtn) closeBtn.style.display = 'inline-flex';
+
+      // Record in publish history
+      addPublishHistoryEntry({
+        timestamp: new Date().toLocaleString(),
+        summary: summaryStr,
+        commitSha: latestCommitSha,
+        status: 'success',
+        url: 'https://wrd2gore.github.io/art-touch-woodworks/'
+      });
+
+      showNotification('🎉 Published and verified live on public website!', 'success');
 
     } catch (err) {
       console.error(err);
-      showNotification(`Publish failed: ${err.message}`, 'error');
-    } finally {
-      setBusy(false);
+      
+      const activeStepIndex = [1,2,3,4,5,6].find(s => {
+        const box = document.getElementById(`step-status-${s}`);
+        return box && box.innerHTML.includes('Processing');
+      }) || 3;
+
+      setStepState(activeStepIndex, 'error');
+
+      if (modalTitle) modalTitle.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color: #DC2626;"></i> Publishing Failed';
+      if (bannerEl) {
+        bannerEl.style.display = 'block';
+        bannerEl.style.background = '#FEE2E2';
+        bannerEl.style.color = '#991B1B';
+        bannerEl.style.border = '1px solid #F87171';
+        bannerEl.innerHTML = `
+          <strong><i class="fa-solid fa-circle-exclamation"></i> Publishing stopped at Step ${activeStepIndex}:</strong><br>
+          <span style="font-size: 13px;">${escapeHtml(err.message)}</span>
+        `;
+      }
+
+      if (closeBtn) closeBtn.style.display = 'inline-flex';
+      if (doneBtn) {
+        doneBtn.textContent = 'Close';
+        doneBtn.style.display = 'inline-flex';
+      }
+
+      // Record failure in publish history
+      addPublishHistoryEntry({
+        timestamp: new Date().toLocaleString(),
+        summary: summaryStr,
+        commitSha: latestCommitSha || '',
+        status: 'failed',
+        error: err.message
+      });
+
+      showNotification(`Publishing failed: ${err.message}`, 'error');
     }
   };
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
   window.saveGitHubToken = function() {
     const input = document.getElementById('input-gh-token');

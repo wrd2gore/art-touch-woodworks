@@ -480,6 +480,37 @@
           </div>
         </div>
 
+        <!-- Publish History Card -->
+        <div class="admin-card" style="margin-bottom: 24px;">
+          <div class="admin-card-header">
+            <div>
+              <h3 class="admin-card-title"><i class="fa-solid fa-clock-rotate-left"></i> Publish History</h3>
+              <p style="font-size: 12px; color: var(--color-admin-text-muted); margin: 2px 0 0 0;">
+                Log of published deployments, commit hashes, and verification statuses.
+              </p>
+            </div>
+            <button type="button" class="btn btn-outline btn-xs" onclick="window.clearPublishHistory()">
+              <i class="fa-solid fa-trash"></i> Clear Log
+            </button>
+          </div>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Date &amp; Time</th>
+                  <th>Changed Content</th>
+                  <th>GitHub Commit</th>
+                  <th>Deployment Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="publish-history-tbody">
+                <!-- Dynamically populated by js/admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- Direct Export / Backup -->
         <div class="admin-card">
           <div class="admin-card-header">
@@ -501,6 +532,78 @@
 
     </div>
   </main>
+
+  <!-- MODAL 5: Live Publishing Progress & Live CDN Verification -->
+  <div class="admin-modal-overlay" id="modal-publish-progress" role="dialog" aria-modal="true">
+    <div class="admin-modal" style="max-width: 580px;">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title" id="publish-progress-modal-title">
+          <i class="fa-solid fa-cloud-arrow-up text-brand"></i> Publishing to Live Website
+        </h3>
+        <button type="button" class="btn-close admin-modal-close" id="btn-close-publish-modal" onclick="window.closeModal('modal-publish-progress')" style="display: none;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="admin-modal-body" style="padding: 24px;">
+        
+        <!-- Live Publishing Step List -->
+        <div class="publish-steps-list" id="publish-steps-list" style="display: flex; flex-direction: column; gap: 14px;">
+          
+          <div class="publish-step-row" id="step-row-1" style="display: flex; align-items: center; gap: 12px; font-size: 14px;">
+            <div class="step-icon-box" id="step-icon-1" style="width: 28px; height: 28px; border-radius: 50%; background: #F3F4F6; color: #9CA3AF; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">1</div>
+            <div class="step-text" style="flex: 1;"><strong>Preparing changes...</strong> <span class="step-desc" style="display: block; font-size: 12px; color: var(--color-admin-text-muted);">Packaging projects, services, FAQs, and business data</span></div>
+            <div class="step-status" id="step-status-1"><i class="fa-solid fa-circle-notch fa-spin text-brand" style="display: none;"></i></div>
+          </div>
+
+          <div class="publish-step-row" id="step-row-2" style="display: flex; align-items: center; gap: 12px; font-size: 14px;">
+            <div class="step-icon-box" id="step-icon-2" style="width: 28px; height: 28px; border-radius: 50%; background: #F3F4F6; color: #9CA3AF; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">2</div>
+            <div class="step-text" style="flex: 1;"><strong>Saving changes locally...</strong> <span class="step-desc" style="display: block; font-size: 12px; color: var(--color-admin-text-muted);">Syncing to local application database</span></div>
+            <div class="step-status" id="step-status-2"></div>
+          </div>
+
+          <div class="publish-step-row" id="step-row-3" style="display: flex; align-items: center; gap: 12px; font-size: 14px;">
+            <div class="step-icon-box" id="step-icon-3" style="width: 28px; height: 28px; border-radius: 50%; background: #F3F4F6; color: #9CA3AF; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">3</div>
+            <div class="step-text" style="flex: 1;"><strong>Updating GitHub repository...</strong> <span class="step-desc" style="display: block; font-size: 12px; color: var(--color-admin-text-muted);">Pushing database to main and master branches</span></div>
+            <div class="step-status" id="step-status-3"></div>
+          </div>
+
+          <div class="publish-step-row" id="step-row-4" style="display: flex; align-items: center; gap: 12px; font-size: 14px;">
+            <div class="step-icon-box" id="step-icon-4" style="width: 28px; height: 28px; border-radius: 50%; background: #F3F4F6; color: #9CA3AF; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">4</div>
+            <div class="step-text" style="flex: 1;"><strong>Creating commit...</strong> <span class="step-desc" id="commit-sha-text" style="display: block; font-size: 12px; color: var(--color-admin-text-muted);">Generating verified Git SHA</span></div>
+            <div class="step-status" id="step-status-4"></div>
+          </div>
+
+          <div class="publish-step-row" id="step-row-5" style="display: flex; align-items: center; gap: 12px; font-size: 14px;">
+            <div class="step-icon-box" id="step-icon-5" style="width: 28px; height: 28px; border-radius: 50%; background: #F3F4F6; color: #9CA3AF; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">5</div>
+            <div class="step-text" style="flex: 1;"><strong>Deploying website...</strong> <span class="step-desc" style="display: block; font-size: 12px; color: var(--color-admin-text-muted);">Triggering GitHub Pages CDN deployment</span></div>
+            <div class="step-status" id="step-status-5"></div>
+          </div>
+
+          <div class="publish-step-row" id="step-row-6" style="display: flex; align-items: center; gap: 12px; font-size: 14px;">
+            <div class="step-icon-box" id="step-icon-6" style="width: 28px; height: 28px; border-radius: 50%; background: #F3F4F6; color: #9CA3AF; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">6</div>
+            <div class="step-text" style="flex: 1;"><strong>Verifying live website...</strong> <span class="step-desc" id="verify-live-text" style="display: block; font-size: 12px; color: var(--color-admin-text-muted);">Testing live public URL response</span></div>
+            <div class="step-status" id="step-status-6"></div>
+          </div>
+
+        </div>
+
+        <!-- Result Box (Success / Error) -->
+        <div id="publish-result-banner" style="display: none; margin-top: 20px; padding: 16px; border-radius: 6px; font-size: 13px; line-height: 1.5;"></div>
+
+      </div>
+      <div class="admin-modal-footer" id="publish-modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <span id="publish-timer-label" style="font-size: 12px; color: var(--color-admin-text-muted);"></span>
+        <div style="display: flex; gap: 8px;">
+          <a href="https://wrd2gore.github.io/art-touch-woodworks/projects.html" target="_blank" class="btn btn-outline btn-sm" id="btn-view-published-site" style="display: none;">
+            <i class="fa-solid fa-globe"></i> Open Live Site
+          </a>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-done-publish" onclick="window.closeModal('modal-publish-progress')" style="display: none;">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL 1: Project Editor & Dedicated Gallery Manager -->
   <div class="admin-modal-overlay" id="modal-project-editor" role="dialog" aria-modal="true">

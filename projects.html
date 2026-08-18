@@ -400,106 +400,200 @@
   <script src="js/search.js"></script>
   <script src="js/main.js"></script>
 
-  <!-- Global Ultra-Reliable Category Filter Engine -->
+  <!-- Live Data-Driven Project Engine & Category Filter -->
   <script>
-    window.filterProjects = function(cat, btnEl) {
-      if (!cat) cat = 'all';
-      var normCat = cat.toLowerCase().trim();
-      var nav = document.getElementById('projects-filter-nav');
-      var container = document.getElementById('projects-grid-container');
-      var searchInput = document.getElementById('projects-search-input');
-      var pageTitle = document.getElementById('projects-page-title');
-      if (!container) return;
+    (function() {
+      function escapeHtml(str) {
+        if (!str) return '';
+        var div = document.createElement('div');
+        div.innerText = str;
+        return div.innerHTML;
+      }
 
-      // 1. Update button active states
-      if (nav) {
-        var btns = nav.querySelectorAll('.filter-btn');
-        for (var i = 0; i < btns.length; i++) {
-          btns[i].classList.remove('active');
-          btns[i].setAttribute('aria-selected', 'false');
+      function escapeAttr(str) {
+        if (!str) return '';
+        return String(str).replace(/"/g, '&quot;');
+      }
+
+      function renderProjectsFromData() {
+        if (!window.ArtTouchData || !Array.isArray(window.ArtTouchData.projects) || window.ArtTouchData.projects.length === 0) {
+          return;
         }
-      }
-      if (btnEl) {
-        btnEl.classList.add('active');
-        btnEl.setAttribute('aria-selected', 'true');
-      } else if (nav) {
-        var targetBtn = nav.querySelector('[data-filter="' + normCat + '"]') || nav.querySelector('[data-filter="all"]');
-        if (targetBtn) {
-          targetBtn.classList.add('active');
-          targetBtn.setAttribute('aria-selected', 'true');
-        }
-      }
 
-      // 2. Clear search input on tab change
-      if (searchInput && btnEl) searchInput.value = '';
+        var container = document.getElementById('projects-grid-container');
+        var nav = document.getElementById('projects-filter-nav');
+        if (!container) return;
 
-      // 3. Update Title
-      if (pageTitle) {
-        if (normCat === 'all') pageTitle.textContent = 'Projects';
-        else if (normCat === 'banks') pageTitle.textContent = 'Banks';
-        else if (normCat === 'commercial') pageTitle.textContent = 'Commercial Projects';
-        else if (normCat === 'residential') pageTitle.textContent = 'Residential Projects';
-        else if (normCat === 'embassies') pageTitle.textContent = 'EMBASSIES';
-        else if (normCat === 'government-projects') pageTitle.textContent = 'Government Projects';
-        else pageTitle.textContent = normCat.toUpperCase();
-      }
+        var projects = window.ArtTouchData.projects;
 
-      // 4. Filter Cards
-      var cards = container.querySelectorAll('.authentic-project-card');
-      for (var j = 0; j < cards.length; j++) {
-        var card = cards[j];
-        var cardCat = (card.getAttribute('data-category') || '').toLowerCase().trim();
-        if (normCat === 'all' || cardCat === normCat) {
-          card.style.setProperty('display', 'flex', 'important');
-          card.style.setProperty('opacity', '1', 'important');
-          card.style.setProperty('visibility', 'visible', 'important');
-        } else {
-          card.style.setProperty('display', 'none', 'important');
-        }
-      }
-    };
+        // 1. Calculate dynamic category counts
+        var totalCount = projects.length;
+        var counts = {
+          'all': totalCount,
+          'banks': 0,
+          'commercial': 0,
+          'residential': 0,
+          'embassies': 0,
+          'government-projects': 0
+        };
 
-    // Live search listener
-    document.addEventListener('DOMContentLoaded', function() {
-      var searchInput = document.getElementById('projects-search-input');
-      var container = document.getElementById('projects-grid-container');
-      if (searchInput && container) {
-        searchInput.value = '';
-        searchInput.addEventListener('input', function(e) {
-          var q = (e.target.value || '').toLowerCase().trim();
-          var nav = document.getElementById('projects-filter-nav');
-          var activeBtn = nav ? nav.querySelector('.filter-btn.active') : null;
-          var activeCat = activeBtn ? (activeBtn.getAttribute('data-filter') || 'all') : 'all';
-          var normCat = activeCat.toLowerCase().trim();
-
-          var cards = container.querySelectorAll('.authentic-project-card');
-          for (var j = 0; j < cards.length; j++) {
-            var card = cards[j];
-            var cardCat = (card.getAttribute('data-category') || '').toLowerCase().trim();
-            var title = (card.querySelector('.project-pill-btn') ? card.querySelector('.project-pill-btn').textContent : '').toLowerCase();
-            var catMatch = (normCat === 'all' || cardCat === normCat);
-            var queryMatch = (!q || title.indexOf(q) !== -1 || cardCat.indexOf(q) !== -1);
-
-            if (catMatch && queryMatch) {
-              card.style.setProperty('display', 'flex', 'important');
-              card.style.setProperty('opacity', '1', 'important');
-              card.style.setProperty('visibility', 'visible', 'important');
-            } else {
-              card.style.setProperty('display', 'none', 'important');
-            }
+        projects.forEach(function(p) {
+          var catSlug = (p.category || '').toLowerCase().replace(/\s+/g, '-');
+          if (counts[catSlug] !== undefined) {
+            counts[catSlug]++;
           }
         });
+
+        // 2. Update category filter buttons HTML
+        if (nav) {
+          nav.innerHTML = `
+            <button type="button" class="filter-btn active" data-filter="all" onclick="filterProjects('all', this)" role="tab" aria-selected="true">
+              All Projects <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(${counts['all']})</span>
+            </button>
+            <button type="button" class="filter-btn" data-filter="banks" onclick="filterProjects('banks', this)" role="tab" aria-selected="false">
+              Banks <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(${counts['banks']})</span>
+            </button>
+            <button type="button" class="filter-btn" data-filter="commercial" onclick="filterProjects('commercial', this)" role="tab" aria-selected="false">
+              Commercial <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(${counts['commercial']})</span>
+            </button>
+            <button type="button" class="filter-btn" data-filter="residential" onclick="filterProjects('residential', this)" role="tab" aria-selected="false">
+              Residential <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(${counts['residential']})</span>
+            </button>
+            <button type="button" class="filter-btn" data-filter="embassies" onclick="filterProjects('embassies', this)" role="tab" aria-selected="false">
+              Embassies <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(${counts['embassies']})</span>
+            </button>
+            <button type="button" class="filter-btn" data-filter="government-projects" onclick="filterProjects('government-projects', this)" role="tab" aria-selected="false">
+              Government Projects <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(${counts['government-projects']})</span>
+            </button>
+          `;
+        }
+
+        // 3. Render project cards
+        container.innerHTML = projects.map(function(p) {
+          var catSlug = (p.category || '').toLowerCase().replace(/\s+/g, '-');
+          var cover = p.coverImage || (p.gallery && p.gallery.length > 0 ? p.gallery[0] : '');
+          var imgSrc = cover || 'images/logo/art-touch-logo.png';
+          var isFallback = !cover;
+
+          return `
+            <article class="authentic-project-card" data-category="${escapeAttr(catSlug)}">
+              <a href="project-details.html?id=${encodeURIComponent(p.id)}" class="project-thumb-box" title="${escapeAttr(p.title)}">
+                <img src="${escapeAttr(imgSrc)}" 
+                     alt="${escapeAttr(p.title)}" 
+                     loading="lazy" 
+                     decoding="async" 
+                     style="${isFallback ? 'padding: 40px; object-fit: contain;' : ''}"
+                     onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+              </a>
+              <a href="project-details.html?id=${encodeURIComponent(p.id)}" class="project-pill-btn">
+                ${escapeHtml(p.title)}
+              </a>
+            </article>
+          `;
+        }).join('');
       }
 
-      // Check URL param ?cat=...
-      var params = new URLSearchParams(window.location.search);
-      var initial = params.get('cat');
-      if (initial) {
-        window.filterProjects(initial);
-      } else {
-        window.filterProjects('all');
-      }
-    });
+      window.filterProjects = function(cat, btnEl) {
+        if (!cat) cat = 'all';
+        var normCat = cat.toLowerCase().trim();
+        var nav = document.getElementById('projects-filter-nav');
+        var container = document.getElementById('projects-grid-container');
+        var searchInput = document.getElementById('projects-search-input');
+        var pageTitle = document.getElementById('projects-page-title');
+        if (!container) return;
+
+        // 1. Update button active states
+        if (nav) {
+          var btns = nav.querySelectorAll('.filter-btn');
+          for (var i = 0; i < btns.length; i++) {
+            btns[i].classList.remove('active');
+            btns[i].setAttribute('aria-selected', 'false');
+          }
+        }
+        if (btnEl) {
+          btnEl.classList.add('active');
+          btnEl.setAttribute('aria-selected', 'true');
+        } else if (nav) {
+          var targetBtn = nav.querySelector('[data-filter="' + normCat + '"]') || nav.querySelector('[data-filter="all"]');
+          if (targetBtn) {
+            targetBtn.classList.add('active');
+            targetBtn.setAttribute('aria-selected', 'true');
+          }
+        }
+
+        // 2. Clear search input on tab change
+        if (searchInput && btnEl) searchInput.value = '';
+
+        // 3. Update Title
+        if (pageTitle) {
+          if (normCat === 'all') pageTitle.textContent = 'Projects';
+          else if (normCat === 'banks') pageTitle.textContent = 'Banks';
+          else if (normCat === 'commercial') pageTitle.textContent = 'Commercial Projects';
+          else if (normCat === 'residential') pageTitle.textContent = 'Residential Projects';
+          else if (normCat === 'embassies') pageTitle.textContent = 'EMBASSIES';
+          else if (normCat === 'government-projects') pageTitle.textContent = 'Government Projects';
+          else pageTitle.textContent = normCat.toUpperCase();
+        }
+
+        // 4. Filter Cards
+        var cards = container.querySelectorAll('.authentic-project-card');
+        for (var j = 0; j < cards.length; j++) {
+          var card = cards[j];
+          var cardCat = (card.getAttribute('data-category') || '').toLowerCase().trim();
+          if (normCat === 'all' || cardCat === normCat) {
+            card.style.setProperty('display', 'flex', 'important');
+            card.style.setProperty('opacity', '1', 'important');
+            card.style.setProperty('visibility', 'visible', 'important');
+          } else {
+            card.style.setProperty('display', 'none', 'important');
+          }
+        }
+      };
+
+      // Live search and initialization
+      document.addEventListener('DOMContentLoaded', function() {
+        renderProjectsFromData();
+
+        var searchInput = document.getElementById('projects-search-input');
+        var container = document.getElementById('projects-grid-container');
+        if (searchInput && container) {
+          searchInput.value = '';
+          searchInput.addEventListener('input', function(e) {
+            var q = (e.target.value || '').toLowerCase().trim();
+            var nav = document.getElementById('projects-filter-nav');
+            var activeBtn = nav ? nav.querySelector('.filter-btn.active') : null;
+            var activeCat = activeBtn ? (activeBtn.getAttribute('data-filter') || 'all') : 'all';
+            var normCat = activeCat.toLowerCase().trim();
+
+            var cards = container.querySelectorAll('.authentic-project-card');
+            for (var j = 0; j < cards.length; j++) {
+              var card = cards[j];
+              var cardCat = (card.getAttribute('data-category') || '').toLowerCase().trim();
+              var title = (card.querySelector('.project-pill-btn') ? card.querySelector('.project-pill-btn').textContent : '').toLowerCase();
+              var catMatch = (normCat === 'all' || cardCat === normCat);
+              var queryMatch = (!q || title.indexOf(q) !== -1 || cardCat.indexOf(q) !== -1);
+
+              if (catMatch && queryMatch) {
+                card.style.setProperty('display', 'flex', 'important');
+                card.style.setProperty('opacity', '1', 'important');
+                card.style.setProperty('visibility', 'visible', 'important');
+              } else {
+                card.style.setProperty('display', 'none', 'important');
+              }
+            }
+          });
+        }
+
+        // Check URL param ?cat=...
+        var params = new URLSearchParams(window.location.search);
+        var initial = params.get('cat');
+        if (initial) {
+          window.filterProjects(initial);
+        } else {
+          window.filterProjects('all');
+        }
+      });
+    })();
   </script>
 </body>
 </html>
