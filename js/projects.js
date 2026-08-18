@@ -1,7 +1,4 @@
 function getActiveProjectsList() {
-  if (window.ArtTouchData && Array.isArray(window.ArtTouchData.projects) && window.ArtTouchData.projects.length > 0) {
-    return window.ArtTouchData.projects;
-  }
   try {
     const cached = localStorage.getItem('arttouch_projects') || localStorage.getItem('arttouch_custom_projects');
     if (cached) {
@@ -9,9 +6,20 @@ function getActiveProjectsList() {
       if (Array.isArray(parsed) && parsed.length > 0) {
         if (window.ArtTouchData) window.ArtTouchData.projects = parsed;
         return parsed;
+      } else {
+        // Clear corrupted empty cache
+        localStorage.removeItem('arttouch_projects');
+        localStorage.removeItem('arttouch_custom_projects');
       }
     }
   } catch (e) {}
+
+  if (window.ArtTouchData && Array.isArray(window.ArtTouchData.projects) && window.ArtTouchData.projects.length > 0) {
+    return window.ArtTouchData.projects;
+  }
+  if (window.ArtTouchData && Array.isArray(window.ArtTouchData.defaultProjects) && window.ArtTouchData.defaultProjects.length > 0) {
+    return window.ArtTouchData.defaultProjects;
+  }
   return [];
 }
 
