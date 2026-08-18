@@ -357,6 +357,9 @@
     }
     updateDashboardStats();
     updateCodePreview();
+
+    // Auto-push directly to GitHub repository & Vercel
+    syncDirectlyToGitHub();
   }
 
   window.restoreDefaultProjects = function() {
@@ -765,8 +768,100 @@ if (typeof module !== 'undefined' && module.exports) {
     }
   }
 
+  // 7. Direct GitHub API Auto-Committer & Live Deployment Sync
+  const GITHUB_REPO = 'wrd2gore/art-touch-woodworks';
+  const GITHUB_BRANCH = 'main';
+
+  function getGitHubToken() {
+    try {
+      const stored = localStorage.getItem('arttouch_gh_token');
+      if (stored) return stored;
+    } catch (e) {}
+    // Dynamic runtime token injection for authorized workspace sessions
+    return (window.__ARTTOUCH_GH_TOKEN__ || '');
+  }
+
+  async function syncDirectlyToGitHub(customCommitMsg) {
+    const statusEl = document.getElementById('github-sync-indicator');
+    if (statusEl) {
+      statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Auto-publishing to GitHub & Vercel...</span>';
+      statusEl.style.color = '#D97706';
+      statusEl.style.background = '#FEF3C7';
+      statusEl.style.borderColor = '#FDE68A';
+    }
+
+    try {
+      const code = generateDataJsSource();
+      const utf8Bytes = new TextEncoder().encode(code);
+      let binary = '';
+      for (let i = 0; i < utf8Bytes.byteLength; i++) {
+        binary += String.fromCharCode(utf8Bytes[i]);
+      }
+      const base64Content = btoa(binary);
+
+      const token = getGitHubToken();
+      if (!token) {
+        console.log('GitHub direct auto-sync ready (local cache active)');
+        return;
+      }
+
+      // 1. Get current file SHA on main branch
+      const getRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/js/data.js?ref=${GITHUB_BRANCH}`, {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+
+      let currentSha = null;
+      if (getRes.ok) {
+        const fileData = await getRes.json();
+        currentSha = fileData.sha;
+      }
+
+      // 2. Commit updated data.js directly to GitHub
+      const putBody = {
+        message: customCommitMsg || `Auto-update portfolio via Art Touch Control Center [${new Date().toLocaleTimeString()}]`,
+        content: base64Content,
+        branch: GITHUB_BRANCH
+      };
+      if (currentSha) {
+        putBody.sha = currentSha;
+      }
+
+      const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/js/data.js`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.github.v3+json'
+        },
+        body: JSON.stringify(putBody)
+      });
+
+      if (putRes.ok) {
+        console.log('Successfully committed to GitHub main branch!');
+        if (statusEl) {
+          statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Published Live to GitHub & Vercel!</span>';
+          statusEl.style.color = '#059669';
+          statusEl.style.background = '#ECFDF5';
+          statusEl.style.borderColor = '#A7F3D0';
+          setTimeout(() => {
+            statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>GitHub & Vercel Connected</span>';
+          }, 5000);
+        }
+      } else {
+        const errData = await putRes.json();
+        console.warn('GitHub API response:', errData);
+      }
+    } catch (err) {
+      console.warn('GitHub direct sync note:', err);
+    }
+  }
+
+  window.syncDirectlyToGitHub = syncDirectlyToGitHub;
   window.publishToGitHub = function() {
-    alert('To publish your latest changes live to https://wrd2gore.github.io/art-touch-woodworks/:\n\n1. Run the "sync_github.bat" file in your project folder, OR\n2. The automated GitHub background publisher will sync your repository automatically within seconds!');
+    syncDirectlyToGitHub('Manual 1-click publish from Art Touch Control Center');
   };
 
   // 7. Dashboard Stats Counter
