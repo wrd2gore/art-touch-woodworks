@@ -139,41 +139,55 @@ function initProjectsFilterPage() {
     if (window.initCardTiltEffect) window.initCardTiltEffect();
   };
 
-  // 1.3 Read URL initial category
-  const urlParams = new URLSearchParams(window.location.search);
-  const initialCategory = urlParams.get('cat') || 'all';
-  renderCards(initialCategory);
-
-  // Set active class on corresponding button
-  if (filterNav && initialCategory !== 'all') {
-    const matchingBtn = filterNav.querySelector(`[data-filter="${initialCategory.toLowerCase().replace(/\s+/g, '-')}"]`);
-    if (matchingBtn) {
-      filterNav.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      matchingBtn.classList.add('active');
-    }
-  }
-
-  // 1.4 Event Listeners
+  // 1.3 Event Delegation on Filter Container
   if (filterNav) {
-    filterNav.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        filterNav.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const cat = btn.getAttribute('data-filter') || 'all';
-        const query = searchInput ? searchInput.value : '';
-        renderCards(cat, query);
+    filterNav.onclick = function(e) {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      filterNav.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
       });
-    });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      const cat = btn.getAttribute('data-filter') || 'all';
+      const query = searchInput ? searchInput.value : '';
+      renderCards(cat, query);
+    };
   }
 
+  // 1.4 Global Filter Function
+  window.filterProjectsByCategory = function(cat) {
+    if (!cat) cat = 'all';
+    const norm = cat.toLowerCase().replace(/\s+/g, '-');
+    if (filterNav) {
+      const targetBtn = filterNav.querySelector(`[data-filter="${norm}"]`) || filterNav.querySelector(`[data-filter="all"]`);
+      if (targetBtn) {
+        filterNav.querySelectorAll('.filter-btn').forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        targetBtn.classList.add('active');
+        targetBtn.setAttribute('aria-selected', 'true');
+      }
+    }
+    const query = searchInput ? searchInput.value : '';
+    renderCards(norm, query);
+  };
+
+  // 1.5 Live Search Input
   if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
+    searchInput.oninput = function(e) {
       const activeBtn = filterNav ? filterNav.querySelector('.filter-btn.active') : null;
       const cat = activeBtn ? activeBtn.getAttribute('data-filter') : 'all';
       renderCards(cat, e.target.value);
-    });
+    };
   }
-}
+
+  // 1.6 Read URL initial category
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialCategory = urlParams.get('cat') || 'all';
+  window.filterProjectsByCategory(initialCategory);
 
 /* 2. Dynamic Project Details & Dedicated Gallery (project-details.html?id=...) */
 function initProjectDetailsPage() {

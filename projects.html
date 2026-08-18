@@ -401,16 +401,5 @@
   <script src="js/search.js"></script>
   <script src="js/projects.js"></script>
   <script src="js/main.js"></script>
-  <script>
-    // Handle category filter passed via URL query parameter (e.g., ?cat=residential)
-    document.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const cat = urlParams.get('cat');
-      if (cat) {
-        const btn = document.querySelector(`.filter-btn[data-filter="${cat}"]`);
-        if (btn) btn.click();
-      }
-    });
-  </script>
 </body>
 </html>
