@@ -33,12 +33,6 @@ function initProjectsFilterPage() {
 
   if (!filterContainer) return;
 
-  // If HTML already contains static cards, preserve them and skip innerHTML overwrite
-  if (filterContainer.querySelectorAll('.authentic-project-card').length >= 14) {
-    if (window.initCardTiltEffect) window.initCardTiltEffect();
-    return;
-  }
-
   const allProjects = getActiveProjectsList();
   if (allProjects.length === 0) {
     filterContainer.innerHTML = `

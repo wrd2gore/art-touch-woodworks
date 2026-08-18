@@ -1116,7 +1116,7 @@ if (typeof module !== 'undefined' && module.exports) {
       /* ---------------- STEP 6: VERIFY LIVE WEBSITE ---------------- */
       setStepState(6, 'active');
       let isVerified = false;
-      const maxAttempts = 18; // 18 * 2.5s = 45 seconds
+      const maxAttempts = 24; // 24 * 3s = 72 seconds
 
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         if (timerLabel) timerLabel.textContent = `Verifying live CDN (Attempt ${attempt}/${maxAttempts})...`;
@@ -1136,7 +1136,11 @@ if (typeof module !== 'undefined' && module.exports) {
           }
         } catch (pollErr) {}
 
-        await sleep(2500);
+        await sleep(3000);
+      }
+
+      if (!isVerified) {
+        throw new Error(`Deployment verification timed out after 72 seconds. GitHub Pages is still building and deploying your commit (Build ID: ${targetBuildId}). The live CDN has not served the new version yet. Please wait 1 minute and check the Live Website Preview.`);
       }
 
       setStepState(6, 'done');
