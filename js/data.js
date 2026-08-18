@@ -358,10 +358,13 @@ const ArtTouchData = {
   ]
 };
 
+// Store pristine default projects snapshot for reset / restoration
+ArtTouchData.defaultProjects = JSON.parse(JSON.stringify(ArtTouchData.projects));
+
 // Dynamic Custom Projects Sync from local/cloud store
 try {
   if (typeof localStorage !== 'undefined') {
-    const customProjects = localStorage.getItem('arttouch_projects');
+    const customProjects = localStorage.getItem('arttouch_projects') || localStorage.getItem('arttouch_custom_projects');
     if (customProjects) {
       const parsed = JSON.parse(customProjects);
       if (Array.isArray(parsed) && parsed.length > 0) {

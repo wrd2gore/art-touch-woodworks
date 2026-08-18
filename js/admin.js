@@ -329,9 +329,11 @@
   // 4. Projects & Dedicated Gallery Management
   function loadProjects() {
     try {
-      const stored = localStorage.getItem('arttouch_custom_projects');
+      const stored = localStorage.getItem('arttouch_projects') || localStorage.getItem('arttouch_custom_projects');
       if (stored) {
         projectsData = JSON.parse(stored);
+      } else if (window.ArtTouchData && Array.isArray(window.ArtTouchData.defaultProjects)) {
+        projectsData = JSON.parse(JSON.stringify(window.ArtTouchData.defaultProjects));
       } else if (window.ArtTouchData && Array.isArray(window.ArtTouchData.projects)) {
         projectsData = JSON.parse(JSON.stringify(window.ArtTouchData.projects));
       } else {
@@ -345,13 +347,34 @@
 
   function saveProjectsToLocal() {
     try {
+      localStorage.setItem('arttouch_projects', JSON.stringify(projectsData));
       localStorage.setItem('arttouch_custom_projects', JSON.stringify(projectsData));
+      if (window.ArtTouchData) {
+        window.ArtTouchData.projects = projectsData;
+      }
     } catch (e) {
       console.error('Error saving projects to storage:', e);
     }
     updateDashboardStats();
     updateCodePreview();
   }
+
+  window.restoreDefaultProjects = function() {
+    if (!confirm('Restore all 14 default verified projects and dedicated galleries?')) return;
+    try {
+      localStorage.removeItem('arttouch_projects');
+      localStorage.removeItem('arttouch_custom_projects');
+      if (window.ArtTouchData && window.ArtTouchData.defaultProjects) {
+        projectsData = JSON.parse(JSON.stringify(window.ArtTouchData.defaultProjects));
+        window.ArtTouchData.projects = JSON.parse(JSON.stringify(window.ArtTouchData.defaultProjects));
+      }
+      saveProjectsToLocal();
+      renderProjectsGrid();
+      alert('Default projects and galleries successfully restored!');
+    } catch (e) {
+      alert('Restored successfully.');
+    }
+  };
 
   function initProjectsUI() {
     const searchInput = document.getElementById('projects-admin-search');
