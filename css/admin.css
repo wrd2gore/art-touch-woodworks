@@ -552,21 +552,24 @@ body.admin-body {
 }
 
 /* ==========================================================================
-   9. SECURITY GATE & AUTHENTICATION LOCK SCREEN
-   Restricts Admin Panel Access Strictly to Authorized Management App
+   9. LUXURY ARCHITECTURAL SECURITY GATE & AUTHENTICATION
    ========================================================================== */
 .admin-lock-screen {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at top right, #2D3339 0%, #15181B 100%);
-  z-index: 9999;
+  background: #111315;
+  background-image: 
+    radial-gradient(circle at 50% 30%, rgba(184, 146, 62, 0.12) 0%, transparent 65%),
+    radial-gradient(circle at 100% 0%, rgba(31, 36, 40, 0.8) 0%, transparent 50%),
+    linear-gradient(180deg, #181B1E 0%, #0F1012 100%);
+  z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
   opacity: 1;
   visibility: visible;
-  transition: opacity 0.35s ease, visibility 0.35s ease;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s;
 }
 
 .admin-lock-screen.is-unlocked {
@@ -577,14 +580,18 @@ body.admin-body {
 
 .admin-lock-card {
   width: 100%;
-  max-width: 440px;
-  background: rgba(31, 36, 40, 0.85);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  padding: 36px 32px;
+  max-width: 400px;
+  background: rgba(26, 30, 34, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(212, 178, 88, 0.22);
+  border-radius: 16px;
+  padding: 36px 28px 28px;
   color: #FFFFFF;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: 
+    0 30px 70px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -596,114 +603,179 @@ body.admin-body {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #A88734, #E2C974, #A88734);
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #D4B258, #F3E3A6, #D4B258, transparent);
 }
 
-.admin-lock-brand {
-  display: inline-flex;
+.admin-lock-emblem {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(212, 178, 88, 0.3);
+  border-radius: 16px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), inset 0 0 12px rgba(212, 178, 88, 0.1);
 }
 
-.admin-lock-brand img {
-  height: 48px;
+.admin-lock-emblem img {
+  height: 38px;
   width: auto;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
+  object-fit: contain;
 }
 
 .admin-lock-title {
   font-family: var(--font-heading);
-  font-size: 22px;
-  font-weight: 700;
-  margin: 0 0 6px 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin: 0 0 4px 0;
   color: #FFFFFF;
 }
 
-.admin-lock-subtitle {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.65);
-  margin: 0 0 24px 0;
-  line-height: 1.5;
+.admin-lock-sub {
+  font-size: 12px;
+  color: #A3A8AF;
+  margin: 0 0 18px 0;
+  letter-spacing: 0.02em;
 }
 
-.admin-lock-badge {
+.admin-lock-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-size: 11px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
   padding: 4px 12px;
-  background: rgba(168, 135, 52, 0.15);
-  border: 1px solid rgba(168, 135, 52, 0.35);
-  color: #E2C974;
+  background: rgba(184, 146, 62, 0.12);
+  border: 1px solid rgba(184, 146, 62, 0.28);
+  color: #E6CE85;
   border-radius: 20px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
-.admin-lock-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  text-align: left;
-}
-
-.admin-lock-input-group {
+.admin-lock-input-wrapper {
   position: relative;
+  margin-bottom: 16px;
+}
+
+.admin-lock-key-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 14px;
+  pointer-events: none;
 }
 
 .admin-lock-input {
   width: 100%;
-  padding: 14px 16px 14px 44px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
+  padding: 13px 44px 13px 40px;
+  background: rgba(15, 17, 20, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
   color: #FFFFFF;
-  font-size: 15px;
+  font-size: 16px;
   font-family: inherit;
+  letter-spacing: 0.1em;
   transition: all 0.2s ease;
   box-sizing: border-box;
+  text-align: center;
 }
 
 .admin-lock-input:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.12);
-  border-color: #E2C974;
-  box-shadow: 0 0 0 3px rgba(226, 201, 116, 0.2);
+  background: rgba(15, 17, 20, 0.95);
+  border-color: #D4B258;
+  box-shadow: 0 0 0 3px rgba(212, 178, 88, 0.2);
 }
 
-.admin-lock-input-icon {
+.admin-lock-eye-btn {
   position: absolute;
-  left: 16px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
+  background: none;
+  border: none;
   color: rgba(255, 255, 255, 0.45);
-  font-size: 15px;
-  pointer-events: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.15s ease;
+}
+
+.admin-lock-eye-btn:hover {
+  color: #E6CE85;
+}
+
+/* Luxury 0-9 Keypad */
+.admin-pin-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.pin-key {
+  padding: 12px 0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.pin-key:hover {
+  background: rgba(212, 178, 88, 0.15);
+  border-color: rgba(212, 178, 88, 0.35);
+  color: #F3E3A6;
+  transform: translateY(-1px);
+}
+
+.pin-key:active {
+  transform: translateY(1px);
+  background: rgba(212, 178, 88, 0.25);
+}
+
+.pin-key.pin-key-action {
+  color: #A3A8AF;
+  font-size: 14px;
+}
+
+.pin-key.pin-key-submit {
+  background: linear-gradient(135deg, rgba(184, 146, 62, 0.3), rgba(140, 106, 30, 0.4));
+  border-color: rgba(212, 178, 88, 0.4);
+  color: #F3E3A6;
 }
 
 .admin-lock-submit-btn {
   width: 100%;
-  padding: 14px;
+  padding: 13px;
   background: linear-gradient(135deg, #B8923E 0%, #8C6A1E 100%);
   border: 1px solid #D4B258;
-  border-radius: 8px;
+  border-radius: 10px;
   color: #FFFFFF;
   font-family: var(--font-heading);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   transition: all 0.2s ease;
-  box-shadow: 0 6px 18px rgba(140, 106, 30, 0.35);
+  box-shadow: 0 6px 20px rgba(140, 106, 30, 0.35);
 }
 
 .admin-lock-submit-btn:hover {
@@ -712,31 +784,32 @@ body.admin-body {
   box-shadow: 0 8px 24px rgba(140, 106, 30, 0.45);
 }
 
-.admin-lock-submit-btn:active {
-  transform: translateY(0);
-}
-
 .admin-lock-error {
   font-size: 12px;
-  color: #F87171;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #FCA5A5;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   display: none;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  margin-bottom: 12px;
 }
 
 .admin-lock-error.is-visible {
   display: flex;
 }
 
-.admin-lock-helper {
+.admin-lock-footer-note {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.4);
-  line-height: 1.5;
-  margin-top: 20px;
+  color: rgba(255, 255, 255, 0.35);
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .admin-lock-shake {
@@ -750,18 +823,30 @@ body.admin-body {
   40%, 60% { transform: translate3d(6px, 0, 0); }
 }
 
-/* App Mode Badges and Lock Buttons */
-.admin-badge-appmode {
-  display: inline-flex;
+/* Sleek Integrated Sidebar Lock Button */
+.admin-sidebar-lock-btn {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-heading);
+  font-size: 13px;
   font-weight: 600;
-  color: #047857;
-  padding: 6px 12px;
-  background: #D1FAE5;
-  border: 1px solid #6EE7B7;
-  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 10px;
+  justify-content: center;
+}
+
+.admin-sidebar-lock-btn:hover {
+  background: rgba(212, 178, 88, 0.15);
+  border-color: rgba(212, 178, 88, 0.35);
+  color: #F3E3A6;
 }
 
 .btn-lock-session {
@@ -771,16 +856,18 @@ body.admin-body {
   padding: 6px 12px;
   font-size: 12px;
   font-weight: 600;
-  color: #B91C1C;
-  background: #FEE2E2;
-  border: 1px solid #FCA5A5;
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .btn-lock-session:hover {
-  background: #FDCFCF;
-  color: #991B1B;
+  background: rgba(212, 178, 88, 0.2);
+  border-color: #D4B258;
+  color: #F3E3A6;
 }
+
 

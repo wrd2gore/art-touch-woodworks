@@ -655,6 +655,28 @@
     }
   };
 
+  window.typePinDigit = function(digit) {
+    const input = document.getElementById('admin-lock-input');
+    if (!input) return;
+    input.value += digit;
+    input.focus();
+  };
+
+  window.clearPinDigit = function() {
+    const input = document.getElementById('admin-lock-input');
+    if (!input) return;
+    input.value = input.value.slice(0, -1);
+    input.focus();
+  };
+
+  window.submitPinUnlock = function() {
+    const form = document.getElementById('admin-lock-form');
+    if (form) {
+      const submitBtn = document.getElementById('btn-unlock-admin');
+      if (submitBtn) submitBtn.click();
+    }
+  };
+
   function initAuthAndSecurity() {
     const lockScreen = document.getElementById('admin-lock-screen');
     const lockForm = document.getElementById('admin-lock-form');

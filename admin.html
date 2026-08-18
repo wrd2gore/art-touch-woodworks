@@ -21,39 +21,56 @@
 </head>
 <body class="admin-body">
 
-  <!-- 0. ADMIN SECURITY GATE & AUTHENTICATION LOCK SCREEN -->
+  <!-- 0. LUXURY ARCHITECTURAL LOCK SCREEN -->
   <div class="admin-lock-screen" id="admin-lock-screen">
     <div class="admin-lock-card" id="admin-lock-card">
-      <div class="admin-lock-brand">
+      <div class="admin-lock-emblem">
         <img src="images/logo/art-touch-logo.png" alt="Art Touch">
       </div>
-      <h2 class="admin-lock-title">Art Touch Control Center</h2>
-      <p class="admin-lock-subtitle">Authorized Management &amp; Requests Portal</p>
       
-      <div class="admin-lock-badge">
-        <i class="fa-solid fa-shield-halved"></i> <span>Secure Management Console</span>
+      <h1 class="admin-lock-title">ART TOUCH</h1>
+      <p class="admin-lock-sub">Architectural Woodworks &amp; Joinery — Control Center</p>
+
+      <div class="admin-lock-pill">
+        <i class="fa-solid fa-shield-halved"></i> <span>Private Management Access</span>
       </div>
 
       <form id="admin-lock-form" class="admin-lock-form" onsubmit="return false;">
         <div class="admin-lock-error" id="admin-lock-error">
-          <i class="fa-solid fa-circle-exclamation"></i> <span id="admin-lock-error-text">Invalid PIN or Passcode.</span>
+          <i class="fa-solid fa-circle-exclamation"></i> <span id="admin-lock-error-text">Incorrect PIN. Please try again.</span>
         </div>
 
-        <div class="admin-lock-input-group" style="position: relative;">
-          <i class="fa-solid fa-key admin-lock-input-icon"></i>
-          <input type="password" id="admin-lock-input" class="admin-lock-input" placeholder="Enter Master PIN" autocomplete="current-password" autofocus style="padding-right: 44px;">
-          <button type="button" onclick="window.togglePinVisibility('admin-lock-input', this)" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer;" title="Show/Hide PIN">
+        <div class="admin-lock-input-wrapper">
+          <span class="admin-lock-key-icon"><i class="fa-solid fa-lock"></i></span>
+          <input type="password" id="admin-lock-input" class="admin-lock-input" placeholder="Enter PIN (Default: 7707)" autocomplete="off" autofocus maxlength="20">
+          <button type="button" class="admin-lock-eye-btn" onclick="window.togglePinVisibility('admin-lock-input', this)" title="Show/Hide PIN">
             <i class="fa-solid fa-eye"></i>
           </button>
         </div>
 
+        <!-- Quick 0-9 Keypad -->
+        <div class="admin-pin-keypad" id="admin-pin-keypad">
+          <button type="button" class="pin-key" onclick="window.typePinDigit('1')">1</button>
+          <button type="button" class="pin-key" onclick="window.typePinDigit('2')">2</button>
+          <button type="button" class="pin-key" onclick="window.typePinDigit('3')">3</button>
+          <button type="button" class="pin-key" onclick="window.typePinDigit('4')">4</button>
+          <button type="button" class="pin-key" onclick="window.typePinDigit('5')">5</button>
+          <button type="button" class="pin-key" onclick="window.typePinDigit('6')">6</button>
+          <button type="button" class="pin-key" onclick="window.typePinDigit('7')">7</button>
+          <button type="button" class="pin-key" onclick="window.typePinDigit('8')">8</button>
+          <button type="button" class="pin-key" onclick="window.typePinDigit('9')">9</button>
+          <button type="button" class="pin-key pin-key-action" onclick="window.clearPinDigit()" title="Delete digit"><i class="fa-solid fa-delete-left"></i></button>
+          <button type="button" class="pin-key" onclick="window.typePinDigit('0')">0</button>
+          <button type="button" class="pin-key pin-key-submit" onclick="window.submitPinUnlock()" title="Unlock"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+
         <button type="submit" class="admin-lock-submit-btn" id="btn-unlock-admin">
-          <i class="fa-solid fa-lock-open"></i> Unlock Control Center
+          <i class="fa-solid fa-key"></i> <span>Unlock Management App</span>
         </button>
       </form>
 
-      <div class="admin-lock-helper">
-        <i class="fa-solid fa-lock"></i> Protected internal system. Only authorized Art Touch leadership and app users have access to inquiries and portfolio management.
+      <div class="admin-lock-footer-note">
+        <i class="fa-solid fa-shield-check"></i> Encrypted Workspace &bull; Amman, Jordan
       </div>
     </div>
   </div>
@@ -92,8 +109,8 @@
     </nav>
 
     <div class="admin-sidebar-footer">
-      <button type="button" class="admin-nav-item" id="btn-sidebar-lock" style="color: #F87171; border: 1px solid rgba(239,68,68,0.25); background: rgba(239,68,68,0.1); margin-bottom: 8px; justify-content: center;">
-        <i class="fa-solid fa-lock"></i> <span>Lock Application</span>
+      <button type="button" class="admin-sidebar-lock-btn" id="btn-sidebar-lock">
+        <i class="fa-solid fa-lock"></i> <span>Lock App</span>
       </button>
       <a href="index.html" target="_blank">
         <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Website
