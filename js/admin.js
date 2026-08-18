@@ -870,6 +870,186 @@
     }
   }
 
+  function generateUpdatedProjectsHtml(baseHtml) {
+    if (!baseHtml) return '';
+    let html = baseHtml;
+
+    const totalCount = projectsData.length;
+    const counts = {
+      'all': totalCount,
+      'banks': 0,
+      'commercial': 0,
+      'residential': 0,
+      'embassies': 0,
+      'government-projects': 0
+    };
+    projectsData.forEach(p => {
+      const catSlug = (p.category || '').toLowerCase().replace(/\s+/g, '-');
+      if (counts[catSlug] !== undefined) counts[catSlug]++;
+    });
+
+    const filterTabsHtml = `
+        <button type="button" class="filter-btn active" data-filter="all" onclick="filterProjects('all', this)" role="tab" aria-selected="true">
+          All Projects <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(${counts['all']})</span>
+        </button>
+        <button type="button" class="filter-btn" data-filter="banks" onclick="filterProjects('banks', this)" role="tab" aria-selected="false">
+          Banks <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(${counts['banks']})</span>
+        </button>
+        <button type="button" class="filter-btn" data-filter="commercial" onclick="filterProjects('commercial', this)" role="tab" aria-selected="false">
+          Commercial <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(${counts['commercial']})</span>
+        </button>
+        <button type="button" class="filter-btn" data-filter="residential" onclick="filterProjects('residential', this)" role="tab" aria-selected="false">
+          Residential <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(${counts['residential']})</span>
+        </button>
+        <button type="button" class="filter-btn" data-filter="embassies" onclick="filterProjects('embassies', this)" role="tab" aria-selected="false">
+          Embassies <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(${counts['embassies']})</span>
+        </button>
+        <button type="button" class="filter-btn" data-filter="government-projects" onclick="filterProjects('government-projects', this)" role="tab" aria-selected="false">
+          Government Projects <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(${counts['government-projects']})</span>
+        </button>
+    `;
+
+    const cardsHtml = projectsData.map(p => {
+      const catSlug = (p.category || '').toLowerCase().replace(/\s+/g, '-');
+      const cover = p.coverImage || (p.gallery && p.gallery.length > 0 ? p.gallery[0] : '');
+      const imgSrc = cover || 'images/logo/art-touch-logo.png';
+      const isFallback = !cover;
+
+      return `
+        <article class="authentic-project-card" data-category="${escapeAttr(catSlug)}">
+          <a href="project-details.html?id=${encodeURIComponent(p.id)}" class="project-thumb-box" title="${escapeAttr(p.title)}">
+            <img src="${escapeAttr(imgSrc)}" 
+                 alt="${escapeAttr(p.title)}" 
+                 loading="lazy" 
+                 decoding="async" 
+                 ${isFallback ? 'style="padding: 40px; object-fit: contain;"' : ''}
+                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+          </a>
+          <a href="project-details.html?id=${encodeURIComponent(p.id)}" class="project-pill-btn">
+            ${escapeHtml(p.title)}
+          </a>
+        </article>
+      `;
+    }).join('\n');
+
+    const filterNavRegex = /(<div class="filter-tabs"[^>]*id="projects-filter-nav"[^>]*>)([\s\S]*?)(<\/div>)/i;
+    if (filterNavRegex.test(html)) {
+      html = html.replace(filterNavRegex, `$1${filterTabsHtml}$3`);
+    }
+
+    const gridRegex = /(<div class="grid grid-3 gap-xl"[^>]*id="projects-grid-container"[^>]*>)([\s\S]*?)(<\/div>\s*<\/div>\s*<\/section>)/i;
+    if (gridRegex.test(html)) {
+      html = html.replace(gridRegex, `$1\n${cardsHtml}\n$3`);
+    }
+
+    return html;
+  }
+
+  function generateUpdatedServicesHtml(baseHtml) {
+    if (!baseHtml) return '';
+    let html = baseHtml;
+
+    const servicesCardsHtml = servicesData.map((s, idx) => `
+        <article class="service-card" id="${escapeAttr(s.id)}" style="padding: var(--space-2xl);">
+          <div style="font-size: 32px; color: var(--color-brand); margin-bottom: var(--space-md);"><i class="${escapeAttr(s.icon || 'fa-solid fa-hammer')}"></i></div>
+          <div class="service-card-body" style="padding: 0;">
+            <span class="badge badge-brand" style="margin-bottom: 8px;"><i class="${escapeAttr(s.icon || 'fa-solid fa-hammer')}"></i> Division ${idx + 1}</span>
+            <h2 class="service-title" style="font-size: var(--text-2xl); margin-bottom: 8px;">${escapeHtml(s.title)}</h2>
+            <p class="service-desc" style="font-size: var(--text-sm); margin-bottom: var(--space-lg);">
+              ${escapeHtml(s.shortDesc)}
+            </p>
+            <div class="service-features" style="margin-bottom: var(--space-xl);">
+              ${(s.features || []).map(f => `<div class="service-feature-item"><i class="fa-solid fa-check text-brand"></i> ${escapeHtml(f)}</div>`).join('\n')}
+            </div>
+            <a href="quote.html?project=${encodeURIComponent(s.title)}" class="btn btn-primary btn-block" style="margin-top: auto;">
+              <i class="fa-solid fa-calculator"></i> Request Quote for ${escapeHtml(s.title)}
+            </a>
+          </div>
+        </article>
+    `).join('\n');
+
+    const servicesGridRegex = /(<div class="grid grid-2 gap-xl"[^>]*id="services-full-list"[^>]*>)([\s\S]*?)(<\/div>\s*<\/div>\s*<\/section>)/i;
+    if (servicesGridRegex.test(html)) {
+      html = html.replace(servicesGridRegex, `$1\n${servicesCardsHtml}\n$3`);
+    }
+
+    return html;
+  }
+
+  function generateUpdatedIndexHtml(baseHtml) {
+    if (!baseHtml) return '';
+    let html = baseHtml;
+
+    const homeServicesHtml = servicesData.slice(0, 6).map(s => `
+        <article class="service-card">
+          <div style="font-size: 28px; color: var(--color-brand); margin-bottom: 12px;">
+            <i class="${escapeAttr(s.icon || 'fa-solid fa-tree')}"></i>
+          </div>
+          <div class="service-card-body" style="padding: 0;">
+            <h3 class="service-title" style="font-size: var(--text-lg); margin-bottom: 6px;">${escapeHtml(s.title)}</h3>
+            <p class="service-desc" style="font-size: var(--text-sm); margin-bottom: 12px;">${escapeHtml(s.shortDesc)}</p>
+            <div class="service-features" style="margin-bottom: 16px;">
+              ${(s.features || []).slice(0, 2).map(f => `<div class="service-feature-item" style="font-size: var(--text-xs);"><i class="fa-solid fa-check text-brand"></i> <span>${escapeHtml(f)}</span></div>`).join('\n')}
+            </div>
+            <a href="services.html#${encodeURIComponent(s.id)}" class="project-link" style="font-size: var(--text-xs);">
+              Learn More <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+    `).join('\n');
+
+    const homeProjectsHtml = projectsData.slice(0, 3).map(p => {
+      const hasImages = p.gallery && Array.isArray(p.gallery) && p.gallery.length > 0;
+      const coverSrc = p.coverImage || (hasImages ? p.gallery[0] : 'images/logo/art-touch-logo.png');
+      const galleryCount = hasImages ? p.gallery.length : 0;
+      return `
+        <article class="project-card">
+          <div class="project-thumb" style="aspect-ratio: 4/3; background-color: #1A1D20; display: flex; align-items: center; justify-content: center; position: relative;">
+            <img src="${escapeAttr(coverSrc)}" alt="${escapeAttr(p.title)}" loading="lazy" decoding="async" width="600" height="450" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='30px'; this.style.objectFit='contain';">
+            <span class="project-category-badge">${escapeHtml(p.category)}</span>
+            ${galleryCount > 0 ? `<span style="position: absolute; bottom: 10px; right: 10px; background: rgba(18,20,23,0.85); color: #fff; font-size: 11px; padding: 3px 8px; border-radius: var(--radius-sm);"><i class="fa-regular fa-image"></i> ${galleryCount} Photos</span>` : ''}
+          </div>
+          <div class="project-body">
+            <div class="project-meta">
+              ${p.location ? `<span><i class="fa-solid fa-location-dot"></i> ${escapeHtml(p.location)}</span>` : ''}
+              ${p.dateCompleted ? `<span><i class="fa-solid fa-calendar"></i> ${escapeHtml(p.dateCompleted)}</span>` : ''}
+            </div>
+            <h3 class="project-title"><a href="project-details.html?id=${encodeURIComponent(p.id)}">${escapeHtml(p.title)}</a></h3>
+            ${p.description ? `<p class="project-desc">${escapeHtml(p.description)}</p>` : ''}
+            <a href="project-details.html?id=${encodeURIComponent(p.id)}" class="project-link">
+              View Project Details <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </article>
+      `;
+    }).join('\n');
+
+    const homeFaqsHtml = faqsData.slice(0, 5).map((f, idx) => `
+        <div class="accordion-item ${idx === 0 ? 'is-open' : ''}">
+          <button type="button" class="accordion-header" aria-expanded="${idx === 0 ? 'true' : 'false'}">
+            <span>${escapeHtml(f.q)}</span>
+            <i class="fa-solid fa-chevron-down accordion-icon"></i>
+          </button>
+          <div class="accordion-body" ${idx === 0 ? 'style="max-height: 250px;"' : ''}>
+            <div class="accordion-content">
+              <p>${escapeHtml(f.a)}</p>
+            </div>
+          </div>
+        </div>
+    `).join('\n');
+
+    const sRegex = /(<div class="grid grid-3 gap-xl"[^>]*id="home-services-grid"[^>]*>)([\s\S]*?)(<\/div>\s*<\/div>\s*<\/section>)/i;
+    if (sRegex.test(html)) html = html.replace(sRegex, `$1\n${homeServicesHtml}\n$3`);
+
+    const pRegex = /(<div class="grid grid-3 gap-xl"[^>]*id="home-featured-projects"[^>]*>)([\s\S]*?)(<\/div>\s*<\/div>\s*<\/section>)/i;
+    if (pRegex.test(html)) html = html.replace(pRegex, `$1\n${homeProjectsHtml}\n$3`);
+
+    const fRegex = /(<div class="accordion"[^>]*id="home-faq-accordion"[^>]*>)([\s\S]*?)(<\/div>\s*<\/div>\s*<\/div>\s*<\/section>)/i;
+    if (fRegex.test(html)) html = html.replace(fRegex, `$1\n${homeFaqsHtml}\n$3`);
+
+    return html;
+  }
+
   function generateMasterDataJs(targetBuildId) {
     const buildId = targetBuildId || `build-at-${Date.now().toString(36)}`;
     const version = `2026.08.18.${new Date().getHours()}${new Date().getMinutes()}`;
@@ -1040,70 +1220,131 @@ if (typeof module !== 'undefined' && module.exports) {
       localStorage.setItem('arttouch_business', JSON.stringify(businessData));
       setStepState(2, 'done');
 
-      /* ---------------- STEP 3: UPDATE GITHUB REPO ---------------- */
+      /* ---------------- STEP 3: UPDATE GITHUB REPO (MULTI-FILE GIT TREE) ---------------- */
       setStepState(3, 'active');
       const repo = 'wrd2gore/art-touch-woodworks';
-      const path = 'js/data.js';
-      const targetBranches = ['main', 'master'];
-      const commitResults = [];
+      const commitMessage = `Update website content via Art Touch Control Center [Build: ${targetBuildId}]`;
+      const ghHeaders = {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      };
 
-      for (const branch of targetBranches) {
-        // Fetch current SHA
-        let sha = null;
+      // Helper to fetch file content from GitHub branch
+      async function fetchRepoFileText(filePath, branch = 'main') {
         try {
-          const getRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`, {
-            headers: {
-              'Authorization': `token ${token}`,
-              'Accept': 'application/vnd.github.v3+json'
+          const res = await fetch(`https://api.github.com/repos/${repo}/contents/${filePath}?ref=${branch}&_cb=${Date.now()}`, { headers: ghHeaders });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.content) {
+              return decodeURIComponent(escape(atob(data.content.replace(/\s/g, ''))));
             }
-          });
-          if (getRes.status === 401 || getRes.status === 403) {
-            throw new Error('GitHub authentication failed. Please verify your Personal Access Token in the Publish tab.');
           }
-          if (getRes.ok) {
-            const getData = await getRes.json();
-            sha = getData.sha;
-          }
-        } catch (e) {
-          if (e.message.includes('authentication failed')) throw e;
-        }
-
-        // Put new content
-        const bodyPayload = {
-          message: commitMessage,
-          content: contentBase64,
-          branch: branch
-        };
-        if (sha) bodyPayload.sha = sha;
-
-        const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `token ${token}`,
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(bodyPayload)
-        });
-
-        if (!putRes.ok) {
-          const errData = await putRes.json();
-          throw new Error(`GitHub update failed on ${branch} branch: ${errData.message || putRes.statusText}`);
-        }
-
-        const putData = await putRes.json();
-        if (putData && putData.commit && putData.commit.sha) {
-          latestCommitSha = putData.commit.sha;
-          commitResults.push({ branch, sha: latestCommitSha });
-        }
+        } catch (e) {}
+        return null;
       }
+
+      // Fetch base HTML templates
+      const baseProjectsHtml = await fetchRepoFileText('projects.html') || '';
+      const baseServicesHtml = await fetchRepoFileText('services.html') || '';
+      const baseIndexHtml = await fetchRepoFileText('index.html') || '';
+
+      // Generate updated files
+      const dataJsContent = generateMasterDataJs(targetBuildId);
+      const updatedProjectsHtml = generateUpdatedProjectsHtml(baseProjectsHtml);
+      const updatedServicesHtml = generateUpdatedServicesHtml(baseServicesHtml);
+      const updatedIndexHtml = generateUpdatedIndexHtml(baseIndexHtml);
+
+      // Build tree files list
+      const treeItems = [
+        { path: 'js/data.js', mode: '100644', type: 'blob', content: dataJsContent }
+      ];
+      if (updatedProjectsHtml) {
+        treeItems.push({ path: 'projects.html', mode: '100644', type: 'blob', content: updatedProjectsHtml });
+      }
+      if (updatedServicesHtml) {
+        treeItems.push({ path: 'services.html', mode: '100644', type: 'blob', content: updatedServicesHtml });
+      }
+      if (updatedIndexHtml) {
+        treeItems.push({ path: 'index.html', mode: '100644', type: 'blob', content: updatedIndexHtml });
+      }
+
+      // Get latest commit on main
+      const refRes = await fetch(`https://api.github.com/repos/${repo}/git/ref/heads/main`, { headers: ghHeaders });
+      if (refRes.status === 401 || refRes.status === 403) {
+        throw new Error('GitHub authentication failed. Please verify your Personal Access Token in the Publish tab.');
+      }
+      if (!refRes.ok) {
+        throw new Error(`Failed to read repository ref: ${refRes.statusText}`);
+      }
+      const refData = await refRes.json();
+      const parentCommitSha = refData.object.sha;
+
+      // Get base tree
+      const parentCommitRes = await fetch(`https://api.github.com/repos/${repo}/git/commits/${parentCommitSha}`, { headers: ghHeaders });
+      const parentCommitData = await parentCommitRes.json();
+      const baseTreeSha = parentCommitData.tree.sha;
+
+      // Create new Tree
+      const treeRes = await fetch(`https://api.github.com/repos/${repo}/git/trees`, {
+        method: 'POST',
+        headers: ghHeaders,
+        body: JSON.stringify({
+          base_tree: baseTreeSha,
+          tree: treeItems
+        })
+      });
+      if (!treeRes.ok) {
+        const treeErr = await treeRes.json();
+        throw new Error(`Git tree creation failed: ${treeErr.message || treeRes.statusText}`);
+      }
+      const treeData = await treeRes.json();
+      const newTreeSha = treeData.sha;
+
+      // Create new Commit
+      const commitRes = await fetch(`https://api.github.com/repos/${repo}/git/commits`, {
+        method: 'POST',
+        headers: ghHeaders,
+        body: JSON.stringify({
+          message: commitMessage,
+          tree: newTreeSha,
+          parents: [parentCommitSha]
+        })
+      });
+      if (!commitRes.ok) {
+        const comErr = await commitRes.json();
+        throw new Error(`Git commit creation failed: ${comErr.message || commitRes.statusText}`);
+      }
+      const commitData = await commitRes.json();
+      latestCommitSha = commitData.sha;
+
+      // Update main ref
+      const updateMainRes = await fetch(`https://api.github.com/repos/${repo}/git/refs/heads/main`, {
+        method: 'PATCH',
+        headers: ghHeaders,
+        body: JSON.stringify({ sha: latestCommitSha, force: true })
+      });
+      if (!updateMainRes.ok) {
+        const refErr = await updateMainRes.json();
+        throw new Error(`Failed to update main branch ref: ${refErr.message}`);
+      }
+
+      // Update master ref
+      try {
+        await fetch(`https://api.github.com/repos/${repo}/git/refs/heads/master`, {
+          method: 'PATCH',
+          headers: ghHeaders,
+          body: JSON.stringify({ sha: latestCommitSha, force: true })
+        });
+      } catch (e) {}
+
       setStepState(3, 'done');
 
       /* ---------------- STEP 4: CREATE COMMIT ---------------- */
       setStepState(4, 'active');
       await sleep(300);
       if (shaDesc && latestCommitSha) {
-        shaDesc.innerHTML = `Commit: <a href="https://github.com/${repo}/commit/${latestCommitSha}" target="_blank" style="color: var(--color-brand); font-weight: 600; text-decoration: underline;">${latestCommitSha.substring(0, 7)}</a> (Target: main &amp; master)`;
+        shaDesc.innerHTML = `Commit: <a href="https://github.com/${repo}/commit/${latestCommitSha}" target="_blank" style="color: var(--color-brand); font-weight: 600; text-decoration: underline;">${latestCommitSha.substring(0, 7)}</a> (Updated: HTML pages &amp; data.js)`;
       }
       setStepState(4, 'done');
 
