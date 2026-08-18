@@ -358,6 +358,19 @@ const ArtTouchData = {
   ]
 };
 
+// Dynamic Custom Projects Sync from local/cloud store
+try {
+  if (typeof localStorage !== 'undefined') {
+    const customProjects = localStorage.getItem('arttouch_projects');
+    if (customProjects) {
+      const parsed = JSON.parse(customProjects);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        ArtTouchData.projects = parsed;
+      }
+    }
+  }
+} catch (e) {}
+
 // Export to window
 if (typeof window !== 'undefined') {
   window.ArtTouchData = ArtTouchData;
