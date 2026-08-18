@@ -134,22 +134,22 @@
 
       <!-- Filter Tabs -->
       <div class="filter-tabs" id="projects-filter-nav" role="tablist">
-        <button class="filter-btn active" data-filter="all" role="tab" aria-selected="true">
+        <button type="button" class="filter-btn active" data-filter="all" onclick="filterProjects('all', this)" role="tab" aria-selected="true">
           All Projects <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(14)</span>
         </button>
-        <button class="filter-btn" data-filter="banks" role="tab" aria-selected="false">
+        <button type="button" class="filter-btn" data-filter="banks" onclick="filterProjects('banks', this)" role="tab" aria-selected="false">
           Banks <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(5)</span>
         </button>
-        <button class="filter-btn" data-filter="commercial" role="tab" aria-selected="false">
+        <button type="button" class="filter-btn" data-filter="commercial" onclick="filterProjects('commercial', this)" role="tab" aria-selected="false">
           Commercial <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(3)</span>
         </button>
-        <button class="filter-btn" data-filter="residential" role="tab" aria-selected="false">
+        <button type="button" class="filter-btn" data-filter="residential" onclick="filterProjects('residential', this)" role="tab" aria-selected="false">
           Residential <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(2)</span>
         </button>
-        <button class="filter-btn" data-filter="embassies" role="tab" aria-selected="false">
+        <button type="button" class="filter-btn" data-filter="embassies" onclick="filterProjects('embassies', this)" role="tab" aria-selected="false">
           Embassies <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(2)</span>
         </button>
-        <button class="filter-btn" data-filter="government-projects" role="tab" aria-selected="false">
+        <button type="button" class="filter-btn" data-filter="government-projects" onclick="filterProjects('government-projects', this)" role="tab" aria-selected="false">
           Government Projects <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(2)</span>
         </button>
       </div>
@@ -400,36 +400,81 @@
   <script src="js/search.js"></script>
   <script src="js/main.js"></script>
 
-  <!-- Inline Fail-Safe Category Filter Engine -->
+  <!-- Global Ultra-Reliable Category Filter Engine -->
   <script>
-    (function() {
-      function initPureFilter() {
-        var filterNav = document.getElementById('projects-filter-nav');
-        var container = document.getElementById('projects-grid-container');
-        var searchInput = document.getElementById('projects-search-input');
-        var pageTitle = document.getElementById('projects-page-title');
-        if (!container) return;
+    window.filterProjects = function(cat, btnEl) {
+      if (!cat) cat = 'all';
+      var normCat = cat.toLowerCase().trim();
+      var nav = document.getElementById('projects-filter-nav');
+      var container = document.getElementById('projects-grid-container');
+      var searchInput = document.getElementById('projects-search-input');
+      var pageTitle = document.getElementById('projects-page-title');
+      if (!container) return;
 
-        // Clear any auto-filled search values
-        if (searchInput) searchInput.value = '';
+      // 1. Update button active states
+      if (nav) {
+        var btns = nav.querySelectorAll('.filter-btn');
+        for (var i = 0; i < btns.length; i++) {
+          btns[i].classList.remove('active');
+          btns[i].setAttribute('aria-selected', 'false');
+        }
+      }
+      if (btnEl) {
+        btnEl.classList.add('active');
+        btnEl.setAttribute('aria-selected', 'true');
+      } else if (nav) {
+        var targetBtn = nav.querySelector('[data-filter="' + normCat + '"]') || nav.querySelector('[data-filter="all"]');
+        if (targetBtn) {
+          targetBtn.classList.add('active');
+          targetBtn.setAttribute('aria-selected', 'true');
+        }
+      }
 
-        function applyFilter(cat, query) {
-          if (!cat) cat = 'all';
-          var normCat = cat.toLowerCase().trim();
-          var q = (query || '').toLowerCase().trim();
+      // 2. Clear search input on tab change
+      if (searchInput && btnEl) searchInput.value = '';
+
+      // 3. Update Title
+      if (pageTitle) {
+        if (normCat === 'all') pageTitle.textContent = 'Projects';
+        else if (normCat === 'banks') pageTitle.textContent = 'Banks';
+        else if (normCat === 'commercial') pageTitle.textContent = 'Commercial Projects';
+        else if (normCat === 'residential') pageTitle.textContent = 'Residential Projects';
+        else if (normCat === 'embassies') pageTitle.textContent = 'EMBASSIES';
+        else if (normCat === 'government-projects') pageTitle.textContent = 'Government Projects';
+        else pageTitle.textContent = normCat.toUpperCase();
+      }
+
+      // 4. Filter Cards
+      var cards = container.querySelectorAll('.authentic-project-card');
+      for (var j = 0; j < cards.length; j++) {
+        var card = cards[j];
+        var cardCat = (card.getAttribute('data-category') || '').toLowerCase().trim();
+        if (normCat === 'all' || cardCat === normCat) {
+          card.style.setProperty('display', 'flex', 'important');
+          card.style.setProperty('opacity', '1', 'important');
+          card.style.setProperty('visibility', 'visible', 'important');
+        } else {
+          card.style.setProperty('display', 'none', 'important');
+        }
+      }
+    };
+
+    // Live search listener
+    document.addEventListener('DOMContentLoaded', function() {
+      var searchInput = document.getElementById('projects-search-input');
+      var container = document.getElementById('projects-grid-container');
+      if (searchInput && container) {
+        searchInput.value = '';
+        searchInput.addEventListener('input', function(e) {
+          var q = (e.target.value || '').toLowerCase().trim();
+          var nav = document.getElementById('projects-filter-nav');
+          var activeBtn = nav ? nav.querySelector('.filter-btn.active') : null;
+          var activeCat = activeBtn ? (activeBtn.getAttribute('data-filter') || 'all') : 'all';
+          var normCat = activeCat.toLowerCase().trim();
+
           var cards = container.querySelectorAll('.authentic-project-card');
-
-          if (pageTitle) {
-            if (normCat === 'all') pageTitle.textContent = 'Projects';
-            else if (normCat === 'banks') pageTitle.textContent = 'Banks';
-            else if (normCat === 'commercial') pageTitle.textContent = 'Commercial Projects';
-            else if (normCat === 'residential') pageTitle.textContent = 'Residential Projects';
-            else if (normCat === 'embassies') pageTitle.textContent = 'EMBASSIES';
-            else if (normCat === 'government-projects') pageTitle.textContent = 'Government Projects';
-            else pageTitle.textContent = normCat.toUpperCase();
-          }
-
-          cards.forEach(function(card) {
+          for (var j = 0; j < cards.length; j++) {
+            var card = cards[j];
             var cardCat = (card.getAttribute('data-category') || '').toLowerCase().trim();
             var title = (card.querySelector('.project-pill-btn') ? card.querySelector('.project-pill-btn').textContent : '').toLowerCase();
             var catMatch = (normCat === 'all' || cardCat === normCat);
@@ -442,57 +487,19 @@
             } else {
               card.style.setProperty('display', 'none', 'important');
             }
-          });
-        }
-
-        if (filterNav) {
-          filterNav.addEventListener('click', function(e) {
-            var btn = e.target.closest('.filter-btn');
-            if (!btn) return;
-            
-            filterNav.querySelectorAll('.filter-btn').forEach(function(b) {
-              b.classList.remove('active');
-              b.setAttribute('aria-selected', 'false');
-            });
-            btn.classList.add('active');
-            btn.setAttribute('aria-selected', 'true');
-            
-            // Clear search query on category switch so category shows all its cards
-            if (searchInput) searchInput.value = '';
-            
-            var cat = btn.getAttribute('data-filter') || 'all';
-            applyFilter(cat, '');
-          });
-        }
-
-        if (searchInput) {
-          searchInput.addEventListener('input', function(e) {
-            var activeBtn = filterNav ? filterNav.querySelector('.filter-btn.active') : null;
-            var cat = activeBtn ? activeBtn.getAttribute('data-filter') : 'all';
-            applyFilter(cat, e.target.value);
-          });
-        }
-
-        var params = new URLSearchParams(window.location.search);
-        var initial = params.get('cat');
-        if (initial && filterNav) {
-          var target = filterNav.querySelector('[data-filter="' + initial.toLowerCase().replace(/\s+/g, '-') + '"]');
-          if (target) {
-            target.click();
-            return;
           }
-        }
-        
-        // Initial show all
-        applyFilter('all', '');
+        });
       }
 
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initPureFilter);
+      // Check URL param ?cat=...
+      var params = new URLSearchParams(window.location.search);
+      var initial = params.get('cat');
+      if (initial) {
+        window.filterProjects(initial);
       } else {
-        initPureFilter();
+        window.filterProjects('all');
       }
-    })();
+    });
   </script>
 </body>
 </html>
