@@ -59,13 +59,15 @@ function initContactForm() {
       status: 'new'
     };
 
-    try {
-      const stored = localStorage.getItem('arttouch_inquiries');
-      const list = stored ? JSON.parse(stored) : [];
-      list.unshift(inquiryRecord);
-      localStorage.setItem('arttouch_inquiries', JSON.stringify(list));
-    } catch (e) {
-      console.warn('Storage save failed:', e);
+    if (window.ArtTouchCloudSync) {
+      window.ArtTouchCloudSync.sendInquiry(inquiryRecord);
+    } else {
+      try {
+        const stored = localStorage.getItem('arttouch_inquiries');
+        const list = stored ? JSON.parse(stored) : [];
+        list.unshift(inquiryRecord);
+        localStorage.setItem('arttouch_inquiries', JSON.stringify(list));
+      } catch (e) {}
     }
 
     // Simulate reliable dispatch

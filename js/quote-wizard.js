@@ -294,13 +294,15 @@ function initQuoteWizard() {
         status: 'new'
       };
 
-      try {
-        const stored = localStorage.getItem('arttouch_inquiries');
-        const list = stored ? JSON.parse(stored) : [];
-        list.unshift(quoteRecord);
-        localStorage.setItem('arttouch_inquiries', JSON.stringify(list));
-      } catch (err) {
-        console.warn('Quote storage save failed:', err);
+      if (window.ArtTouchCloudSync) {
+        window.ArtTouchCloudSync.sendInquiry(quoteRecord);
+      } else {
+        try {
+          const stored = localStorage.getItem('arttouch_inquiries');
+          const list = stored ? JSON.parse(stored) : [];
+          list.unshift(quoteRecord);
+          localStorage.setItem('arttouch_inquiries', JSON.stringify(list));
+        } catch (err) {}
       }
       
       // Render Success View

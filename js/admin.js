@@ -76,34 +76,43 @@
     }
   }
 
-  // 3. Inquiries Management
+  // 3. Inquiries Management & Live Cloud Sync
   function loadInquiries() {
     try {
       const stored = localStorage.getItem('arttouch_inquiries');
       if (stored) {
         inquiriesData = JSON.parse(stored);
       } else {
-        // Initial sample verified inquiry
-        inquiriesData = [
-          {
-            id: 'inq-' + Date.now(),
-            type: 'contact',
-            name: 'Sarah Al-Majali',
-            email: 's.majali@example.jo',
-            phone: '+962 7 9123 4567',
-            subject: 'Custom Executive Boardroom Fit-Out',
-            message: 'We are requesting a proposal and shop drawings for our new regional office boardroom tables and architectural wall cladding in Amman.',
-            timestamp: new Date().toISOString(),
-            status: 'new'
-          }
-        ];
-        saveInquiries();
+        inquiriesData = [];
       }
     } catch (e) {
-      console.error('Error loading inquiries:', e);
       inquiriesData = [];
     }
+
+    // Connect to Cloud Sync
+    if (window.ArtTouchCloudSync) {
+      window.ArtTouchCloudSync.syncInquiries((syncedList) => {
+        if (Array.isArray(syncedList) && syncedList.length > 0) {
+          inquiriesData = syncedList;
+          renderInquiriesTable();
+          updateDashboardStats();
+        }
+      });
+    }
   }
+
+  // Auto-sync polling every 10 seconds
+  setInterval(() => {
+    if (window.ArtTouchCloudSync) {
+      window.ArtTouchCloudSync.syncInquiries((syncedList) => {
+        if (Array.isArray(syncedList) && syncedList.length > inquiriesData.length) {
+          inquiriesData = syncedList;
+          renderInquiriesTable();
+          updateDashboardStats();
+        }
+      });
+    }
+  }, 10000);
 
   function saveInquiries() {
     try {

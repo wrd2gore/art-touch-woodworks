@@ -1,0 +1,143 @@
+/* ==========================================================================
+   ART TOUCH WOODWORKS — ARABIC (RTL) STYLESHEET
+   Supports Seamless Arabic Typography (Cairo / Tajawal / Plus Jakarta Sans)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap');
+
+html[dir="rtl"],
+body[dir="rtl"] {
+  font-family: 'Cairo', 'Tajawal', var(--font-body), sans-serif;
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6,
+[dir="rtl"] .font-heading {
+  font-family: 'Cairo', 'Tajawal', var(--font-heading), sans-serif;
+  letter-spacing: normal !important;
+}
+
+/* Header & Navigation RTL */
+[dir="rtl"] .header-actions {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .nav-desktop {
+  margin-right: var(--space-xl);
+  margin-left: 0;
+}
+
+[dir="rtl"] .nav-link i {
+  margin-right: 4px;
+  margin-left: 0;
+}
+
+[dir="rtl"] .brand-logo {
+  flex-direction: row;
+}
+
+/* Language Switcher Button */
+.lang-switch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #F3F4F6;
+  color: var(--color-text-main);
+  border: 1px solid var(--color-border);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+}
+
+.lang-switch-btn:hover {
+  background: var(--color-brand);
+  color: #FFFFFF;
+  border-color: var(--color-brand);
+}
+
+[dir="rtl"] .lang-switch-btn {
+  font-family: 'Cairo', sans-serif;
+}
+
+/* Forms & Inputs RTL */
+[dir="rtl"] .form-control {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .btn i {
+  margin-left: 6px;
+  margin-right: 0;
+}
+
+/* Project Cards & Badges RTL */
+[dir="rtl"] .project-card-tag {
+  left: auto;
+  right: var(--space-sm);
+}
+
+[dir="rtl"] .admin-project-category-tag {
+  left: auto;
+  right: 10px;
+}
+
+[dir="rtl"] .admin-nav-badge {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .admin-sidebar {
+  left: auto;
+  right: 0;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+[dir="rtl"] .admin-main {
+  margin-left: 0;
+  margin-right: var(--admin-sidebar-w);
+}
+
+[dir="rtl"] .admin-nav-item {
+  text-align: right;
+}
+
+[dir="rtl"] .admin-nav-item i {
+  text-align: center;
+}
+
+[dir="rtl"] .admin-table {
+  text-align: right;
+}
+
+[dir="rtl"] .gallery-photo-delete {
+  right: auto;
+  left: 4px;
+}
+
+/* Chevron & Icons Flip */
+[dir="rtl"] .fa-arrow-right:before {
+  content: "\f060"; /* fa-arrow-left */
+}
+
+[dir="rtl"] .fa-arrow-left:before {
+  content: "\f061"; /* fa-arrow-right */
+}
+
+[dir="rtl"] .fa-chevron-right:before {
+  content: "\f053"; /* fa-chevron-left */
+}
+
+[dir="rtl"] .fa-chevron-left:before {
+  content: "\f054"; /* fa-chevron-right */
+}

@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/pages.css">
   <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/rtl.css">
   <link rel="stylesheet" href="css/animations.css">
 
   <!-- Schema.org Structured Data -->
@@ -106,6 +107,9 @@
 
       <!-- Header Actions -->
       <div class="header-actions">
+        <button type="button" class="lang-switch-btn" onclick="ArtTouchI18n.toggleLanguage()" title="Switch Language">
+          <i class="fa-solid fa-globe"></i> <span>العربية</span>
+        </button>
         <button type="button" class="btn-search-trigger js-search-trigger" aria-label="Search Website (Ctrl+K)" title="Search Website (Ctrl+K)">
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
@@ -128,6 +132,11 @@
         </div>
         <button type="button" class="mobile-drawer-close" aria-label="Close Menu">
           <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div style="padding: 0 0 16px 0; border-bottom: 1px solid var(--color-border); margin-bottom: 16px;">
+        <button type="button" class="lang-switch-btn" onclick="ArtTouchI18n.toggleLanguage()" style="width: 100%; justify-content: center;">
+          <i class="fa-solid fa-globe"></i> <span>العربية / English</span>
         </button>
       </div>
       <ul class="mobile-nav-list">
@@ -382,6 +391,8 @@
   <!-- Vanilla Scripts (Zero TypeScript, Zero Frameworks) -->
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
+  <script src="js/cloud-sync.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/components.js"></script>
   <script src="js/search.js"></script>
   <script src="js/slider.js"></script>

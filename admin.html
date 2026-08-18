@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/rtl.css">
   <link rel="icon" type="image/png" href="images/logo/art-touch-logo.png">
 </head>
 <body class="admin-body">
@@ -72,6 +73,9 @@
         <p id="admin-page-sub">View and manage contact form submissions and quote requests.</p>
       </div>
       <div class="admin-topbar-actions">
+        <button type="button" class="lang-switch-btn" onclick="ArtTouchI18n.toggleLanguage()" title="Switch Language">
+          <i class="fa-solid fa-globe"></i> <span>العربية</span>
+        </button>
         <button type="button" class="btn btn-outline btn-sm" onclick="location.reload()" title="Refresh Data">
           <i class="fa-solid fa-rotate"></i> Refresh
         </button>
@@ -369,6 +373,8 @@
 
   <!-- Scripts -->
   <script src="js/data.js"></script>
+  <script src="js/cloud-sync.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/admin.js"></script>
 </body>
 </html>
