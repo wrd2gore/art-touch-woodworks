@@ -401,5 +401,92 @@
   <script src="js/search.js"></script>
   <script src="js/projects.js"></script>
   <script src="js/main.js"></script>
+
+  <!-- Inline Fail-Safe Category Filter Engine -->
+  <script>
+    (function() {
+      function initPureFilter() {
+        var filterNav = document.getElementById('projects-filter-nav');
+        var container = document.getElementById('projects-grid-container');
+        var searchInput = document.getElementById('projects-search-input');
+        var pageTitle = document.getElementById('projects-page-title');
+        if (!filterNav || !container) return;
+
+        function applyFilter(cat, query) {
+          if (!cat) cat = 'all';
+          var normCat = cat.toLowerCase().trim();
+          var q = (query || '').toLowerCase().trim();
+          var cards = container.querySelectorAll('.authentic-project-card');
+
+          if (pageTitle) {
+            if (normCat === 'all') pageTitle.textContent = 'Projects';
+            else if (normCat === 'banks') pageTitle.textContent = 'Banks';
+            else if (normCat === 'commercial') pageTitle.textContent = 'Commercial Projects';
+            else if (normCat === 'residential') pageTitle.textContent = 'Residential Projects';
+            else if (normCat === 'embassies') pageTitle.textContent = 'EMBASSIES';
+            else if (normCat === 'government-projects') pageTitle.textContent = 'Government Projects';
+            else pageTitle.textContent = normCat.toUpperCase();
+          }
+
+          cards.forEach(function(card) {
+            var cardCat = (card.getAttribute('data-category') || '').toLowerCase().trim();
+            var text = card.textContent.toLowerCase();
+            var catMatch = (normCat === 'all' || cardCat === normCat);
+            var queryMatch = (!q || text.indexOf(q) !== -1);
+
+            if (catMatch && queryMatch) {
+              card.style.display = 'flex';
+              card.style.opacity = '1';
+              card.style.visibility = 'visible';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        }
+
+        // Direct event delegation on buttons
+        filterNav.onclick = function(e) {
+          var btn = e.target.closest('.filter-btn');
+          if (!btn) return;
+          filterNav.querySelectorAll('.filter-btn').forEach(function(b) {
+            b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          btn.classList.add('active');
+          btn.setAttribute('aria-selected', 'true');
+          var cat = btn.getAttribute('data-filter') || 'all';
+          var q = searchInput ? searchInput.value : '';
+          applyFilter(cat, q);
+        };
+
+        if (searchInput) {
+          searchInput.oninput = function(e) {
+            var activeBtn = filterNav.querySelector('.filter-btn.active');
+            var cat = activeBtn ? activeBtn.getAttribute('data-filter') : 'all';
+            applyFilter(cat, e.target.value);
+          };
+        }
+
+        var params = new URLSearchParams(window.location.search);
+        var initial = params.get('cat');
+        if (initial) {
+          var target = filterNav.querySelector('[data-filter="' + initial.toLowerCase().replace(/\s+/g, '-') + '"]');
+          if (target) {
+            target.click();
+          } else {
+            applyFilter('all');
+          }
+        } else {
+          applyFilter('all');
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPureFilter);
+      } else {
+        initPureFilter();
+      }
+    })();
+  </script>
 </body>
 </html>
