@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Art Touch Control Center — Project &amp; Requests Management</title>
+  <title>Art Touch Control Center — Management &amp; Live Publishing</title>
   
   <!-- Typography & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +21,7 @@
 </head>
 <body class="admin-body">
 
-  <!-- 0. LUXURY ARCHITECTURAL LOCK SCREEN -->
+  <!-- 0. ARCHITECTURAL PRIVATE LOCK SCREEN -->
   <div class="admin-lock-screen" id="admin-lock-screen">
     <div class="admin-lock-card" id="admin-lock-card">
       <div class="admin-lock-emblem">
@@ -32,7 +32,7 @@
       <p class="admin-lock-sub">Architectural Woodworks &amp; Joinery — Control Center</p>
 
       <div class="admin-lock-pill">
-        <i class="fa-solid fa-shield-halved"></i> <span>Private Management Access</span>
+        <i class="fa-solid fa-shield-halved"></i> <span>Authorized Staff Access Only</span>
       </div>
 
       <form id="admin-lock-form" class="admin-lock-form" onsubmit="return false;">
@@ -70,7 +70,7 @@
       </form>
 
       <div class="admin-lock-footer-note">
-        <i class="fa-solid fa-shield-check"></i> Encrypted Workspace &bull; Amman, Jordan
+        <i class="fa-solid fa-shield-check"></i> Private System &bull; Amman, Jordan
       </div>
     </div>
   </div>
@@ -88,7 +88,7 @@
     <nav class="admin-nav">
       <button type="button" class="admin-nav-item active" data-tab="inquiries">
         <i class="fa-solid fa-inbox"></i>
-        <span>Requests &amp; Inquiries</span>
+        <span>Customer Inquiries</span>
         <span class="admin-nav-badge" id="stat-unread-count">0</span>
       </button>
 
@@ -97,56 +97,70 @@
         <span>Projects &amp; Galleries</span>
       </button>
 
+      <button type="button" class="admin-nav-item" data-tab="services">
+        <i class="fa-solid fa-hammer"></i>
+        <span>Services &amp; Capabilities</span>
+      </button>
+
+      <button type="button" class="admin-nav-item" data-tab="faqs">
+        <i class="fa-solid fa-circle-question"></i>
+        <span>Frequently Asked FAQs</span>
+      </button>
+
       <button type="button" class="admin-nav-item" data-tab="settings">
-        <i class="fa-solid fa-sliders"></i>
-        <span>Business Settings</span>
+        <i class="fa-solid fa-building"></i>
+        <span>Company &amp; Hours</span>
       </button>
 
       <button type="button" class="admin-nav-item" data-tab="sync">
-        <i class="fa-solid fa-floppy-disk"></i>
-        <span>Website Sync &amp; Export</span>
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <span>Publish to Website</span>
       </button>
     </nav>
 
     <div class="admin-sidebar-footer">
       <button type="button" class="admin-sidebar-lock-btn" id="btn-sidebar-lock">
-        <i class="fa-solid fa-lock"></i> <span>Lock App</span>
+        <i class="fa-solid fa-lock"></i> <span>Lock Control Center</span>
       </button>
-      <a href="index.html" target="_blank">
+      <a href="https://wrd2gore.github.io/art-touch-woodworks/" target="_blank">
         <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Website
       </a>
-      <a href="projects" target="_blank">
-        <i class="fa-solid fa-images"></i> View Portfolio
+      <a href="https://wrd2gore.github.io/art-touch-woodworks/projects.html" target="_blank">
+        <i class="fa-solid fa-images"></i> View Live Portfolio
       </a>
     </div>
   </aside>
 
   <!-- 2. Main Admin Workspace -->
   <main class="admin-main">
-    <!-- Topbar -->
+    <!-- Topbar with Live Publish Action & Draft Indicator -->
     <header class="admin-topbar">
       <div class="admin-page-heading">
         <h2 id="admin-page-title">Customer Inquiries &amp; Requests</h2>
         <p id="admin-page-sub">View and manage contact form submissions and quote requests.</p>
       </div>
+      
       <div class="admin-topbar-actions">
-        <div id="admin-appmode-indicator" class="admin-badge-appmode" style="display: inline-flex;">
-          <i class="fa-solid fa-shield-check"></i> <span id="admin-appmode-text">Authorized App Node</span>
+        <!-- Draft vs. Published Indicator Badge -->
+        <div id="publish-status-badge" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46;">
+          <i class="fa-solid fa-circle-check"></i> <span id="publish-status-text">Live Website Up to Date</span>
         </div>
-        <div id="github-sync-indicator" style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #059669; padding: 6px 12px; background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 20px;">
-          <i class="fa-solid fa-circle-check"></i> <span>GitHub &amp; Vercel Connected</span>
-        </div>
+
+        <!-- 1-Click Publish to Live Website Button -->
+        <button type="button" class="btn btn-primary btn-sm" id="btn-publish-header" onclick="window.publishToLiveWebsite()" style="box-shadow: 0 2px 6px rgba(168, 135, 52, 0.3);">
+          <i class="fa-solid fa-cloud-arrow-up"></i> <span>Publish Changes</span>
+        </button>
+
+        <a href="https://wrd2gore.github.io/art-touch-woodworks/" target="_blank" class="btn btn-outline btn-sm" title="View Live Public Website">
+          <i class="fa-solid fa-globe"></i> <span>View Live Site</span>
+        </a>
+
         <button type="button" class="lang-switch-btn" onclick="ArtTouchI18n.toggleLanguage()" title="Switch Language">
           <i class="fa-solid fa-globe"></i> <span>العربية</span>
         </button>
-        <button type="button" class="btn btn-primary btn-sm" id="btn-publish-github-live" onclick="window.syncDirectlyToGitHub('Manual 1-click sync from Art Touch Control Center')" title="Publish all changes to GitHub">
-          <i class="fa-brands fa-github"></i> <span>Publish to GitHub</span>
-        </button>
-        <button type="button" class="btn-lock-session" id="btn-topbar-lock" title="Lock and protect control center">
-          <i class="fa-solid fa-lock"></i> Lock
-        </button>
-        <button type="button" class="btn btn-outline btn-sm" onclick="location.reload()" title="Refresh Data">
-          <i class="fa-solid fa-rotate"></i> Refresh
+
+        <button type="button" class="btn-lock-session" id="btn-topbar-lock" title="Lock session">
+          <i class="fa-solid fa-lock"></i>
         </button>
       </div>
     </header>
@@ -159,7 +173,7 @@
         <div class="admin-stat-card">
           <div class="admin-stat-info">
             <div class="stat-num" id="stat-inquiries-count">0</div>
-            <div class="stat-lbl">Total Requests</div>
+            <div class="stat-lbl">Customer Requests</div>
           </div>
           <div class="admin-stat-icon primary"><i class="fa-solid fa-inbox"></i></div>
         </div>
@@ -174,18 +188,18 @@
 
         <div class="admin-stat-card">
           <div class="admin-stat-info">
-            <div class="stat-num" id="stat-categories-count">5</div>
-            <div class="stat-lbl">Categories</div>
+            <div class="stat-num" id="stat-services-count">6</div>
+            <div class="stat-lbl">Core Services</div>
           </div>
-          <div class="admin-stat-info-icon admin-stat-icon dark"><i class="fa-solid fa-tags"></i></div>
+          <div class="admin-stat-info-icon admin-stat-icon dark"><i class="fa-solid fa-hammer"></i></div>
         </div>
 
         <div class="admin-stat-card">
           <div class="admin-stat-info">
-            <div class="stat-num" style="color: var(--color-success);">Ready</div>
-            <div class="stat-lbl">Offline-First Engine</div>
+            <div class="stat-num" id="stat-faqs-count">5</div>
+            <div class="stat-lbl">Client FAQs</div>
           </div>
-          <div class="admin-stat-icon warning"><i class="fa-solid fa-bolt"></i></div>
+          <div class="admin-stat-icon warning"><i class="fa-solid fa-circle-question"></i></div>
         </div>
       </div>
 
@@ -193,7 +207,7 @@
       <section id="section-inquiries">
         <div class="admin-card">
           <div class="admin-card-header">
-            <h3 class="admin-card-title">Submitted Client Requests</h3>
+            <h3 class="admin-card-title">Submitted Client Requests &amp; Quote Inquiries</h3>
             
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
               <input type="text" id="inquiries-search" class="form-control" placeholder="Search by name, email, subject..." style="width: 240px; padding: 8px 12px; font-size: 13px;">
@@ -202,10 +216,16 @@
                 <option value="all">All Inquiries</option>
                 <option value="contact">Contact Forms</option>
                 <option value="quote">Quote Estimates</option>
+                <option value="new">Status: New</option>
+                <option value="handled">Status: Handled</option>
               </select>
 
-              <button type="button" class="btn btn-secondary btn-sm" id="btn-export-csv">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-export-csv" onclick="window.exportInquiriesCSV()">
                 <i class="fa-solid fa-file-export"></i> Export CSV
+              </button>
+
+              <button type="button" class="btn btn-outline btn-sm" onclick="window.clearHandledInquiries()" title="Clear handled inquiries">
+                <i class="fa-solid fa-trash-can"></i> Clear Handled
               </button>
             </div>
           </div>
@@ -235,26 +255,26 @@
       <section id="section-projects" style="display: none;">
         <div class="admin-card">
           <div class="admin-card-header">
-            <h3 class="admin-card-title">Portfolio Projects &amp; Independent Galleries</h3>
+            <h3 class="admin-card-title">Portfolio Projects &amp; Dedicated Galleries</h3>
             
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
               <input type="text" id="projects-admin-search" class="form-control" placeholder="Search projects..." style="width: 220px; padding: 8px 12px; font-size: 13px;">
               
               <select id="projects-admin-category-filter" class="form-control" style="width: 180px; padding: 8px 12px; font-size: 13px;">
                 <option value="all">All Categories</option>
-                <option value="banks">BANKS</option>
-                <option value="commercial">Commercial</option>
-                <option value="residential">Residential</option>
-                <option value="embassies">EMBASSIES</option>
-                <option value="government-projects">Government Projects</option>
+                <option value="Banks">BANKS</option>
+                <option value="Commercial">Commercial</option>
+                <option value="Residential">Residential</option>
+                <option value="Embassies">EMBASSIES</option>
+                <option value="Government Projects">Government Projects</option>
               </select>
 
-              <button type="button" class="btn btn-primary btn-sm" id="btn-add-new-project">
+              <button type="button" class="btn btn-primary btn-sm" id="btn-add-new-project" onclick="window.openNewProjectModal()">
                 <i class="fa-solid fa-plus"></i> Add New Project
               </button>
 
-              <button type="button" class="btn btn-outline btn-sm" onclick="window.restoreDefaultProjects()" title="Restore all default verified projects">
-                <i class="fa-solid fa-rotate-left"></i> Restore Default Projects
+              <button type="button" class="btn btn-outline btn-sm" onclick="window.restoreDefaultProjects()" title="Restore all 14 official verified projects">
+                <i class="fa-solid fa-rotate-left"></i> Restore 14 Default Projects
               </button>
             </div>
           </div>
@@ -267,90 +287,120 @@
         </div>
       </section>
 
-      <!-- SECTION 3: BUSINESS SETTINGS -->
+      <!-- SECTION 3: SERVICES & CAPABILITIES -->
+      <section id="section-services" style="display: none;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">Woodwork Services &amp; Capabilities</h3>
+            <button type="button" class="btn btn-primary btn-sm" onclick="window.openNewServiceModal()">
+              <i class="fa-solid fa-plus"></i> Add Service
+            </button>
+          </div>
+          <div class="admin-card-body">
+            <div class="admin-services-grid" id="admin-services-grid-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
+              <!-- Dynamically populated by js/admin.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 4: FREQUENTLY ASKED QUESTIONS -->
+      <section id="section-faqs" style="display: none;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">Frequently Asked Questions (FAQs)</h3>
+            <button type="button" class="btn btn-primary btn-sm" onclick="window.openNewFaqModal()">
+              <i class="fa-solid fa-plus"></i> Add FAQ
+            </button>
+          </div>
+          <div class="admin-card-body">
+            <div id="admin-faqs-list" style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Dynamically populated by js/admin.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 5: BUSINESS & CONTACT SETTINGS -->
       <section id="section-settings" style="display: none;">
         <div class="admin-card" style="max-width: 800px;">
           <div class="admin-card-header">
-            <h3 class="admin-card-title">Business Hours &amp; Centralized Company Profile</h3>
+            <h3 class="admin-card-title"><i class="fa-solid fa-building"></i> Company Information &amp; Operating Hours</h3>
+            <button type="button" class="btn btn-primary btn-sm" onclick="window.saveBusinessSettings()">
+              <i class="fa-solid fa-floppy-disk"></i> Save Info
+            </button>
           </div>
           <div class="admin-card-body">
-            <div style="background: #FEF3C7; border: 1px solid #FDE68A; padding: 16px; border-radius: 4px; margin-bottom: 24px;">
-              <h4 style="margin: 0 0 6px 0; font-size: 14px; color: #92400E;"><i class="fa-solid fa-cloud-arrow-down"></i> Live Website Cloud Sync Bridge</h4>
-              <p style="margin: 0 0 12px 0; font-size: 13px; color: #78350F;">
-                Enter your live Vercel or public website URL (e.g. <code>https://art-touch-woodworks.vercel.app</code>) to pull all incoming customer requests into this desktop app in real time.
-              </p>
-              <div style="display: flex; gap: 8px;">
-                <input type="url" id="input-api-url" class="form-control" placeholder="https://your-art-touch.vercel.app" style="font-size: 13px;">
-                <button type="button" class="btn btn-primary btn-sm" id="btn-save-api-url" style="white-space: nowrap;">
-                  <i class="fa-solid fa-link"></i> Connect API
-                </button>
-              </div>
-            </div>
-
-            <form id="form-business-settings">
+            <form id="form-business-settings" onsubmit="return false;">
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label">Company Location</label>
-                  <input type="text" class="form-control" value="Nadhmi Abdul Hadi St., Amman, Jordan" readonly>
+                  <label class="form-label">Workshop Location</label>
+                  <input type="text" id="setting-location" class="form-control" value="Nadhmi Abdul Hadi St., Amman, Jordan">
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Phone Contact</label>
-                  <input type="text" class="form-control" value="+962 (6) 222 3 707" readonly>
+                  <label class="form-label">Primary Phone Contact</label>
+                  <input type="text" id="setting-phone" class="form-control" value="+962 (6) 222 3 707">
                 </div>
               </div>
 
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label">Working Days</label>
-                  <input type="text" class="form-control" value="Sunday - Thursday" readonly>
+                  <label class="form-label">Operating Days</label>
+                  <input type="text" id="setting-days" class="form-control" value="Sunday - Thursday">
                 </div>
                 <div class="form-group">
                   <label class="form-label">Operating Hours (Jordan Local Time)</label>
-                  <input type="text" class="form-control" value="09:00 AM - 06:00 PM" readonly>
+                  <input type="text" id="setting-hours" class="form-control" value="09:00 AM - 06:00 PM">
                 </div>
               </div>
 
               <div class="form-group">
-                <label class="form-label">General Manager Email</label>
-                <input type="email" class="form-control" value="m.shaheen@arttouchjo.com" readonly>
+                <label class="form-label">General Contact Email</label>
+                <input type="email" id="setting-email-general" class="form-control" value="info@arttouchjo.com">
               </div>
 
-              <div class="form-group">
-                <label class="form-label">CEO — Plant Manager Email</label>
-                <input type="email" class="form-control" value="m.maghari@arttouchjo.com" readonly>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">General Manager Email</label>
+                  <input type="email" id="setting-email-gm" class="form-control" value="m.shaheen@arttouchjo.com">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">CEO &amp; Plant Manager Email</label>
+                  <input type="email" id="setting-email-ceo" class="form-control" value="m.maghari@arttouchjo.com">
+                </div>
               </div>
             </form>
           </div>
         </div>
 
-        <!-- Security & App Access Control Card -->
+        <!-- Security & PIN Management Card -->
         <div class="admin-card" style="max-width: 800px; margin-top: 24px;">
           <div class="admin-card-header">
-            <h3 class="admin-card-title"><i class="fa-solid fa-shield-halved" style="color: #A88734;"></i> Security &amp; App Access Control</h3>
+            <h3 class="admin-card-title"><i class="fa-solid fa-shield-halved" style="color: #A88734;"></i> Security &amp; PIN Access</h3>
             <span id="active-pin-badge" style="font-size: 12px; font-weight: 600; padding: 4px 10px; background: #ECFDF5; border: 1px solid #A7F3D0; color: #047857; border-radius: 20px;">
-              <i class="fa-solid fa-lock"></i> Master Protected
+              <i class="fa-solid fa-lock"></i> PIN Protected
             </span>
           </div>
           <div class="admin-card-body">
             <p style="font-size: 13px; color: var(--color-admin-text-muted); margin-bottom: 16px;">
-              Manage the master security credentials required to unlock this administrative console. Only people with this PIN or running the authorized desktop application can view or edit company data.
+              Manage the PIN required to unlock this control center. Keep this PIN confidential among authorized staff.
             </p>
 
             <form id="form-security-settings" onsubmit="return false;">
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label">Current Master PIN / Passcode</label>
+                  <label class="form-label">Current PIN</label>
                   <div style="position: relative;">
-                    <input type="password" id="input-current-pin" class="form-control" placeholder="Enter current PIN (Default: 7707)" autocomplete="current-password" style="padding-right: 40px;">
+                    <input type="password" id="input-current-pin" class="form-control" placeholder="Current PIN (Default: 7707)" autocomplete="current-password" style="padding-right: 40px;">
                     <button type="button" class="btn-toggle-pin-visibility" onclick="window.togglePinVisibility('input-current-pin', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #9CA3AF; cursor: pointer;" title="Show/Hide PIN">
                       <i class="fa-solid fa-eye"></i>
                     </button>
                   </div>
                 </div>
                 <div class="form-group">
-                  <label class="form-label">New Master PIN / Passcode</label>
+                  <label class="form-label">New PIN</label>
                   <div style="position: relative;">
-                    <input type="password" id="input-new-pin" class="form-control" placeholder="Enter new PIN (e.g. 1234 or your code)" autocomplete="new-password" style="padding-right: 40px;">
+                    <input type="password" id="input-new-pin" class="form-control" placeholder="Enter new PIN" autocomplete="new-password" style="padding-right: 40px;">
                     <button type="button" class="btn-toggle-pin-visibility" onclick="window.togglePinVisibility('input-new-pin', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #9CA3AF; cursor: pointer;" title="Show/Hide PIN">
                       <i class="fa-solid fa-eye"></i>
                     </button>
@@ -361,17 +411,14 @@
               <div id="security-alert-msg" style="display: none; padding: 12px 16px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; font-weight: 500;"></div>
 
               <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                <button type="button" class="btn btn-primary btn-sm" id="btn-update-pin">
+                <button type="button" class="btn btn-primary btn-sm" id="btn-update-pin" onclick="window.updateSecurityPin()">
                   <i class="fa-solid fa-key"></i> Save New PIN
                 </button>
-                <button type="button" class="btn btn-outline btn-sm" id="btn-reset-pin-default">
+                <button type="button" class="btn btn-outline btn-sm" onclick="window.resetPinToDefault()">
                   <i class="fa-solid fa-rotate-left"></i> Reset to Default (7707)
                 </button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="window.lockAdminControlCenter()" title="Lock immediately to test your new PIN">
-                  <i class="fa-solid fa-lock"></i> Test Lock Now
-                </button>
-                <button type="button" class="btn btn-outline btn-sm" id="btn-clear-remembered-sessions" style="color: #DC2626; border-color: #FCA5A5;">
-                  <i class="fa-solid fa-trash-can"></i> Clear Remembered Sessions
+                <button type="button" class="btn btn-secondary btn-sm" onclick="window.lockAdminControlCenter()" title="Lock immediately to test your PIN">
+                  <i class="fa-solid fa-lock"></i> Lock App Now
                 </button>
               </div>
             </form>
@@ -379,31 +426,49 @@
         </div>
       </section>
 
-      <!-- SECTION 4: WEBSITE SYNC & EXPORT -->
+      <!-- SECTION 6: PUBLISH & DEPLOYMENT CENTER -->
       <section id="section-sync" style="display: none;">
-        <!-- GitHub Direct Publishing Card -->
+        <!-- Big 1-Click Publishing Hub -->
         <div class="admin-card" style="margin-bottom: 24px;">
-          <div class="admin-card-header">
-            <h3 class="admin-card-title"><i class="fa-brands fa-github"></i> 1-Click Live Website Publisher</h3>
-            <div style="display: flex; gap: 10px;">
-              <a href="https://wrd2gore.github.io/art-touch-woodworks/" target="_blank" class="btn btn-outline btn-sm">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Website
-              </a>
-              <button type="button" class="btn btn-primary btn-sm" onclick="window.syncDirectlyToGitHub('Manual sync from Admin Control Center')">
-                <i class="fa-brands fa-github"></i> Publish to GitHub &amp; Pages Now
-              </button>
+          <div class="admin-card-header" style="background: #FDFCF9; border-bottom: 1px solid #E8DFCE;">
+            <div>
+              <h3 class="admin-card-title" style="font-size: 18px; color: #1F2428;">
+                <i class="fa-solid fa-cloud-arrow-up text-brand"></i> 1-Click Live Website Publisher
+              </h3>
+              <p style="font-size: 13px; color: var(--color-admin-text-muted); margin: 4px 0 0 0;">
+                Clicking Publish automatically updates your live website (<a href="https://wrd2gore.github.io/art-touch-woodworks/" target="_blank" style="color: var(--color-brand); font-weight: 600;">wrd2gore.github.io/art-touch-woodworks</a>) in seconds.
+              </p>
             </div>
           </div>
-          <div class="admin-card-body">
-            <p style="font-size: 13px; color: var(--color-admin-text-muted); margin-bottom: 16px;">
-              Your live website is hosted at <a href="https://wrd2gore.github.io/art-touch-woodworks/" target="_blank" style="color: var(--color-brand); font-weight: 600;">https://wrd2gore.github.io/art-touch-woodworks/</a>. You <strong>do not need a VPS</strong> or paid server. Edits can be published in 1 click!
-            </p>
-            
-            <div style="background: #F3F4F6; padding: 16px; border-radius: 8px; border: 1px solid var(--color-admin-border);">
-              <label class="form-label" style="font-size: 13px; font-weight: 600;">GitHub Personal Access Token (Saved locally in this app)</label>
-              <div style="display: flex; gap: 10px; margin-bottom: 8px;">
-                <input type="password" id="input-gh-token" class="form-control" placeholder="ghp_... or github_pat_..." style="font-size: 13px;">
-                <button type="button" class="btn btn-secondary btn-sm" id="btn-save-gh-token" style="white-space: nowrap;">
+          <div class="admin-card-body" style="padding: 24px;">
+            <!-- Status Card -->
+            <div id="publish-status-box" style="display: flex; align-items: center; justify-content: space-between; padding: 20px; background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 8px; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+              <div>
+                <div style="font-size: 16px; font-weight: 700; color: #065F46; margin-bottom: 4px;" id="publish-box-title">
+                  <i class="fa-solid fa-circle-check"></i> Live Website Is Fully Synchronized
+                </div>
+                <div style="font-size: 13px; color: #047857;" id="publish-box-subtitle">
+                  All your projects, services, and business information are live on the public website.
+                </div>
+                <div style="font-size: 12px; color: #6B7280; margin-top: 6px;" id="publish-last-timestamp">
+                  Last Published: Never
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-primary" id="btn-publish-main" onclick="window.publishToLiveWebsite()" style="font-size: 15px; padding: 12px 24px;">
+                <i class="fa-solid fa-cloud-arrow-up"></i> <span>Publish to Live Website</span>
+              </button>
+            </div>
+
+            <!-- GitHub Token Configuration for Staff -->
+            <div style="background: #F9FAFB; padding: 18px; border-radius: 8px; border: 1px solid var(--color-admin-border);">
+              <label class="form-label" style="font-size: 13px; font-weight: 700;">GitHub Connection Token</label>
+              <p style="font-size: 12px; color: var(--color-admin-text-muted); margin-bottom: 10px;">
+                Stored securely on this computer only. Never shared with website visitors.
+              </p>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="password" id="input-gh-token" class="form-control" placeholder="GitHub Personal Access Token" style="font-size: 13px; flex: 1; min-width: 260px;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-save-gh-token" onclick="window.saveGitHubToken()" style="white-space: nowrap;">
                   <i class="fa-solid fa-floppy-disk"></i> Save Token
                 </button>
                 <button type="button" class="btn btn-outline btn-sm" id="btn-test-gh-token" onclick="window.testGitHubTokenConnection()" style="white-space: nowrap;">
@@ -411,34 +476,25 @@
                 </button>
               </div>
               <div id="gh-token-test-result" style="display: none; padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-top: 10px;"></div>
-              <small style="color: var(--color-admin-text-muted); font-size: 11px; display: block; margin-top: 8px;">
-                <i class="fa-solid fa-circle-info"></i> Token requires <code>repo</code> scope (Classic token) or <code>Contents: Read and write</code> (Fine-Grained token) on repo <code>wrd2gore/art-touch-woodworks</code>.
-              </small>
             </div>
           </div>
         </div>
 
+        <!-- Direct Export / Backup -->
         <div class="admin-card">
           <div class="admin-card-header">
-            <h3 class="admin-card-title">Sync Edits to js/data.js</h3>
+            <h3 class="admin-card-title"><i class="fa-solid fa-code"></i> Live Database Preview (js/data.js)</h3>
             <div style="display: flex; gap: 10px;">
-              <button type="button" class="btn btn-primary btn-sm" id="btn-save-direct">
-                <i class="fa-solid fa-floppy-disk"></i> Direct Save (File Picker)
+              <button type="button" class="btn btn-secondary btn-sm" onclick="window.downloadDataJs()">
+                <i class="fa-solid fa-download"></i> Download data.js Backup
               </button>
-              <button type="button" class="btn btn-secondary btn-sm" id="btn-download-datajs">
-                <i class="fa-solid fa-download"></i> Download data.js
-              </button>
-              <button type="button" class="btn btn-outline btn-sm" id="btn-copy-datajs">
+              <button type="button" class="btn btn-outline btn-sm" onclick="window.copyDataJsCode()">
                 <i class="fa-solid fa-copy"></i> Copy Code
               </button>
             </div>
           </div>
           <div class="admin-card-body">
-            <p style="font-size: 14px; color: var(--color-admin-text-muted); margin-bottom: 16px;">
-              The box below contains the live, formatted JavaScript code for your website's <code>js/data.js</code> file.
-              Whenever you add or edit projects and galleries, click <strong>Direct Save</strong> or <strong>Download data.js</strong> to update your local website files permanently.
-            </p>
-            <pre id="datajs-code-preview" style="background: #1F2428; color: #F3F4F6; padding: 20px; border-radius: 4px; font-family: var(--font-mono); font-size: 13px; max-height: 400px; overflow-y: auto; white-space: pre;"></pre>
+            <pre id="datajs-code-preview" style="background: #1F2428; color: #F3F4F6; padding: 20px; border-radius: 4px; font-family: var(--font-mono); font-size: 13px; max-height: 360px; overflow-y: auto; white-space: pre;"></pre>
           </div>
         </div>
       </section>
@@ -451,10 +507,10 @@
     <div class="admin-modal">
       <div class="admin-modal-header">
         <h3 class="admin-modal-title" id="project-modal-title">Edit Project</h3>
-        <button type="button" class="btn-close admin-modal-close" style="font-size: 18px; color: #9CA3AF;"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" class="btn-close admin-modal-close" onclick="window.closeModal('modal-project-editor')"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="admin-modal-body">
-        <form id="form-project-editor">
+        <form id="form-project-editor" onsubmit="window.saveProjectFromModal(event); return false;">
           <input type="hidden" id="edit-project-id">
           
           <div class="form-row">
@@ -468,7 +524,7 @@
                 <option value="Banks">BANKS</option>
                 <option value="Commercial">Commercial</option>
                 <option value="Residential">Residential</option>
-                <option value="EMBASSIES">EMBASSIES</option>
+                <option value="Embassies">EMBASSIES</option>
                 <option value="Government Projects">Government Projects</option>
               </select>
             </div>
@@ -477,7 +533,7 @@
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Location</label>
-              <input type="text" id="edit-project-location" class="form-control" placeholder="e.g. Amman - QAIA Airport">
+              <input type="text" id="edit-project-location" class="form-control" placeholder="e.g. Amman, Jordan">
             </div>
             <div class="form-group">
               <label class="form-label">Date Completed / Year</label>
@@ -498,7 +554,7 @@
 
           <div class="form-group">
             <label class="form-label">Description</label>
-            <textarea id="edit-project-desc" class="form-control" rows="2" placeholder="Describe the woodwork details, materials, or scope..."></textarea>
+            <textarea id="edit-project-desc" class="form-control" rows="2" placeholder="Describe the architectural woodwork, materials, or scope..."></textarea>
           </div>
 
           <!-- Dedicated Gallery Photo Array Manager -->
@@ -508,12 +564,12 @@
               <span id="gallery-manager-count" style="font-size: 12px; color: var(--color-brand); font-weight: 600;">0 photos</span>
             </div>
             <p style="font-size: 12px; color: var(--color-admin-text-muted); margin-bottom: 12px;">
-              Add image paths located in your <code>images/projects/</code> folder. Photos will automatically appear in this project's isolated gallery on the website.
+              Add photo image paths (e.g. <code>images/projects/project-01/01.png</code>).
             </p>
 
             <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-              <input type="text" id="new-photo-url-input" class="form-control" placeholder="e.g. images/projects/commercial/pwc/02.png" style="font-size: 13px;">
-              <button type="button" class="btn btn-secondary btn-sm" id="btn-add-gallery-photo" style="white-space: nowrap;">
+              <input type="text" id="new-photo-url-input" class="form-control" placeholder="images/projects/.../02.png" style="font-size: 13px;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="window.addGalleryPhotoFromInput()" style="white-space: nowrap;">
                 <i class="fa-solid fa-plus"></i> Add Photo
               </button>
             </div>
@@ -525,7 +581,7 @@
         </form>
       </div>
       <div class="admin-modal-footer">
-        <button type="button" class="btn btn-outline btn-sm admin-modal-close">Cancel</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="window.closeModal('modal-project-editor')">Cancel</button>
         <button type="submit" form="form-project-editor" class="btn btn-primary btn-sm">
           <i class="fa-solid fa-check"></i> Save Project &amp; Gallery
         </button>
@@ -538,13 +594,86 @@
     <div class="admin-modal">
       <div class="admin-modal-header">
         <h3 class="admin-modal-title">Customer Request Details</h3>
-        <button type="button" class="btn-close admin-modal-close" style="font-size: 18px; color: #9CA3AF;"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" class="btn-close admin-modal-close" onclick="window.closeModal('modal-inquiry-detail')"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="admin-modal-body" id="modal-inquiry-body">
         <!-- Dynamically populated by js/admin.js -->
       </div>
+      <div class="admin-modal-footer" id="modal-inquiry-footer">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="window.closeModal('modal-inquiry-detail')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Service Editor Modal -->
+  <div class="admin-modal-overlay" id="modal-service-editor" role="dialog" aria-modal="true">
+    <div class="admin-modal">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title" id="service-modal-title">Edit Service</h3>
+        <button type="button" class="btn-close admin-modal-close" onclick="window.closeModal('modal-service-editor')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="admin-modal-body">
+        <form id="form-service-editor" onsubmit="window.saveServiceFromModal(event); return false;">
+          <input type="hidden" id="edit-service-id">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Service Title <span class="req">*</span></label>
+              <input type="text" id="edit-service-title" class="form-control" placeholder="e.g. Architectural Joinery" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">FontAwesome Icon Class</label>
+              <input type="text" id="edit-service-icon" class="form-control" placeholder="fa-solid fa-tree">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Short Description</label>
+            <textarea id="edit-service-desc" class="form-control" rows="3" placeholder="Brief summary of what this woodwork service delivers..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Key Features (One per line)</label>
+            <textarea id="edit-service-features" class="form-control" rows="4" placeholder="3D acoustic wall paneling&#10;Custom wood ceiling systems&#10;Concealed pivot doors"></textarea>
+          </div>
+        </form>
+      </div>
       <div class="admin-modal-footer">
-        <button type="button" class="btn btn-secondary btn-sm admin-modal-close">Close</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="window.closeModal('modal-service-editor')">Cancel</button>
+        <button type="submit" form="form-service-editor" class="btn btn-primary btn-sm">
+          <i class="fa-solid fa-check"></i> Save Service
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: FAQ Editor Modal -->
+  <div class="admin-modal-overlay" id="modal-faq-editor" role="dialog" aria-modal="true">
+    <div class="admin-modal">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title" id="faq-modal-title">Edit FAQ</h3>
+        <button type="button" class="btn-close admin-modal-close" onclick="window.closeModal('modal-faq-editor')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="admin-modal-body">
+        <form id="form-faq-editor" onsubmit="window.saveFaqFromModal(event); return false;">
+          <input type="hidden" id="edit-faq-index">
+          
+          <div class="form-group">
+            <label class="form-label">Question <span class="req">*</span></label>
+            <input type="text" id="edit-faq-q" class="form-control" placeholder="e.g. How do I request a custom quotation?" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Answer <span class="req">*</span></label>
+            <textarea id="edit-faq-a" class="form-control" rows="4" placeholder="Detailed response for customers..." required></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn btn-outline btn-sm" onclick="window.closeModal('modal-faq-editor')">Cancel</button>
+        <button type="submit" form="form-faq-editor" class="btn btn-primary btn-sm">
+          <i class="fa-solid fa-check"></i> Save FAQ
+        </button>
       </div>
     </div>
   </div>

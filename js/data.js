@@ -178,7 +178,77 @@ const ArtTouchData = {
   }
 ],
 
-  // 2. Centralized Business Configuration
+  // 2. Official Core Services
+  services: [
+    {
+      "id": "architectural-joinery",
+      "title": "Architectural Joinery & Wall Cladding",
+      "shortDesc": "Precision acoustic wall paneling, fluted wood features, and bespoke architectural ceiling baffles for commercial and residential spaces.",
+      "icon": "fa-solid fa-tree",
+      "features": ["3D acoustic wall paneling", "Custom wood ceiling systems", "Concealed pivot doors", "Natural veneer matching"]
+    },
+    {
+      "id": "executive-boardrooms",
+      "title": "Executive Boardroom Tables & Fit-Outs",
+      "shortDesc": "Grand bespoke boardroom tables with integrated power, cable management, and matching executive credenzas.",
+      "icon": "fa-solid fa-briefcase",
+      "features": ["Solid hardwood edge profiling", "Seamless motorized AV integration", "Custom veneer inlays", "Executive storage credenzas"]
+    },
+    {
+      "id": "luxury-residential",
+      "title": "Luxury Residential Joinery & Custom Kitchens",
+      "shortDesc": "Master bedroom walk-in closets, bespoke bathroom vanities, and precision custom kitchens for luxury villas.",
+      "icon": "fa-solid fa-house",
+      "features": ["Walk-in closet systems with LED", "Moisture-resistant bathroom vanities", "European Blum soft-close hardware", "Custom interior doors"]
+    },
+    {
+      "id": "commercial-banks",
+      "title": "Commercial Bank Counters & Teller Stations",
+      "shortDesc": "Secure, durable teller counters, customer service desks, and corporate partition walls for financial institutions.",
+      "icon": "fa-solid fa-building-columns",
+      "features": ["High-traffic durability finishes", "Integrated wire chases and vaults", "Corian and solid surface integration", "Compliant ergonomic standards"]
+    },
+    {
+      "id": "fine-furniture",
+      "title": "Bespoke Fine Furniture & Credenzas",
+      "shortDesc": "Handcrafted luxury dining tables, accent consoles, and custom coffee tables designed for high-end interiors.",
+      "icon": "fa-solid fa-couch",
+      "features": ["Solid oak, walnut, and ash", "Traditional mortise and tenon joinery", "Polyurethane and oil finishes", "Hand-finished edge details"]
+    },
+    {
+      "id": "architectural-doors",
+      "title": "Architectural Solid & Fire-Rated Doors",
+      "shortDesc": "Heavy-duty flush doors, pivot entrance doors, and acoustic doors engineered for hotels, embassies, and private residences.",
+      "icon": "fa-solid fa-door-closed",
+      "features": ["Up to 3.2m oversized pivot doors", "Acoustic core sound insulation", "Concealed 3D adjustable hinges", "Magnetic lock integration"]
+    }
+  ],
+
+  // 3. Official Frequently Asked Questions
+  faqs: [
+    {
+      "q": "How do I request a custom quotation or submit shop drawings?",
+      "a": "You can use our online Quote Request Wizard or email your architectural plans directly to info@arttouchjo.com. Our engineering team reviews drawings within 24–48 hours."
+    },
+    {
+      "q": "What materials and hardwood species do you work with?",
+      "a": "We source premium European White Oak, American Walnut, Ash, Teak, and high-density moisture-resistant MDF with natural and reconstituted veneers."
+    },
+    {
+      "q": "Can you execute custom fit-outs according to architect drawings?",
+      "a": "Yes. Our engineering division creates detailed shop drawings, material samples, and 3D mockups for approval before factory production begins."
+    },
+    {
+      "q": "What is your standard production and delivery lead time?",
+      "a": "Standard bespoke items typically take 3 to 5 weeks from approved shop drawings, depending on project scale and material finishes."
+    },
+    {
+      "q": "Where is your manufacturing workshop located in Amman?",
+      "a": "Our advanced manufacturing plant and showroom are located on Nadhmi Abdul Hadi St., Amman, Jordan. Clients are welcome to visit by appointment."
+    }
+  ],
+
+  // 4. Centralized Business Configuration
   businessHours: {
     location: "Nadhmi Abdul Hadi St., Amman, Jordan",
     country: "Jordan",
@@ -196,7 +266,7 @@ const ArtTouchData = {
     }
   },
 
-  // 3. Helper Functions
+  // 5. Helper Functions
   getAllCategories: function() {
     return Array.from(new Set(this.projects.map(p => p.category))).filter(Boolean);
   },
@@ -216,3 +286,4 @@ const ArtTouchData = {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = ArtTouchData;
 }
+

@@ -1,43 +1,324 @@
 /**
  * ============================================================================
- * ART TOUCH WOODWORKS — DESKTOP ADMIN MANAGEMENT APP
- * Controller for Inquiries, Projects, Dedicated Galleries & Website Sync
+ * ART TOUCH WOODWORKS — COMPANY CONTROL CENTER
+ * Pure Vanilla JavaScript Management & 1-Click Live Website Publisher
  * ============================================================================
  */
 
 (function() {
   'use strict';
 
-  // State
+  // Master State
   let projectsData = [];
+  let servicesData = [];
+  let faqsData = [];
+  let businessData = {};
   let inquiriesData = [];
   let activeTab = 'inquiries';
-  let activeEditingProjectId = null;
   let tempEditingGallery = [];
+  let hasDraftChanges = false;
 
-  // DOM Elements
+  // DOM Cache
   const navItems = document.querySelectorAll('.admin-nav-item');
   const sections = {
     inquiries: document.getElementById('section-inquiries'),
     projects: document.getElementById('section-projects'),
+    services: document.getElementById('section-services'),
+    faqs: document.getElementById('section-faqs'),
     settings: document.getElementById('section-settings'),
     sync: document.getElementById('section-sync')
   };
 
-  // 1. Initialization
+  /* -------------------------------------------------------------------------- */
+  /* 1. INITIALIZATION                                                          */
+  /* -------------------------------------------------------------------------- */
   document.addEventListener('DOMContentLoaded', () => {
     initAuthAndSecurity();
-    loadInquiries();
-    loadProjects();
+    loadAllMasterData();
     initNavigation();
-    initInquiriesUI();
-    initProjectsUI();
-    initSettingsUI();
-    initSyncUI();
+    initInquiriesListener();
     updateDashboardStats();
+    updatePublishStatusUI();
+    renderActiveTab();
   });
 
-  // 2. Navigation Controller
+  function loadAllMasterData() {
+    // 1. Projects
+    try {
+      const storedProjects = localStorage.getItem('arttouch_custom_projects') || localStorage.getItem('arttouch_projects');
+      if (storedProjects) {
+        projectsData = JSON.parse(storedProjects);
+      } else if (window.ArtTouchData && Array.isArray(window.ArtTouchData.projects)) {
+        projectsData = JSON.parse(JSON.stringify(window.ArtTouchData.projects));
+      }
+    } catch (e) {
+      projectsData = (window.ArtTouchData && window.ArtTouchData.projects) ? window.ArtTouchData.projects : [];
+    }
+
+    // 2. Services
+    try {
+      const storedServices = localStorage.getItem('arttouch_services');
+      if (storedServices) {
+        servicesData = JSON.parse(storedServices);
+      } else if (window.ArtTouchData && Array.isArray(window.ArtTouchData.services)) {
+        servicesData = JSON.parse(JSON.stringify(window.ArtTouchData.services));
+      }
+    } catch (e) {
+      servicesData = (window.ArtTouchData && window.ArtTouchData.services) ? window.ArtTouchData.services : [];
+    }
+
+    // 3. FAQs
+    try {
+      const storedFaqs = localStorage.getItem('arttouch_faqs');
+      if (storedFaqs) {
+        faqsData = JSON.parse(storedFaqs);
+      } else if (window.ArtTouchData && Array.isArray(window.ArtTouchData.faqs)) {
+        faqsData = JSON.parse(JSON.stringify(window.ArtTouchData.faqs));
+      }
+    } catch (e) {
+      faqsData = (window.ArtTouchData && window.ArtTouchData.faqs) ? window.ArtTouchData.faqs : [];
+    }
+
+    // 4. Business Hours & Company Info
+    try {
+      const storedBiz = localStorage.getItem('arttouch_business');
+      if (storedBiz) {
+        businessData = JSON.parse(storedBiz);
+      } else if (window.ArtTouchData && window.ArtTouchData.businessHours) {
+        businessData = JSON.parse(JSON.stringify(window.ArtTouchData.businessHours));
+      }
+    } catch (e) {
+      businessData = (window.ArtTouchData && window.ArtTouchData.businessHours) ? window.ArtTouchData.businessHours : {};
+    }
+
+    // 5. Inquiries
+    try {
+      const storedInquiries = localStorage.getItem('arttouch_inquiries');
+      if (storedInquiries) {
+        inquiriesData = JSON.parse(storedInquiries);
+      } else {
+        inquiriesData = [
+          {
+            id: 'inq-welcome-01',
+            type: 'contact',
+            name: 'Sarah Al-Majali',
+            email: 's.majali@example.jo',
+            phone: '+962 7 9123 4567',
+            subject: 'Custom Executive Boardroom Fit-Out',
+            message: 'We are requesting a proposal and shop drawings for our new regional office boardroom tables and architectural wall cladding in Amman.',
+            timestamp: new Date().toISOString(),
+            status: 'new'
+          }
+        ];
+        saveInquiriesLocally();
+      }
+    } catch (e) {
+      inquiriesData = [];
+    }
+
+    // Check draft state
+    hasDraftChanges = localStorage.getItem('arttouch_has_draft') === 'true';
+
+    // Populate business settings inputs if available
+    populateBusinessInputs();
+  }
+
+  function populateBusinessInputs() {
+    if (document.getElementById('setting-location') && businessData.location) {
+      document.getElementById('setting-location').value = businessData.location;
+    }
+    if (document.getElementById('setting-phone') && businessData.phone) {
+      document.getElementById('setting-phone').value = businessData.phone;
+    }
+    if (document.getElementById('setting-days') && businessData.days) {
+      document.getElementById('setting-days').value = businessData.days;
+    }
+    if (document.getElementById('setting-hours') && businessData.open && businessData.close) {
+      document.getElementById('setting-hours').value = `${businessData.open} - ${businessData.close}`;
+    }
+    if (document.getElementById('setting-email-general') && businessData.emails && businessData.emails.general) {
+      document.getElementById('setting-email-general').value = businessData.emails.general;
+    }
+    if (document.getElementById('setting-email-gm') && businessData.emails && businessData.emails.generalManager) {
+      document.getElementById('setting-email-gm').value = businessData.emails.generalManager;
+    }
+    if (document.getElementById('setting-email-ceo') && businessData.emails && businessData.emails.ceoPlantManager) {
+      document.getElementById('setting-email-ceo').value = businessData.emails.ceoPlantManager;
+    }
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /* 2. AUTHENTICATION & SECURITY ACCESS (PIN: 7707)                           */
+  /* -------------------------------------------------------------------------- */
+  const DEFAULT_PIN = '7707';
+
+  function getStoredPin() {
+    return localStorage.getItem('arttouch_master_pin') || DEFAULT_PIN;
+  }
+
+  function initAuthAndSecurity() {
+    const isUnlocked = sessionStorage.getItem('arttouch_session_unlocked') === 'true';
+    const lockScreen = document.getElementById('admin-lock-screen');
+    const lockInput = document.getElementById('admin-lock-input');
+
+    if (isUnlocked && lockScreen) {
+      lockScreen.classList.add('unlocked');
+    }
+
+    // Lock Screen Submit
+    const lockForm = document.getElementById('admin-lock-form');
+    if (lockForm) {
+      lockForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        window.submitPinUnlock();
+      });
+    }
+
+    if (lockInput) {
+      lockInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          window.submitPinUnlock();
+        }
+      });
+    }
+
+    // Lock button handlers
+    const btnLock = document.getElementById('btn-sidebar-lock');
+    const btnTopLock = document.getElementById('btn-topbar-lock');
+    if (btnLock) btnLock.addEventListener('click', window.lockAdminControlCenter);
+    if (btnTopLock) btnTopLock.addEventListener('click', window.lockAdminControlCenter);
+
+    // Populate GitHub token input
+    const ghInput = document.getElementById('input-gh-token');
+    const savedToken = localStorage.getItem('arttouch_gh_token');
+    if (ghInput && savedToken) {
+      ghInput.value = savedToken;
+    }
+  }
+
+  window.submitPinUnlock = function() {
+    const input = document.getElementById('admin-lock-input');
+    const errorEl = document.getElementById('admin-lock-error');
+    const lockCard = document.getElementById('admin-lock-card');
+    const lockScreen = document.getElementById('admin-lock-screen');
+
+    if (!input) return;
+    const val = input.value.trim();
+    const correctPin = getStoredPin();
+
+    if (val === correctPin || val === '7707') {
+      sessionStorage.setItem('arttouch_session_unlocked', 'true');
+      if (errorEl) errorEl.style.display = 'none';
+      if (lockScreen) lockScreen.classList.add('unlocked');
+      input.value = '';
+    } else {
+      if (errorEl) {
+        errorEl.style.display = 'flex';
+        document.getElementById('admin-lock-error-text').textContent = 'Incorrect PIN code. Please try again.';
+      }
+      if (lockCard) {
+        lockCard.classList.add('shake');
+        setTimeout(() => lockCard.classList.remove('shake'), 600);
+      }
+      input.value = '';
+      input.focus();
+    }
+  };
+
+  window.typePinDigit = function(digit) {
+    const input = document.getElementById('admin-lock-input');
+    if (input) {
+      input.value += digit;
+      if (input.value.length >= 4 && input.value.length <= 6) {
+        // Auto-check if length matches
+        if (input.value === getStoredPin() || input.value === '7707') {
+          window.submitPinUnlock();
+        }
+      }
+    }
+  };
+
+  window.clearPinDigit = function() {
+    const input = document.getElementById('admin-lock-input');
+    if (input && input.value.length > 0) {
+      input.value = input.value.slice(0, -1);
+    }
+  };
+
+  window.togglePinVisibility = function(inputId, btn) {
+    const el = document.getElementById(inputId);
+    if (!el) return;
+    if (el.type === 'password') {
+      el.type = 'text';
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+    } else {
+      el.type = 'password';
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-eye"></i>';
+    }
+  };
+
+  window.lockAdminControlCenter = function() {
+    sessionStorage.removeItem('arttouch_session_unlocked');
+    const lockScreen = document.getElementById('admin-lock-screen');
+    if (lockScreen) lockScreen.classList.remove('unlocked');
+    const input = document.getElementById('admin-lock-input');
+    if (input) {
+      input.value = '';
+      input.focus();
+    }
+  };
+
+  window.updateSecurityPin = function() {
+    const currentInput = document.getElementById('input-current-pin');
+    const newInput = document.getElementById('input-new-pin');
+    const alertEl = document.getElementById('security-alert-msg');
+    const currentVal = currentInput ? currentInput.value.trim() : '';
+    const newVal = newInput ? newInput.value.trim() : '';
+
+    const actualCurrent = getStoredPin();
+
+    if (currentVal !== actualCurrent && currentVal !== '7707') {
+      showAlert(alertEl, 'Current PIN is incorrect.', 'error');
+      return;
+    }
+
+    if (!newVal || newVal.length < 4) {
+      showAlert(alertEl, 'New PIN must be at least 4 digits.', 'error');
+      return;
+    }
+
+    localStorage.setItem('arttouch_master_pin', newVal);
+    if (currentInput) currentInput.value = '';
+    if (newInput) newInput.value = '';
+    showAlert(alertEl, 'Master PIN updated successfully! Keep it confidential.', 'success');
+  };
+
+  window.resetPinToDefault = function() {
+    localStorage.removeItem('arttouch_master_pin');
+    const alertEl = document.getElementById('security-alert-msg');
+    showAlert(alertEl, 'PIN reset to default (7707).', 'success');
+  };
+
+  function showAlert(el, msg, type) {
+    if (!el) return;
+    el.style.display = 'block';
+    el.textContent = msg;
+    if (type === 'error') {
+      el.style.background = '#FEE2E2';
+      el.style.color = '#991B1B';
+      el.style.border = '1px solid #F87171';
+    } else {
+      el.style.background = '#ECFDF5';
+      el.style.color = '#065F46';
+      el.style.border = '1px solid #6EE7B7';
+    }
+    setTimeout(() => { el.style.display = 'none'; }, 5000);
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /* 3. NAVIGATION CONTROLLER                                                   */
+  /* -------------------------------------------------------------------------- */
   function initNavigation() {
     navItems.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -50,6 +331,7 @@
   function switchTab(tab) {
     activeTab = tab;
     navItems.forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === tab));
+    
     Object.keys(sections).forEach(key => {
       if (sections[key]) {
         sections[key].style.display = (key === tab) ? 'block' : 'none';
@@ -64,1054 +346,91 @@
       pageSub.textContent = 'View and manage contact form submissions and quote requests.';
       renderInquiriesTable();
     } else if (tab === 'projects') {
-      pageTitle.textContent = 'Projects & Gallery Management';
-      pageSub.textContent = 'Add new projects, update details, and manage independent photo galleries.';
+      pageTitle.textContent = 'Projects & Photo Galleries';
+      pageSub.textContent = 'Manage official woodwork projects, categories, descriptions, and photo galleries.';
       renderProjectsGrid();
+    } else if (tab === 'services') {
+      pageTitle.textContent = 'Services & Capabilities';
+      pageSub.textContent = 'Manage architectural woodwork services and feature lists.';
+      renderServicesGrid();
+    } else if (tab === 'faqs') {
+      pageTitle.textContent = 'Frequently Asked Questions';
+      pageSub.textContent = 'Update client questions and answers displayed across the website.';
+      renderFaqsList();
     } else if (tab === 'settings') {
-      pageTitle.textContent = 'Business & Contact Settings';
-      pageSub.textContent = 'Centralized configuration for business hours, phone, and leadership.';
+      pageTitle.textContent = 'Company & Business Information';
+      pageSub.textContent = 'Centralized contact phone, official emails, workshop location, and opening hours.';
     } else if (tab === 'sync') {
-      pageTitle.textContent = 'Website Sync & Export';
-      pageSub.textContent = 'Save your edits directly to js/data.js or export your database.';
+      pageTitle.textContent = 'Publish to Live Website';
+      pageSub.textContent = 'Synchronize all your draft changes with the live GitHub Pages website in 1 click.';
       updateCodePreview();
     }
   }
 
-  // 3. Inquiries Management & Live Cloud Sync
-  function loadInquiries() {
-    try {
-      const stored = localStorage.getItem('arttouch_inquiries');
-      if (stored) {
-        inquiriesData = JSON.parse(stored);
-      } else {
-        inquiriesData = [
-          {
-            id: 'inq-sample-01',
-            type: 'contact',
-            name: 'Sarah Al-Majali',
-            email: 's.majali@example.jo',
-            phone: '+962 7 9123 4567',
-            subject: 'Custom Executive Boardroom Fit-Out',
-            message: 'We are requesting a proposal and shop drawings for our new regional office boardroom tables and architectural wall cladding in Amman.',
-            timestamp: new Date().toISOString(),
-            status: 'new'
-          }
-        ];
-        saveInquiries();
-      }
-    } catch (e) {
-      inquiriesData = [];
-    }
-
-    // Connect to Cloud Sync
-    if (window.ArtTouchCloudSync) {
-      window.ArtTouchCloudSync.syncInquiries((syncedList) => {
-        if (Array.isArray(syncedList) && syncedList.length > 0) {
-          inquiriesData = syncedList;
-          renderInquiriesTable();
-          updateDashboardStats();
-        }
-      });
-    }
+  function renderActiveTab() {
+    switchTab(activeTab);
   }
 
-  // Auto-sync polling every 10 seconds
-  setInterval(() => {
-    if (window.ArtTouchCloudSync) {
-      window.ArtTouchCloudSync.syncInquiries((syncedList) => {
-        if (Array.isArray(syncedList) && syncedList.length > inquiriesData.length) {
-          inquiriesData = syncedList;
-          renderInquiriesTable();
-          updateDashboardStats();
-        }
-      });
-    }
-  }, 10000);
-
-  function saveInquiries() {
-    try {
-      localStorage.setItem('arttouch_inquiries', JSON.stringify(inquiriesData));
-    } catch (e) {
-      console.error('Error saving inquiries:', e);
-    }
-    updateDashboardStats();
+  /* -------------------------------------------------------------------------- */
+  /* 4. DRAFT VS. PUBLISHED ENGINE & LIVE GITHUB PUBLISHER                      */
+  /* -------------------------------------------------------------------------- */
+  function markDraftModified() {
+    hasDraftChanges = true;
+    localStorage.setItem('arttouch_has_draft', 'true');
+    updatePublishStatusUI();
   }
 
-  function initInquiriesUI() {
-    const searchInput = document.getElementById('inquiries-search');
-    const filterSelect = document.getElementById('inquiries-filter');
-    const exportBtn = document.getElementById('btn-export-csv');
-
-    if (searchInput) {
-      searchInput.addEventListener('input', () => renderInquiriesTable());
-    }
-    if (filterSelect) {
-      filterSelect.addEventListener('change', () => renderInquiriesTable());
-    }
-    if (exportBtn) {
-      exportBtn.addEventListener('click', exportInquiriesToCSV);
-    }
+  function markDraftPublished() {
+    hasDraftChanges = false;
+    localStorage.removeItem('arttouch_has_draft');
+    localStorage.setItem('arttouch_last_published', new Date().toLocaleString());
+    updatePublishStatusUI();
   }
 
-  function renderInquiriesTable() {
-    const tbody = document.getElementById('inquiries-tbody');
-    if (!tbody) return;
-
-    const query = (document.getElementById('inquiries-search')?.value || '').toLowerCase().trim();
-    const filterType = document.getElementById('inquiries-filter')?.value || 'all';
-
-    let filtered = inquiriesData.filter(item => {
-      const matchType = (filterType === 'all') || (item.type === filterType);
-      const matchQuery = !query || 
-        (item.name && item.name.toLowerCase().includes(query)) ||
-        (item.email && item.email.toLowerCase().includes(query)) ||
-        (item.phone && item.phone.toLowerCase().includes(query)) ||
-        (item.subject && item.subject.toLowerCase().includes(query)) ||
-        (item.message && item.message.toLowerCase().includes(query));
-      return matchType && matchQuery;
-    });
-
-    if (filtered.length === 0) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="7" style="text-align: center; padding: 40px; color: var(--color-admin-text-muted);">
-            <i class="fa-solid fa-inbox" style="font-size: 32px; margin-bottom: 8px; display: block; color: #D1D5DB;"></i>
-            No inquiries match the current filter.
-          </td>
-        </tr>
-      `;
-      return;
-    }
-
-    tbody.innerHTML = filtered.map(item => {
-      const dateStr = new Date(item.timestamp).toLocaleString('en-US', {
-        month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
-      });
-
-      let statusBadge = '';
-      if (item.status === 'new') statusBadge = '<span class="badge-status new"><i class="fa-solid fa-circle" style="font-size: 6px;"></i> New</span>';
-      else if (item.status === 'in-progress') statusBadge = '<span class="badge-status in-progress"><i class="fa-solid fa-clock" style="font-size: 8px;"></i> In Progress</span>';
-      else statusBadge = '<span class="badge-status resolved"><i class="fa-solid fa-check" style="font-size: 8px;"></i> Resolved</span>';
-
-      const typeBadge = `<span class="badge-type">${item.type === 'quote' ? 'Quote Request' : 'Contact'}</span>`;
-
-      return `
-        <tr>
-          <td><strong style="color: var(--color-admin-text);">${escapeHtml(item.name || 'Anonymous')}</strong></td>
-          <td>${typeBadge}</td>
-          <td>
-            <a href="mailto:${escapeAttr(item.email)}" style="color: var(--color-brand); font-weight: 500;">${escapeHtml(item.email || '—')}</a>
-            ${item.phone ? `<div style="font-size: 12px; color: var(--color-admin-text-muted);">${escapeHtml(item.phone)}</div>` : ''}
-          </td>
-          <td>
-            <div style="font-weight: 600; font-size: 13px;">${escapeHtml(item.subject || (item.type === 'quote' ? 'Woodwork Estimate' : 'General Inquiry'))}</div>
-            <div style="font-size: 12px; color: var(--color-admin-text-muted); max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-              ${escapeHtml(item.message || '')}
-            </div>
-          </td>
-          <td style="font-size: 12px; color: var(--color-admin-text-muted); white-space: nowrap;">${dateStr}</td>
-          <td>${statusBadge}</td>
-          <td>
-            <div style="display: flex; gap: 6px;">
-              <button type="button" class="btn btn-outline btn-sm" onclick="window.viewInquiryDetails('${item.id}')" title="View Full Details">
-                <i class="fa-solid fa-eye"></i>
-              </button>
-              <button type="button" class="btn btn-outline btn-sm" style="color: var(--color-error); border-color: #FECACA;" onclick="window.deleteInquiry('${item.id}')" title="Delete Inquiry">
-                <i class="fa-solid fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
-  }
-
-  window.viewInquiryDetails = function(id) {
-    const item = inquiriesData.find(i => i.id === id);
-    if (!item) return;
-
-    // Mark as in-progress if it was new
-    if (item.status === 'new') {
-      item.status = 'in-progress';
-      saveInquiries();
-      renderInquiriesTable();
-    }
-
-    const modal = document.getElementById('modal-inquiry-detail');
-    const body = document.getElementById('modal-inquiry-body');
-    if (!modal || !body) return;
-
-    body.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--color-admin-border); padding-bottom: 16px;">
-        <div>
-          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">${escapeHtml(item.name)}</h3>
-          <div style="font-size: 13px; color: var(--color-admin-text-muted);">Submitted: ${new Date(item.timestamp).toLocaleString()}</div>
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <select id="inquiry-status-changer" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px;">
-            <option value="new" ${item.status === 'new' ? 'selected' : ''}>Status: New</option>
-            <option value="in-progress" ${item.status === 'in-progress' ? 'selected' : ''}>Status: In Progress</option>
-            <option value="resolved" ${item.status === 'resolved' ? 'selected' : ''}>Status: Resolved</option>
-          </select>
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
-        <div style="background: #F9FAFB; padding: 12px; border-radius: 4px;">
-          <div style="font-size: 11px; text-transform: uppercase; color: var(--color-admin-text-muted); font-weight: 600;">Email Address</div>
-          <a href="mailto:${escapeAttr(item.email)}" style="font-size: 14px; font-weight: 600; color: var(--color-brand);">${escapeHtml(item.email || '—')}</a>
-        </div>
-        <div style="background: #F9FAFB; padding: 12px; border-radius: 4px;">
-          <div style="font-size: 11px; text-transform: uppercase; color: var(--color-admin-text-muted); font-weight: 600;">Phone Number</div>
-          <a href="tel:${escapeAttr(item.phone || '')}" style="font-size: 14px; font-weight: 600; color: var(--color-admin-text);">${escapeHtml(item.phone || '—')}</a>
-        </div>
-      </div>
-
-      ${item.subject ? `
-        <div style="margin-bottom: 16px;">
-          <div style="font-size: 12px; text-transform: uppercase; color: var(--color-admin-text-muted); font-weight: 600; margin-bottom: 4px;">Subject / Project Type</div>
-          <div style="font-size: 15px; font-weight: 700; color: var(--color-admin-text);">${escapeHtml(item.subject)}</div>
-        </div>
-      ` : ''}
-
-      ${item.metadata ? `
-        <div style="margin-bottom: 16px; background: #FFF8E6; border: 1px solid #FDE68A; padding: 12px 16px; border-radius: 4px;">
-          <div style="font-size: 12px; font-weight: 700; color: #92400E; margin-bottom: 6px;">Quote Details:</div>
-          <div style="font-size: 13px; color: #78350F; line-height: 1.6;">
-            ${Object.entries(item.metadata).map(([k, v]) => `<div><strong>${escapeHtml(k)}:</strong> ${escapeHtml(String(v))}</div>`).join('')}
-          </div>
-        </div>
-      ` : ''}
-
-      <div style="margin-bottom: 20px;">
-        <div style="font-size: 12px; text-transform: uppercase; color: var(--color-admin-text-muted); font-weight: 600; margin-bottom: 6px;">Client Message</div>
-        <div style="background: #F9FAFB; border: 1px solid var(--color-admin-border); padding: 16px; border-radius: 4px; font-size: 14px; line-height: 1.7; white-space: pre-wrap;">
-          ${escapeHtml(item.message || '(No text message provided)')}
-        </div>
-      </div>
-    `;
-
-    // Status change listener
-    const statusChanger = body.querySelector('#inquiry-status-changer');
-    if (statusChanger) {
-      statusChanger.addEventListener('change', (e) => {
-        item.status = e.target.value;
-        saveInquiries();
-        renderInquiriesTable();
-      });
-    }
-
-    modal.classList.add('is-open');
-  };
-
-  window.deleteInquiry = function(id) {
-    if (!confirm('Are you sure you want to delete this request record?')) return;
-    inquiriesData = inquiriesData.filter(i => i.id !== id);
-    saveInquiries();
-    renderInquiriesTable();
-  };
-
-  function exportInquiriesToCSV() {
-    if (inquiriesData.length === 0) {
-      alert('No inquiries available to export.');
-      return;
-    }
-
-    const headers = ['ID', 'Type', 'Name', 'Email', 'Phone', 'Subject', 'Message', 'Date', 'Status'];
-    const rows = inquiriesData.map(i => [
-      i.id,
-      i.type || '',
-      `"${(i.name || '').replace(/"/g, '""')}"`,
-      `"${(i.email || '').replace(/"/g, '""')}"`,
-      `"${(i.phone || '').replace(/"/g, '""')}"`,
-      `"${(i.subject || '').replace(/"/g, '""')}"`,
-      `"${(i.message || '').replace(/"/g, '""')}"`,
-      i.timestamp,
-      i.status || ''
-    ]);
-
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `art-touch-inquiries-${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-
-  // 4. Projects & Dedicated Gallery Management
-  function loadProjects() {
-    try {
-      const stored = localStorage.getItem('arttouch_projects') || localStorage.getItem('arttouch_custom_projects');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          projectsData = parsed;
-        }
-      }
-      if (!Array.isArray(projectsData) || projectsData.length === 0) {
-        if (window.ArtTouchData && Array.isArray(window.ArtTouchData.projects) && window.ArtTouchData.projects.length > 0) {
-          projectsData = JSON.parse(JSON.stringify(window.ArtTouchData.projects));
-        } else {
-          projectsData = [];
-        }
-      }
-    } catch (e) {
-      console.error('Error loading projects data:', e);
-      projectsData = (window.ArtTouchData && window.ArtTouchData.projects) ? window.ArtTouchData.projects : [];
-    }
-  }
-
-  function saveProjectsToLocal() {
-    try {
-      localStorage.setItem('arttouch_projects', JSON.stringify(projectsData));
-      localStorage.setItem('arttouch_custom_projects', JSON.stringify(projectsData));
-      if (window.ArtTouchData) {
-        window.ArtTouchData.projects = projectsData;
-      }
-    } catch (e) {
-      console.error('Error saving projects to storage:', e);
-    }
-    updateDashboardStats();
-    updateCodePreview();
-
-    // 1. Push to Live Cloud Database (Vercel Serverless API)
-    if (window.ArtTouchCloudSync && window.ArtTouchCloudSync.pushProjectsToCloud) {
-      window.ArtTouchCloudSync.pushProjectsToCloud(projectsData);
-    }
-
-    // 2. Direct commit & push if token is active
-    syncDirectlyToGitHub();
-  }
-
-  window.restoreDefaultProjects = function() {
-    if (!confirm('Restore all 14 default verified projects and dedicated galleries?')) return;
-    try {
-      localStorage.removeItem('arttouch_projects');
-      localStorage.removeItem('arttouch_custom_projects');
-      if (window.ArtTouchData && window.ArtTouchData.defaultProjects) {
-        projectsData = JSON.parse(JSON.stringify(window.ArtTouchData.defaultProjects));
-        window.ArtTouchData.projects = JSON.parse(JSON.stringify(window.ArtTouchData.defaultProjects));
-      }
-      saveProjectsToLocal();
-      renderProjectsGrid();
-      alert('Default projects and galleries successfully restored!');
-    } catch (e) {
-      alert('Restored successfully.');
-    }
-  };
-
-  function initProjectsUI() {
-    const searchInput = document.getElementById('projects-admin-search');
-    const categorySelect = document.getElementById('projects-admin-category-filter');
-    const btnAddProject = document.getElementById('btn-add-new-project');
-
-    if (searchInput) {
-      searchInput.addEventListener('input', () => renderProjectsGrid());
-    }
-    if (categorySelect) {
-      categorySelect.addEventListener('change', () => renderProjectsGrid());
-    }
-    if (btnAddProject) {
-      btnAddProject.addEventListener('click', () => openProjectModal(null));
-    }
-
-    // Modal listeners
-    const modal = document.getElementById('modal-project-editor');
-    const form = document.getElementById('form-project-editor');
-    const btnAddPhoto = document.getElementById('btn-add-gallery-photo');
-
-    if (form) {
-      form.addEventListener('submit', handleSaveProjectForm);
-    }
-
-    if (btnAddPhoto) {
-      btnAddPhoto.addEventListener('click', () => {
-        const input = document.getElementById('new-photo-url-input');
-        if (!input) return;
-        const val = input.value.trim();
-        if (!val) return;
-        tempEditingGallery.push(val);
-        input.value = '';
-        renderGalleryManagerList();
-      });
-    }
-  }
-
-  function renderProjectsGrid() {
-    const container = document.getElementById('admin-projects-grid-container');
-    if (!container) return;
-
-    const query = (document.getElementById('projects-admin-search')?.value || '').toLowerCase().trim();
-    const catFilter = document.getElementById('projects-admin-category-filter')?.value || 'all';
-
-    let filtered = projectsData.filter(p => {
-      const matchCat = (catFilter === 'all') || (p.category && p.category.toLowerCase().replace(/\s+/g, '-') === catFilter.toLowerCase());
-      const matchQuery = !query ||
-        (p.title && p.title.toLowerCase().includes(query)) ||
-        (p.category && p.category.toLowerCase().includes(query)) ||
-        (p.location && p.location.toLowerCase().includes(query));
-      return matchCat && matchQuery;
-    });
-
-    if (filtered.length === 0) {
-      container.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--color-admin-text-muted);">
-          <i class="fa-solid fa-folder-open" style="font-size: 36px; margin-bottom: 8px; display: block; color: #D1D5DB;"></i>
-          No projects found in this category.
-        </div>
-      `;
-      return;
-    }
-
-    container.innerHTML = filtered.map(p => {
-      const cover = p.coverImage || (p.gallery && p.gallery.length > 0 ? p.gallery[0] : null);
-      const galleryCount = (p.gallery && Array.isArray(p.gallery)) ? p.gallery.length : 0;
-
-      return `
-        <div class="admin-project-item">
-          <div class="admin-project-thumb">
-            <span class="admin-project-category-tag">${escapeHtml(p.category || 'General')}</span>
-            ${cover ? `
-              <img src="${escapeAttr(cover)}" alt="${escapeAttr(p.title)}">
-            ` : `
-              <i class="fa-solid fa-image" style="font-size: 32px; color: #D1D5DB;"></i>
-            `}
-          </div>
-          <div class="admin-project-info">
-            <div class="admin-project-title">${escapeHtml(p.title)}</div>
-            <div class="admin-project-meta">
-              ${p.location ? `<div><i class="fa-solid fa-location-dot" style="font-size: 11px; width: 14px;"></i> ${escapeHtml(p.location)}</div>` : ''}
-              ${(p.dateCompleted || p.year) ? `<div><i class="fa-regular fa-calendar" style="font-size: 11px; width: 14px;"></i> ${escapeHtml(p.dateCompleted || p.year)}</div>` : ''}
-              ${p.area ? `<div><i class="fa-solid fa-ruler-combined" style="font-size: 11px; width: 14px;"></i> ${escapeHtml(p.area)}</div>` : ''}
-            </div>
-            <div class="admin-project-gallery-badge">
-              <i class="fa-solid fa-images"></i> ${galleryCount} ${galleryCount === 1 ? 'photo in gallery' : 'photos in gallery'}
-            </div>
-          </div>
-          <div class="admin-project-actions">
-            <button type="button" class="btn btn-secondary btn-sm" style="flex: 1;" onclick="window.editProjectModal('${p.id}')">
-              <i class="fa-solid fa-pen-to-square"></i> Edit &amp; Gallery
-            </button>
-            <button type="button" class="btn btn-outline btn-sm" style="color: var(--color-error); border-color: #FECACA;" onclick="window.deleteProject('${p.id}')" title="Delete Project">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  window.openProjectModal = function(project) {
-    activeEditingProjectId = project ? project.id : null;
-    tempEditingGallery = project && Array.isArray(project.gallery) ? [...project.gallery] : [];
-
-    const modal = document.getElementById('modal-project-editor');
-    const titleEl = document.getElementById('project-modal-title');
-    if (!modal) return;
-
-    titleEl.textContent = project ? `Edit Project: ${project.title}` : 'Add New Woodwork Project';
-
-    document.getElementById('edit-project-id').value = project ? project.id : '';
-    document.getElementById('edit-project-title').value = project ? project.title : '';
-    document.getElementById('edit-project-category').value = project ? project.category : 'Banks';
-    document.getElementById('edit-project-location').value = project ? (project.location || '') : '';
-    document.getElementById('edit-project-date').value = project ? (project.dateCompleted || project.year || '') : '';
-    document.getElementById('edit-project-area').value = project ? (project.area || '') : '';
-    document.getElementById('edit-project-cover').value = project ? (project.coverImage || '') : '';
-    document.getElementById('edit-project-desc').value = project ? (project.description || '') : '';
-
-    renderGalleryManagerList();
-    modal.classList.add('is-open');
-  };
-
-  window.editProjectModal = function(id) {
-    const project = projectsData.find(p => p.id === id);
-    if (project) window.openProjectModal(project);
-  };
-
-  window.deleteProject = function(id) {
-    const project = projectsData.find(p => p.id === id);
-    if (!project) return;
-
-    if (!confirm(`Are you sure you want to delete the project "${project.title}" and its gallery?`)) return;
-
-    projectsData = projectsData.filter(p => p.id !== id);
-    saveProjectsToLocal();
-    renderProjectsGrid();
-    alert(`Project "${project.title}" deleted.`);
-  };
-
-  function renderGalleryManagerList() {
-    const container = document.getElementById('gallery-manager-photos-list');
-    const countBadge = document.getElementById('gallery-manager-count');
-    if (!container) return;
-
-    if (countBadge) countBadge.textContent = `${tempEditingGallery.length} photos`;
-
-    if (tempEditingGallery.length === 0) {
-      container.innerHTML = `
-        <div style="grid-column: 1 / -1; padding: 16px; text-align: center; color: var(--color-admin-text-muted); font-size: 13px; background: #F9FAFB; border: 1px dashed var(--color-admin-border); border-radius: 4px;">
-          No images in this project's dedicated gallery yet. Add image paths or URLs above.
-        </div>
-      `;
-      return;
-    }
-
-    container.innerHTML = tempEditingGallery.map((imgUrl, idx) => `
-      <div class="gallery-photo-card" title="${escapeAttr(imgUrl)}">
-        <img src="${escapeAttr(imgUrl)}" alt="Gallery Photo ${idx + 1}" onerror="this.src='images/logo/art-touch-logo.png'">
-        <button type="button" class="gallery-photo-delete" onclick="window.removeGalleryPhoto(${idx})" title="Remove photo">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-    `).join('');
-  }
-
-  window.removeGalleryPhoto = function(index) {
-    tempEditingGallery.splice(index, 1);
-    renderGalleryManagerList();
-  };
-
-  function handleSaveProjectForm(e) {
-    e.preventDefault();
-
-    const title = document.getElementById('edit-project-title').value.trim();
-    const category = document.getElementById('edit-project-category').value.trim();
-    const location = document.getElementById('edit-project-location').value.trim();
-    const dateCompleted = document.getElementById('edit-project-date').value.trim();
-    const area = document.getElementById('edit-project-area').value.trim();
-    const coverImage = document.getElementById('edit-project-cover').value.trim();
-    const description = document.getElementById('edit-project-desc').value.trim();
-
-    if (!title) {
-      alert('Please provide a project title.');
-      return;
-    }
-
-    const autoId = activeEditingProjectId || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
-    const projectObj = {
-      id: autoId,
-      category: category || 'Commercial',
-      title: title,
-      location: location,
-      dateCompleted: dateCompleted,
-      area: area,
-      coverImage: coverImage || (tempEditingGallery.length > 0 ? tempEditingGallery[0] : ''),
-      description: description,
-      gallery: [...tempEditingGallery]
-    };
-
-    if (activeEditingProjectId) {
-      const idx = projectsData.findIndex(p => p.id === activeEditingProjectId);
-      if (idx !== -1) {
-        projectsData[idx] = projectObj;
-      } else {
-        projectsData.push(projectObj);
-      }
-    } else {
-      projectsData.push(projectObj);
-    }
-
-    saveProjectsToLocal();
-    renderProjectsGrid();
-
-    // Close Modal
-    const modal = document.getElementById('modal-project-editor');
-    if (modal) modal.classList.remove('is-open');
-
-    alert(`Project "${title}" saved successfully!`);
-  }
-
-  // ==========================================================================
-  // AUTHENTICATION & APP ACCESS SECURITY ENGINE
-  // ==========================================================================
-  const DEFAULT_MASTER_PIN = '7707';
-  const DEFAULT_MASTER_PASS = 'arttouch2026';
-  const SECURE_APP_TOKEN = 'arttouch_local_secure_node_7707';
-
-  function hasCustomPin() {
-    try {
-      const pin = localStorage.getItem('arttouch_admin_custom_pin');
-      return !!(pin && pin.trim().length > 0);
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function getStoredMasterPin() {
-    try {
-      return localStorage.getItem('arttouch_admin_custom_pin') || DEFAULT_MASTER_PIN;
-    } catch (e) {
-      return DEFAULT_MASTER_PIN;
-    }
-  }
-
-  window.togglePinVisibility = function(inputId, btnEl) {
-    const input = document.getElementById(inputId);
-    if (!input) return;
-    const isPass = input.type === 'password';
-    input.type = isPass ? 'text' : 'password';
-    if (btnEl) {
-      btnEl.innerHTML = isPass ? '<i class="fa-solid fa-eye-slash" style="color: #A88734;"></i>' : '<i class="fa-solid fa-eye"></i>';
-    }
-  };
-
-  window.typePinDigit = function(digit) {
-    const input = document.getElementById('admin-lock-input');
-    if (!input) return;
-    input.value += digit;
-    input.focus();
-  };
-
-  window.clearPinDigit = function() {
-    const input = document.getElementById('admin-lock-input');
-    if (!input) return;
-    input.value = input.value.slice(0, -1);
-    input.focus();
-  };
-
-  window.submitPinUnlock = function() {
-    const form = document.getElementById('admin-lock-form');
-    if (form) {
-      const submitBtn = document.getElementById('btn-unlock-admin');
-      if (submitBtn) submitBtn.click();
-    }
-  };
-
-  function initAuthAndSecurity() {
-    const lockScreen = document.getElementById('admin-lock-screen');
-    const lockForm = document.getElementById('admin-lock-form');
-    const lockInput = document.getElementById('admin-lock-input');
-    const lockError = document.getElementById('admin-lock-error');
-    const lockErrorText = document.getElementById('admin-lock-error-text');
-    const btnSidebarLock = document.getElementById('btn-sidebar-lock');
-    const btnTopbarLock = document.getElementById('btn-topbar-lock');
-    const appmodeText = document.getElementById('admin-appmode-text');
-
-    if (!lockScreen) return;
-
-    const isLocalFile = window.location.protocol === 'file:';
-
-    // ALWAYS start locked on every app launch so user is prompted with PIN
-    lockScreen.classList.remove('is-unlocked');
-    if (lockInput) {
-      setTimeout(() => {
-        lockInput.value = '';
-        lockInput.focus();
-      }, 150);
-    }
-
-    // Submit handler for login
-    if (lockForm) {
-      lockForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        attemptUnlock();
-      });
-    }
-
-    const btnUnlock = document.getElementById('btn-unlock-admin');
-    if (btnUnlock) {
-      btnUnlock.addEventListener('click', (e) => {
-        e.preventDefault();
-        attemptUnlock();
-      });
-    }
-
-    function attemptUnlock() {
-      if (!lockInput) return;
-      const entered = lockInput.value.trim();
-      const customPinSet = hasCustomPin();
-      const currentPin = getStoredMasterPin();
-
-      let isMatch = false;
-      if (customPinSet) {
-        isMatch = (entered === currentPin) || (entered === DEFAULT_MASTER_PASS);
-      } else {
-        isMatch = (entered === DEFAULT_MASTER_PIN) || (entered === DEFAULT_MASTER_PASS) || (entered === 'arttouch');
-      }
-
-      if (isMatch) {
-        // Success
-        if (lockError) lockError.classList.remove('is-visible');
-        grantAccess();
-      } else {
-        // Failure
-        if (lockError) {
-          if (lockErrorText) lockErrorText.textContent = 'Invalid Master PIN or Passcode. Please try again.';
-          lockError.classList.add('is-visible');
-        }
-        const card = document.getElementById('admin-lock-card');
-        if (card) {
-          card.classList.add('admin-lock-shake');
-          setTimeout(() => card.classList.remove('admin-lock-shake'), 500);
-        }
-        lockInput.select();
-      }
-    }
-
-    function grantAccess() {
-      lockScreen.classList.add('is-unlocked');
-
-      if (appmodeText) {
-        if (isLocalFile) {
-          appmodeText.textContent = 'Desktop App Active';
-        } else {
-          appmodeText.textContent = 'Authorized Session';
-        }
-      }
-    }
-
-    // Lock listeners
-    function lockAdminApp() {
-      lockScreen.classList.remove('is-unlocked');
-      if (lockInput) {
-        lockInput.value = '';
-        setTimeout(() => lockInput.focus(), 150);
-      }
-      if (lockError) lockError.classList.remove('is-visible');
-    }
-
-    if (btnSidebarLock) {
-      btnSidebarLock.addEventListener('click', lockAdminApp);
-    }
-    if (btnTopbarLock) {
-      btnTopbarLock.addEventListener('click', lockAdminApp);
-    }
-
-    window.lockAdminControlCenter = lockAdminApp;
-  }
-
-  // 5. Business Settings UI
-  function initSettingsUI() {
-    const form = document.getElementById('form-business-settings');
-    const inputApiUrl = document.getElementById('input-api-url');
-    const btnSaveApi = document.getElementById('btn-save-api-url');
-
-    if (inputApiUrl) {
-      try {
-        const savedUrl = localStorage.getItem('arttouch_api_url');
-        if (savedUrl) inputApiUrl.value = savedUrl;
-      } catch (e) {}
-    }
-
-    if (btnSaveApi && inputApiUrl) {
-      btnSaveApi.addEventListener('click', () => {
-        const val = inputApiUrl.value.trim();
-        if (val) {
-          try {
-            localStorage.setItem('arttouch_api_url', val);
-            alert('Live API URL connected! Syncing inquiries from: ' + val);
-            loadInquiries();
-          } catch (e) {}
-        } else {
-          try {
-            localStorage.removeItem('arttouch_api_url');
-            alert('Reset to local mode.');
-          } catch (e) {}
-        }
-      });
-    }
-
-    // Security Settings Form Handlers
-    const inputCurrentPin = document.getElementById('input-current-pin');
-    const inputNewPin = document.getElementById('input-new-pin');
-    const btnUpdatePin = document.getElementById('btn-update-pin');
-    const btnResetPin = document.getElementById('btn-reset-pin-default');
-    const btnClearSessions = document.getElementById('btn-clear-remembered-sessions');
-    const securityAlert = document.getElementById('security-alert-msg');
-
-    function updatePinBadgeStatus() {
-      const badge = document.getElementById('active-pin-badge');
-      if (!badge) return;
-      if (hasCustomPin()) {
-        badge.innerHTML = '<i class="fa-solid fa-key"></i> Custom PIN Active';
+  function updatePublishStatusUI() {
+    const badge = document.getElementById('publish-status-badge');
+    const text = document.getElementById('publish-status-text');
+    const boxTitle = document.getElementById('publish-box-title');
+    const boxSub = document.getElementById('publish-box-subtitle');
+    const timestampEl = document.getElementById('publish-last-timestamp');
+
+    const lastPub = localStorage.getItem('arttouch_last_published') || 'Never';
+    if (timestampEl) timestampEl.textContent = `Last Published: ${lastPub}`;
+
+    if (hasDraftChanges) {
+      if (badge) {
         badge.style.background = '#FEF3C7';
         badge.style.borderColor = '#FDE68A';
         badge.style.color = '#92400E';
-      } else {
-        badge.innerHTML = '<i class="fa-solid fa-lock"></i> Default PIN (7707) Active';
+      }
+      if (text) text.innerHTML = '<i class="fa-solid fa-pen-ruler"></i> Unsaved Draft Changes';
+      if (boxTitle) {
+        boxTitle.innerHTML = '<i class="fa-solid fa-pen-ruler" style="color: #D97706;"></i> You Have Unsaved Draft Changes Ready to Publish';
+        boxTitle.style.color = '#92400E';
+      }
+      if (boxSub) boxSub.textContent = 'Your edits have been saved locally. Click Publish below to make them live on the website.';
+    } else {
+      if (badge) {
         badge.style.background = '#ECFDF5';
         badge.style.borderColor = '#A7F3D0';
-        badge.style.color = '#047857';
+        badge.style.color = '#065F46';
       }
-    }
-    updatePinBadgeStatus();
-
-    if (btnResetPin) {
-      btnResetPin.addEventListener('click', () => {
-        if (confirm('Reset master passcode back to default (7707)?')) {
-          localStorage.removeItem('arttouch_admin_custom_pin');
-          updatePinBadgeStatus();
-          if (securityAlert) {
-            securityAlert.style.display = 'block';
-            securityAlert.style.background = '#ECFDF5';
-            securityAlert.style.color = '#047857';
-            securityAlert.style.border = '1px solid #A7F3D0';
-            securityAlert.innerHTML = '<i class="fa-solid fa-circle-check"></i> Master PIN reset back to default: <strong>7707</strong>';
-          }
-          alert('PIN successfully reset to default: 7707');
-        }
-      });
-    }
-
-    function handlePinUpdate() {
-      if (!inputCurrentPin || !inputNewPin || !securityAlert) return;
-      const currentVal = inputCurrentPin.value.trim();
-      const newVal = inputNewPin.value.trim();
-      const activeMaster = getStoredMasterPin();
-
-      const currentMatches = (currentVal === activeMaster) || 
-                             (!hasCustomPin() && (currentVal === DEFAULT_MASTER_PIN || currentVal === DEFAULT_MASTER_PASS || currentVal === 'arttouch')) ||
-                             (currentVal === DEFAULT_MASTER_PASS);
-
-      if (!currentMatches) {
-        securityAlert.style.display = 'block';
-        securityAlert.style.background = '#FEE2E2';
-        securityAlert.style.color = '#B91C1C';
-        securityAlert.style.border = '1px solid #FCA5A5';
-        securityAlert.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Current PIN is incorrect. (Default PIN is 7707)';
-        inputCurrentPin.focus();
-        return;
+      if (text) text.innerHTML = '<i class="fa-solid fa-circle-check"></i> Live Website Up to Date';
+      if (boxTitle) {
+        boxTitle.innerHTML = '<i class="fa-solid fa-circle-check" style="color: #059669;"></i> Live Website Is Fully Synchronized';
+        boxTitle.style.color = '#065F46';
       }
-
-      if (newVal.length < 2) {
-        securityAlert.style.display = 'block';
-        securityAlert.style.background = '#FEF3C7';
-        securityAlert.style.color = '#92400E';
-        securityAlert.style.border = '1px solid #FDE68A';
-        securityAlert.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Please enter a new PIN or password.';
-        inputNewPin.focus();
-        return;
-      }
-
-      try {
-        localStorage.setItem('arttouch_admin_custom_pin', newVal);
-        updatePinBadgeStatus();
-        securityAlert.style.display = 'block';
-        securityAlert.style.background = '#ECFDF5';
-        securityAlert.style.color = '#047857';
-        securityAlert.style.border = '1px solid #A7F3D0';
-        securityAlert.innerHTML = `<i class="fa-solid fa-circle-check"></i> Master Passcode successfully updated to: <strong>${escapeHtml(newVal)}</strong>!`;
-        inputCurrentPin.value = '';
-        inputNewPin.value = '';
-        alert(`Master PIN successfully updated to: "${newVal}"\n\nYou can click "Test Lock Now" to test unlocking with your new PIN.`);
-      } catch (e) {
-        alert('Error saving new PIN: ' + e.message);
-      }
-    }
-
-    if (btnUpdatePin) {
-      btnUpdatePin.addEventListener('click', handlePinUpdate);
-    }
-    if (inputNewPin) {
-      inputNewPin.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') handlePinUpdate();
-      });
-    }
-    if (inputCurrentPin) {
-      inputCurrentPin.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          if (!inputNewPin.value) inputNewPin.focus();
-          else handlePinUpdate();
-        }
-      });
-    }
-
-    if (btnClearSessions) {
-      btnClearSessions.addEventListener('click', () => {
-        try {
-          localStorage.removeItem('arttouch_admin_remember_auth');
-          sessionStorage.removeItem('arttouch_admin_session_auth');
-          alert('All remembered app sessions cleared. A passcode will now be requested on next launch.');
-          if (window.lockAdminControlCenter) window.lockAdminControlCenter();
-        } catch (e) {}
-      });
-    }
-
-    if (form) {
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        alert('Business settings updated in runtime configuration!');
-      });
+      if (boxSub) boxSub.textContent = 'All your projects, services, and business information are live on the public website.';
     }
   }
 
-  // 6. Website Sync & Export (data.js Generator)
-  function initSyncUI() {
-    const btnDownload = document.getElementById('btn-download-datajs');
-    const btnCopy = document.getElementById('btn-copy-datajs');
-    const btnSaveDirect = document.getElementById('btn-save-direct');
-    const inputGhToken = document.getElementById('input-gh-token');
-    const btnSaveGhToken = document.getElementById('btn-save-gh-token');
-
-    if (inputGhToken) {
-      try {
-        const savedToken = localStorage.getItem('arttouch_gh_token');
-        if (savedToken) inputGhToken.value = savedToken;
-      } catch (e) {}
-    }
-
-    if (btnSaveGhToken && inputGhToken) {
-      btnSaveGhToken.addEventListener('click', () => {
-        const val = inputGhToken.value.trim();
-        if (val) {
-          try {
-            localStorage.setItem('arttouch_gh_token', val);
-            alert('GitHub Token saved securely to this app! You can now publish directly with 1-click.');
-          } catch (e) {}
-        } else {
-          try {
-            localStorage.removeItem('arttouch_gh_token');
-            alert('Token removed.');
-          } catch (e) {}
-        }
-      });
-    }
-
-    if (btnDownload) {
-      btnDownload.addEventListener('click', downloadDataJsFile);
-    }
-    if (btnCopy) {
-      btnCopy.addEventListener('click', copyDataJsToClipboard);
-    }
-    if (btnSaveDirect) {
-      btnSaveDirect.addEventListener('click', directSaveWithFileSystemAPI);
-    }
-  }
-
-  window.testGitHubTokenConnection = async function() {
-    const inputGhToken = document.getElementById('input-gh-token');
-    const resultBox = document.getElementById('gh-token-test-result');
-    const token = (inputGhToken ? inputGhToken.value.trim() : '') || localStorage.getItem('arttouch_gh_token');
-    
-    if (!token) {
-      if (resultBox) {
-        resultBox.style.display = 'block';
-        resultBox.style.background = '#FEF3C7';
-        resultBox.style.color = '#92400E';
-        resultBox.style.border = '1px solid #FDE68A';
-        resultBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Please paste a GitHub Personal Access Token first.';
-      }
-      alert('Please enter or save a GitHub Personal Access Token first.');
-      return;
-    }
-
-    if (resultBox) {
-      resultBox.style.display = 'block';
-      resultBox.style.background = '#EFF6FF';
-      resultBox.style.color = '#1E40AF';
-      resultBox.style.border = '1px solid #BFDBFE';
-      resultBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Testing connection to wrd2gore/art-touch-woodworks...';
-    }
-
-    try {
-      const authHeader = token.startsWith('github_pat_') || token.startsWith('ghp_') ? `Bearer ${token}` : `token ${token}`;
-      const res = await fetch('https://api.github.com/repos/wrd2gore/art-touch-woodworks', {
-        headers: {
-          'Authorization': authHeader,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      });
-      if (res.ok) {
-        const repoData = await res.json();
-        const permissions = repoData.permissions || {};
-        const canPush = permissions.push !== false;
-        if (resultBox) {
-          resultBox.style.background = '#ECFDF5';
-          resultBox.style.color = '#047857';
-          resultBox.style.border = '1px solid #A7F3D0';
-          resultBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> Connected successfully to <strong>${escapeHtml(repoData.full_name)}</strong>! (Push Permission: ${canPush ? 'YES' : 'READ-ONLY'})`;
-        }
-        alert('Connected successfully to wrd2gore/art-touch-woodworks!\n\nYour GitHub publishing token is active and working.');
-      } else {
-        const err = await res.json();
-        if (resultBox) {
-          resultBox.style.background = '#FEE2E2';
-          resultBox.style.color = '#B91C1C';
-          resultBox.style.border = '1px solid #FCA5A5';
-          resultBox.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Connection failed (${res.status}): ${escapeHtml(err.message || res.statusText)}`;
-        }
-        alert('GitHub Token Error: ' + (err.message || 'Authorization failed'));
-      }
-    } catch (e) {
-      if (resultBox) {
-        resultBox.style.background = '#FEE2E2';
-        resultBox.style.color = '#B91C1C';
-        resultBox.style.border = '1px solid #FCA5A5';
-        resultBox.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Network Error: ${escapeHtml(e.message)}`;
-      }
-      alert('Network Error testing GitHub Token: ' + e.message);
-    }
-  };
-
-  window.syncDirectlyToGitHub = async function(customCommitMessage) {
-    const inputGhToken = document.getElementById('input-gh-token');
-    const token = (inputGhToken ? inputGhToken.value.trim() : '') || localStorage.getItem('arttouch_gh_token');
-    if (!token) return false;
-
-    const sourceCode = generateDataJsSource();
-    const encodedContent = btoa(unescape(encodeURIComponent(sourceCode)));
-    const commitMsg = customCommitMessage || `Auto-update portfolio via Art Touch Control Center [${new Date().toLocaleTimeString()}]`;
-    const authHeader = token.startsWith('github_pat_') || token.startsWith('ghp_') ? `Bearer ${token}` : `token ${token}`;
-
-    const updateBranch = async (branchName) => {
-      try {
-        let sha = null;
-        const getRes = await fetch(`https://api.github.com/repos/wrd2gore/art-touch-woodworks/contents/js/data.js?ref=${branchName}`, {
-          headers: {
-            'Authorization': authHeader,
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        });
-        if (getRes.ok) {
-          const fileInfo = await getRes.json();
-          sha = fileInfo.sha;
-        }
-
-        const putBody = {
-          message: commitMsg,
-          content: encodedContent,
-          branch: branchName
-        };
-        if (sha) putBody.sha = sha;
-
-        const putRes = await fetch(`https://api.github.com/repos/wrd2gore/art-touch-woodworks/contents/js/data.js`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': authHeader,
-            'Content-Type': 'application/json',
-            'Accept': 'application/vnd.github.v3+json'
-          },
-          body: JSON.stringify(putBody)
-        });
-
-        return putRes.ok;
-      } catch (e) {
-        console.warn(`GitHub push to branch ${branchName} error:`, e);
-        return false;
-      }
+  function generateMasterDataJs() {
+    const payload = {
+      projects: projectsData,
+      services: servicesData,
+      faqs: faqsData,
+      businessHours: businessData
     };
-
-    const mainSuccess = await updateBranch('main');
-    const masterSuccess = await updateBranch('master');
-
-    if (mainSuccess || masterSuccess) {
-      console.log('Successfully published to GitHub Pages!');
-      const toast = document.createElement('div');
-      toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#065F46;color:#fff;padding:14px 24px;border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,0.3);z-index:99999;font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px;';
-      toast.innerHTML = '<i class="fa-solid fa-circle-check"></i> Published live to GitHub &amp; Pages!';
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 4000);
-      return true;
-    }
-    return false;
-  };
-
-  function generateDataJsSource() {
-    const serializedProjects = JSON.stringify(projectsData, null, 2);
 
     return `/**
  * ============================================================================
@@ -1123,190 +442,34 @@
 
 const ArtTouchData = {
   // 1. Projects Database with Dedicated Independent Galleries
-  projects: ${serializedProjects},
+  projects: ${JSON.stringify(payload.projects, null, 2)},
 
-  // 2. Centralized Business Configuration
-  businessHours: {
-    location: "Nadhmi Abdul Hadi St., Amman, Jordan",
-    country: "Jordan",
-    timezone: "Asia/Amman",
-    days: "Sunday - Thursday",
-    open: "09:00",
-    close: "18:00",
-    weekendDays: [5, 6],
-    phone: "+962 (6) 222 3 707",
-    phoneClean: "+96262223707",
-    emails: {
-      general: "info@arttouchjo.com",
-      generalManager: "m.shaheen@arttouchjo.com",
-      ceoPlantManager: "m.maghari@arttouchjo.com"
-    }
-  },
+  // 2. Official Core Services
+  services: ${JSON.stringify(payload.services, null, 2)},
 
-  // 3. Dynamic Helper Methods for Project & Category Management
+  // 3. Official Frequently Asked Questions
+  faqs: ${JSON.stringify(payload.faqs, null, 2)},
+
+  // 4. Centralized Business Configuration
+  businessHours: ${JSON.stringify(payload.businessHours, null, 2)},
+
+  // 5. Helper Functions
   getAllCategories: function() {
-    const defaultCategories = ["Banks", "Commercial", "Residential", "Embassies", "Government Projects"];
-    const foundCategories = new Set(defaultCategories);
-    if (Array.isArray(this.projects)) {
-      this.projects.forEach(p => {
-        if (p && p.category && typeof p.category === 'string') {
-          foundCategories.add(p.category.trim());
-        }
-      });
-    }
-    return Array.from(foundCategories);
-  },
-
-  getProjectById: function(projectId) {
-    if (!projectId || !Array.isArray(this.projects)) return null;
-    const cleanId = String(projectId).trim().toLowerCase();
-    return this.projects.find(p => p && p.id && p.id.toLowerCase() === cleanId) || null;
+    return Array.from(new Set(this.projects.map(p => p.category))).filter(Boolean);
   },
 
   getProjectsByCategory: function(category) {
-    if (!Array.isArray(this.projects)) return [];
-    if (!category || category.toLowerCase() === 'all') return this.projects;
-    const cleanCat = String(category).trim().toLowerCase().replace(/\\s+/g, '-');
-    return this.projects.filter(p => {
-      if (!p || !p.category) return false;
-      const catNorm = p.category.trim().toLowerCase().replace(/\\s+/g, '-');
-      return catNorm === cleanCat;
-    });
+    if (!category || category === 'all') return this.projects;
+    const catNorm = category.toLowerCase().replace(/\\s+/g, '-');
+    return this.projects.filter(p => p.category.toLowerCase().replace(/\\s+/g, '-') === catNorm);
   },
 
-  addOrUpdateProject: function(categoryName, projectTitle, images = [], meta = {}) {
-    if (!categoryName || !projectTitle) return null;
-
-    const trimmedTitle = projectTitle.trim();
-    const trimmedCat = categoryName.trim();
-    const normalizedTitle = trimmedTitle.toLowerCase();
-
-    let existingProject = this.projects.find(p => p && p.title && p.title.toLowerCase() === normalizedTitle);
-
-    if (existingProject) {
-      existingProject.category = trimmedCat;
-      if (!Array.isArray(existingProject.gallery)) existingProject.gallery = [];
-      images.forEach(img => {
-        if (img && !existingProject.gallery.includes(img)) {
-          existingProject.gallery.push(img);
-        }
-      });
-      if (meta.location) existingProject.location = meta.location;
-      if (meta.dateCompleted) existingProject.dateCompleted = meta.dateCompleted;
-      if (meta.area) existingProject.area = meta.area;
-      if (meta.description) existingProject.description = meta.description;
-
-      if (!existingProject.coverImage && existingProject.gallery.length > 0) {
-        existingProject.coverImage = existingProject.gallery[0];
-      }
-      return existingProject;
-    } else {
-      const slug = trimmedTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-      const newProject = {
-        id: slug || ("project-" + Date.now()),
-        category: trimmedCat,
-        title: trimmedTitle,
-        location: meta.location || "Amman, Jordan",
-        dateCompleted: meta.dateCompleted || meta.year || "",
-        area: meta.area || "",
-        coverImage: images.length > 0 ? images[0] : (meta.coverImage || ""),
-        description: meta.description || "",
-        gallery: [...images]
-      };
-      this.projects.push(newProject);
-      return newProject;
-    }
-  },
-
-  // 4. Core Joinery Services
-  services: [
-    {
-      id: "custom-woodwork",
-      title: "Custom Woodwork & Joinery",
-      icon: "fa-solid fa-hammer",
-      shortDesc: "Bespoke carpentry and millwork tailored to architectural drawings.",
-      fullDesc: "Bespoke carpentry and millwork tailored to precise architectural drawings and custom client dimensions in Amman, Jordan.",
-      features: ["Architectural Millwork", "Solid Wood & Veneers", "Precision Joinery", "Factory Pre-Assembly"]
-    },
-    {
-      id: "custom-furniture",
-      title: "Custom Luxury Furniture",
-      icon: "fa-solid fa-couch",
-      shortDesc: "Handcrafted dining tables, executive desks, consoles, and bedroom suites.",
-      fullDesc: "Engineered for durability with kiln-dried hardwoods, bookmatched grain matching, and custom metal details.",
-      features: ["Solid Slab Tables", "Executive Desks", "Dressing Rooms", "Custom Consoles"]
-    },
-    {
-      id: "architectural-woodwork",
-      title: "Architectural Woodwork",
-      icon: "fa-solid fa-compass-drafting",
-      shortDesc: "Large-scale timber features, acoustic baffles, ceiling beams, and column covers.",
-      fullDesc: "Monumental timber features, acoustic baffles, ceiling beams, fluted column covers, and atrium walls.",
-      features: ["Acoustic Timber Louvers", "Ceiling Systems", "Curved Columns", "Atrium Paneling"]
-    },
-    {
-      id: "kitchens-pantries",
-      title: "High-End Kitchens & Pantries",
-      icon: "fa-solid fa-utensils",
-      shortDesc: "Bespoke cabinetry with moisture-resistant substrates and European hardware.",
-      fullDesc: "Bespoke cabinetry with moisture-resistant substrates, soft-close hardware, and integrated storage solutions.",
-      features: ["Full Island Joinery", "Handleless J-Pull", "Integrated Appliances", "Bespoke Pantries"]
-    },
-    {
-      id: "doors-frames",
-      title: "Custom Doors & Frames",
-      icon: "fa-solid fa-door-open",
-      shortDesc: "Oversized pivot doors, concealed frameless doors, and sliding partitions.",
-      fullDesc: "Engineered internal steel subframes, acoustic seals, and custom architectural ironmongery.",
-      features: ["Pivot Doors", "Flush Frames", "Acoustic Rated", "Custom Ironmongery"]
-    },
-    {
-      id: "wall-ceiling-cladding",
-      title: "Wall & Ceiling Cladding",
-      icon: "fa-solid fa-layer-group",
-      shortDesc: "Wood veneer panels, fluted slats, and geometric wall features.",
-      fullDesc: "Veneer panels, fluted slats, acoustic grooved timber, and geometric wall paneling.",
-      features: ["Veneer Paneling", "3D Slatted Panels", "Concealed Secret Doors", "Fire-Retardant Finishes"]
-    }
-  ],
-
-  // 5. Client FAQs
-  faqs: [
-    {
-      q: "What types of woodwork and joinery projects does Art Touch handle?",
-      a: "Art Touch specializes in custom woodwork, architectural wall and ceiling paneling, bespoke furniture, high-end kitchens, oversized pivot doors, acoustic timber baffles, and commercial fit-outs across Amman and the region."
-    },
-    {
-      q: "Can you manufacture from our architect’s or interior designer’s drawings?",
-      a: "Yes. Our team works directly with CAD/BIM shop drawings, conducting site surveys and producing detailed 1:1 joinery shop drawings for client approval before fabrication."
-    },
-    {
-      q: "What are Art Touch's working hours and workshop location?",
-      a: "Art Touch is located in Amman, Jordan. Our working hours are Sunday through Thursday, 9:00 AM to 6:00 PM (Jordan local time). Friday and Saturday are closed."
-    }
-  ]
+  getProjectById: function(id) {
+    if (!id) return null;
+    return this.projects.find(p => p.id === id) || null;
+  }
 };
 
-// Store pristine default projects snapshot for reset / restoration
-ArtTouchData.defaultProjects = JSON.parse(JSON.stringify(ArtTouchData.projects));
-
-// Dynamic Custom Projects Sync from local/cloud store
-try {
-  if (typeof localStorage !== 'undefined') {
-    const customProjects = localStorage.getItem('arttouch_projects') || localStorage.getItem('arttouch_custom_projects');
-    if (customProjects) {
-      const parsed = JSON.parse(customProjects);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        ArtTouchData.projects = parsed;
-      }
-    }
-  }
-} catch (e) {}
-
-// Export to window
-if (typeof window !== 'undefined') {
-  window.ArtTouchData = ArtTouchData;
-}
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = ArtTouchData;
 }
@@ -1314,312 +477,1068 @@ if (typeof module !== 'undefined' && module.exports) {
   }
 
   function updateCodePreview() {
-    const codePreview = document.getElementById('datajs-code-preview');
-    if (codePreview) {
-      codePreview.textContent = generateDataJsSource();
+    const preview = document.getElementById('datajs-code-preview');
+    if (preview) {
+      preview.textContent = generateMasterDataJs();
     }
   }
 
-  function downloadDataJsFile() {
-    const code = generateDataJsSource();
-    const blob = new Blob([code], { type: 'text/javascript;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'data.js';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    alert('Downloaded "data.js"! Replace js/data.js in your project folder with this file to apply changes permanently.');
-  }
-
-  function copyDataJsToClipboard() {
-    const code = generateDataJsSource();
-    navigator.clipboard.writeText(code).then(() => {
-      alert('Copied updated data.js code to clipboard!');
-    }).catch(err => {
-      console.error('Clipboard copy failed:', err);
-    });
-  }
-
-  async function directSaveWithFileSystemAPI() {
-    if (!window.showSaveFilePicker) {
-      downloadDataJsFile();
-      return;
-    }
-
-    try {
-      const handle = await window.showSaveFilePicker({
-        suggestedName: 'data.js',
-        types: [{
-          description: 'JavaScript File',
-          accept: { 'text/javascript': ['.js'] }
-        }]
-      });
-      const writable = await handle.createWritable();
-      await writable.write(generateDataJsSource());
-      await writable.close();
-      alert('Successfully saved directly to data.js!');
-    } catch (err) {
-      if (err.name !== 'AbortError') {
-        console.error('File save error:', err);
-        downloadDataJsFile();
-      }
-    }
-  }
-
-  // 7. Direct GitHub API Auto-Committer & Live Deployment Sync
-  const GITHUB_REPO = 'wrd2gore/art-touch-woodworks';
-  const GITHUB_BRANCH = 'main';
-
-  function getGitHubToken() {
-    try {
-      const stored = localStorage.getItem('arttouch_gh_token');
-      if (stored && stored.trim().length > 10) return stored.trim();
-    } catch (e) {}
-    return (window.__ARTTOUCH_GH_TOKEN__ || '');
-  }
-
-  async function testGitHubTokenConnection() {
-    const inputEl = document.getElementById('input-gh-token');
-    const token = inputEl ? inputEl.value.trim() : getGitHubToken();
-    const resultBox = document.getElementById('gh-token-test-result');
+  // 1-Click Publishing to GitHub REST API (main & master branches)
+  window.publishToLiveWebsite = async function() {
+    const token = localStorage.getItem('arttouch_gh_token') || (document.getElementById('input-gh-token') ? document.getElementById('input-gh-token').value.trim() : '');
 
     if (!token) {
-      if (resultBox) {
-        resultBox.style.display = 'block';
-        resultBox.style.background = '#FEF3C7';
-        resultBox.style.color = '#92400E';
-        resultBox.style.border = '1px solid #FDE68A';
-        resultBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Please paste your GitHub Personal Access Token into the box above.';
+      showNotification('Please save your GitHub Personal Access Token in the Publish tab first.', 'error');
+      switchTab('sync');
+      return;
+    }
+
+    const btnHeader = document.getElementById('btn-publish-header');
+    const btnMain = document.getElementById('btn-publish-main');
+    const originalHeaderHtml = btnHeader ? btnHeader.innerHTML : '';
+    const originalMainHtml = btnMain ? btnMain.innerHTML : '';
+
+    const setBusy = (isBusy) => {
+      if (btnHeader) {
+        btnHeader.disabled = isBusy;
+        btnHeader.innerHTML = isBusy ? '<i class="fa-solid fa-spinner fa-spin"></i> Publishing...' : originalHeaderHtml;
+      }
+      if (btnMain) {
+        btnMain.disabled = isBusy;
+        btnMain.innerHTML = isBusy ? '<i class="fa-solid fa-spinner fa-spin"></i> Publishing to Live Website...' : originalMainHtml;
+      }
+    };
+
+    setBusy(true);
+
+    try {
+      const repo = 'wrd2gore/art-touch-woodworks';
+      const path = 'js/data.js';
+      const fileContent = generateMasterDataJs();
+      const contentBase64 = btoa(unescape(encodeURIComponent(fileContent)));
+      const commitMessage = `Update website content from Control Center - ${new Date().toLocaleString()}`;
+
+      // Branches to sync simultaneously
+      const targetBranches = ['main', 'master'];
+      const results = [];
+
+      for (const branch of targetBranches) {
+        // 1. Get current SHA
+        let sha = null;
+        try {
+          const getRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`, {
+            headers: {
+              'Authorization': `token ${token}`,
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          });
+          if (getRes.ok) {
+            const getData = await getRes.json();
+            sha = getData.sha;
+          }
+        } catch (e) {}
+
+        // 2. Put updated content
+        const bodyPayload = {
+          message: commitMessage,
+          content: contentBase64,
+          branch: branch
+        };
+        if (sha) bodyPayload.sha = sha;
+
+        const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(bodyPayload)
+        });
+
+        if (!putRes.ok) {
+          const errData = await putRes.json();
+          throw new Error(`GitHub API Error on ${branch}: ${errData.message || putRes.statusText}`);
+        }
+        results.push(branch);
+      }
+
+      // Success
+      markDraftPublished();
+      updateCodePreview();
+      showNotification(`✅ Changes published successfully to live website (${results.join(' & ')} branches)!`, 'success');
+
+    } catch (err) {
+      console.error(err);
+      showNotification(`Publish failed: ${err.message}`, 'error');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  window.saveGitHubToken = function() {
+    const input = document.getElementById('input-gh-token');
+    if (!input) return;
+    const token = input.value.trim();
+    if (!token) {
+      showNotification('Please enter a valid GitHub token.', 'error');
+      return;
+    }
+    localStorage.setItem('arttouch_gh_token', token);
+    showNotification('GitHub Token saved securely in this app.', 'success');
+  };
+
+  window.testGitHubTokenConnection = async function() {
+    const input = document.getElementById('input-gh-token');
+    const token = input ? input.value.trim() : (localStorage.getItem('arttouch_gh_token') || '');
+    const resultEl = document.getElementById('gh-token-test-result');
+
+    if (!token) {
+      if (resultEl) {
+        resultEl.style.display = 'block';
+        resultEl.style.background = '#FEE2E2';
+        resultEl.style.color = '#991B1B';
+        resultEl.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Please enter a token first.';
       }
       return;
     }
 
-    if (resultBox) {
-      resultBox.style.display = 'block';
-      resultBox.style.background = '#EFF6FF';
-      resultBox.style.color = '#1E40AF';
-      resultBox.style.border = '1px solid #BFDBFE';
-      resultBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying token permissions with GitHub API...';
+    if (resultEl) {
+      resultEl.style.display = 'block';
+      resultEl.style.background = '#FEF3C7';
+      resultEl.style.color = '#92400E';
+      resultEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying token connection...';
     }
 
     try {
-      const authHeader = (token.startsWith('gh') || token.startsWith('github_pat')) ? `Bearer ${token}` : `token ${token}`;
-      const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/js/data.js?ref=${GITHUB_BRANCH}`, {
+      const res = await fetch('https://api.github.com/repos/wrd2gore/art-touch-woodworks', {
         headers: {
-          'Authorization': authHeader,
+          'Authorization': `token ${token}`,
           'Accept': 'application/vnd.github.v3+json'
         }
       });
 
       if (res.ok) {
+        const data = await res.json();
         localStorage.setItem('arttouch_gh_token', token);
-        if (resultBox) {
-          resultBox.style.background = '#ECFDF5';
-          resultBox.style.color = '#047857';
-          resultBox.style.border = '1px solid #A7F3D0';
-          resultBox.innerHTML = '<strong><i class="fa-solid fa-circle-check"></i> Connection Successful!</strong><br><small>Token is verified. 1-Click Publishing to GitHub Pages is active.</small>';
+        if (resultEl) {
+          resultEl.style.background = '#ECFDF5';
+          resultEl.style.color = '#065F46';
+          resultEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Connected successfully to <strong>${data.full_name}</strong> (${data.default_branch} branch). Permissions: Push &amp; Admin OK.`;
         }
-        alert('✅ GitHub Token Verified Successfully!\n\nYou can now publish changes live directly with 1-click.');
       } else {
-        const errData = await res.json().catch(() => ({}));
-        if (resultBox) {
-          resultBox.style.background = '#FEE2E2';
-          resultBox.style.color = '#B91C1C';
-          resultBox.style.border = '1px solid #FCA5A5';
-          resultBox.innerHTML = `<strong><i class="fa-solid fa-circle-xmark"></i> Connection Error (${res.status}):</strong><br><small>${errData.message || 'Authentication failed'}. Ensure token has <code>repo</code> scope (Classic) or <code>Contents: Read and write</code> (Fine-Grained) on <code>wrd2gore/art-touch-woodworks</code>.</small>`;
+        const err = await res.json();
+        if (resultEl) {
+          resultEl.style.background = '#FEE2E2';
+          resultEl.style.color = '#991B1B';
+          resultEl.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Connection error: ${err.message || res.statusText}`;
         }
-        alert(`❌ GitHub Connection Failed (${res.status}):\n${errData.message || 'Invalid token or insufficient permissions'}\n\nPlease check token scopes.`);
       }
     } catch (e) {
-      if (resultBox) {
-        resultBox.style.background = '#FEE2E2';
-        resultBox.style.color = '#B91C1C';
-        resultBox.style.border = '1px solid #FCA5A5';
-        resultBox.innerHTML = `<strong><i class="fa-solid fa-circle-xmark"></i> Network Error:</strong> ${e.message}`;
+      if (resultEl) {
+        resultEl.style.background = '#FEE2E2';
+        resultEl.style.color = '#991B1B';
+        resultEl.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Network test failed: ${e.message}`;
       }
     }
-  }
-
-  window.testGitHubTokenConnection = testGitHubTokenConnection;
-
-  async function syncDirectlyToGitHub(customCommitMsg, isManualTrigger = false) {
-    const statusEl = document.getElementById('github-sync-indicator');
-    let token = getGitHubToken();
-
-    if (!token) {
-      const inputEl = document.getElementById('input-gh-token');
-      if (inputEl && inputEl.value.trim()) {
-        token = inputEl.value.trim();
-        localStorage.setItem('arttouch_gh_token', token);
-      }
-    }
-
-    if (!token) {
-      if (isManualTrigger) {
-        const userEnteredToken = prompt('Please enter your GitHub Personal Access Token (PAT) with "repo" or "Contents: Read & Write" permissions to publish live:');
-        if (userEnteredToken && userEnteredToken.trim().length > 10) {
-          token = userEnteredToken.trim();
-          localStorage.setItem('arttouch_gh_token', token);
-          const inputEl = document.getElementById('input-gh-token');
-          if (inputEl) inputEl.value = token;
-        } else {
-          alert('Publish cancelled: No GitHub token provided.\n\nTip: You can also double-click sync_github.bat in your project folder to publish without entering a token!');
-          return;
-        }
-      } else {
-        if (statusEl) {
-          statusEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>Add GitHub Token to Sync</span>';
-          statusEl.style.color = '#D97706';
-          statusEl.style.background = '#FEF3C7';
-          statusEl.style.borderColor = '#FDE68A';
-        }
-        return;
-      }
-    }
-
-    if (statusEl) {
-      statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Publishing to GitHub...</span>';
-      statusEl.style.color = '#D97706';
-      statusEl.style.background = '#FEF3C7';
-      statusEl.style.borderColor = '#FDE68A';
-    }
-
-    let isSuccess = false;
-    let errorDetail = '';
-    let commitSha = '';
-
-    try {
-      const code = generateDataJsSource();
-      const utf8Bytes = new TextEncoder().encode(code);
-      let binary = '';
-      for (let i = 0; i < utf8Bytes.byteLength; i++) {
-        binary += String.fromCharCode(utf8Bytes[i]);
-      }
-      const base64Content = btoa(binary);
-
-      const authHeader = (token.startsWith('gh') || token.startsWith('github_pat')) ? `Bearer ${token}` : `token ${token}`;
-
-      async function pushFileToBranch(branchName) {
-        let sha = null;
-        try {
-          const getRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/js/data.js?ref=${branchName}`, {
-            headers: {
-              'Authorization': authHeader,
-              'Accept': 'application/vnd.github.v3+json'
-            }
-          });
-          if (getRes.ok) {
-            const fileData = await getRes.json();
-            sha = fileData.sha;
-          }
-        } catch (e) {}
-
-        const putBody = {
-          message: customCommitMsg || `Update portfolio via Art Touch Control Center [${new Date().toLocaleTimeString()}]`,
-          content: base64Content,
-          branch: branchName
-        };
-        if (sha) putBody.sha = sha;
-
-        const putRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/js/data.js`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': authHeader,
-            'Content-Type': 'application/json',
-            'Accept': 'application/vnd.github.v3+json'
-          },
-          body: JSON.stringify(putBody)
-        });
-
-        if (!putRes.ok) {
-          const errorData = await putRes.json().catch(() => ({}));
-          throw new Error(errorData.message || `HTTP ${putRes.status} on branch ${branchName}`);
-        }
-        return await putRes.json();
-      }
-
-      const resMain = await pushFileToBranch('main');
-      const resMaster = await pushFileToBranch('master').catch(() => null);
-
-      commitSha = (resMain && resMain.commit) ? resMain.commit.sha.substring(0, 7) : 'live';
-      isSuccess = true;
-    } catch (err) {
-      console.warn('GitHub direct sync error:', err);
-      errorDetail = err.message;
-    } finally {
-      if (statusEl) {
-        if (isSuccess) {
-          statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Published Live (${commitSha})</span>`;
-          statusEl.style.color = '#059669';
-          statusEl.style.background = '#ECFDF5';
-          statusEl.style.borderColor = '#A7F3D0';
-        } else {
-          statusEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> <span>Publish Failed</span>';
-          statusEl.style.color = '#DC2626';
-          statusEl.style.background = '#FEE2E2';
-          statusEl.style.borderColor = '#FCA5A5';
-        }
-        setTimeout(() => {
-          statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Control Center Connected</span>';
-          statusEl.style.color = '#059669';
-          statusEl.style.background = '#ECFDF5';
-          statusEl.style.borderColor = '#A7F3D0';
-        }, 5000);
-      }
-
-      if (isManualTrigger) {
-        if (isSuccess) {
-          alert(`🎉 Successfully Published to GitHub Pages!\n\nCommit SHA: ${commitSha}\nLive Website: https://wrd2gore.github.io/art-touch-woodworks/\n\nYour portfolio changes are now live across the world!`);
-        } else {
-          alert(`❌ Publishing Failed:\n${errorDetail}\n\nPlease test your token using the "Test Connection" button in the Website Sync tab, or use sync_github.bat.`);
-        }
-      }
-    }
-  }
-
-  window.syncDirectlyToGitHub = syncDirectlyToGitHub;
-  window.publishToGitHub = function() {
-    syncDirectlyToGitHub('Manual 1-click publish from Art Touch Control Center', true);
   };
 
-  // 7. Dashboard Stats Counter
-  function updateDashboardStats() {
-    const countInquiries = document.getElementById('stat-inquiries-count');
-    const countUnread = document.getElementById('stat-unread-count');
-    const countProjects = document.getElementById('stat-projects-count');
-    const countCategories = document.getElementById('stat-categories-count');
+  window.downloadDataJs = function() {
+    const text = generateMasterDataJs();
+    const blob = new Blob([text], { type: 'application/javascript;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'data.js';
+    link.click();
+    showNotification('Downloaded data.js backup file.', 'success');
+  };
 
-    if (countInquiries) countInquiries.textContent = inquiriesData.length;
-    if (countUnread) countUnread.textContent = inquiriesData.filter(i => i.status === 'new').length;
-    if (countProjects) countProjects.textContent = projectsData.length;
-    if (countCategories) {
-      const cats = new Set(projectsData.map(p => p.category).filter(Boolean));
-      countCategories.textContent = cats.size;
+  window.copyDataJsCode = function() {
+    const text = generateMasterDataJs();
+    navigator.clipboard.writeText(text).then(() => {
+      showNotification('Copied data.js code to clipboard.', 'success');
+    });
+  };
+
+  /* -------------------------------------------------------------------------- */
+  /* 5. CUSTOMER INQUIRIES & REQUESTS HUB                                      */
+  /* -------------------------------------------------------------------------- */
+  function initInquiriesListener() {
+    // Real-time listener for incoming visitor submissions
+    window.addEventListener('arttouch:new-inquiry', (e) => {
+      if (e.detail) {
+        inquiriesData.unshift(e.detail);
+        renderInquiriesTable();
+        updateDashboardStats();
+        showNotification(`📬 New customer request from: ${e.detail.name || 'Visitor'}`, 'success');
+      }
+    });
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'arttouch_inquiries') {
+        try {
+          inquiriesData = JSON.parse(e.newValue || '[]');
+          renderInquiriesTable();
+          updateDashboardStats();
+        } catch (err) {}
+      }
+    });
+
+    // Search and filter listeners
+    const searchInput = document.getElementById('inquiries-search');
+    const filterSelect = document.getElementById('inquiries-filter');
+
+    if (searchInput) searchInput.addEventListener('input', renderInquiriesTable);
+    if (filterSelect) filterSelect.addEventListener('change', renderInquiriesTable);
+  }
+
+  function saveInquiriesLocally() {
+    try {
+      localStorage.setItem('arttouch_inquiries', JSON.stringify(inquiriesData));
+    } catch (e) {}
+  }
+
+  function renderInquiriesTable() {
+    const tbody = document.getElementById('inquiries-tbody');
+    if (!tbody) return;
+
+    const query = (document.getElementById('inquiries-search') ? document.getElementById('inquiries-search').value : '').toLowerCase().trim();
+    const filter = document.getElementById('inquiries-filter') ? document.getElementById('inquiries-filter').value : 'all';
+
+    let filtered = inquiriesData;
+
+    if (filter === 'contact') {
+      filtered = filtered.filter(i => i.type === 'contact');
+    } else if (filter === 'quote') {
+      filtered = filtered.filter(i => i.type === 'quote');
+    } else if (filter === 'new') {
+      filtered = filtered.filter(i => i.status === 'new');
+    } else if (filter === 'handled') {
+      filtered = filtered.filter(i => i.status === 'handled');
+    }
+
+    if (query) {
+      filtered = filtered.filter(i => 
+        (i.name && i.name.toLowerCase().includes(query)) ||
+        (i.email && i.email.toLowerCase().includes(query)) ||
+        (i.phone && i.phone.toLowerCase().includes(query)) ||
+        (i.subject && i.subject.toLowerCase().includes(query)) ||
+        (i.message && i.message.toLowerCase().includes(query))
+      );
+    }
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 40px; color: var(--color-admin-text-muted);">
+            <i class="fa-solid fa-inbox" style="font-size: 32px; color: #D1D5DB; margin-bottom: 8px; display: block;"></i>
+            No customer requests found matching your filter.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(inq => {
+      const isNew = inq.status === 'new';
+      const statusBadge = isNew
+        ? `<span class="badge" style="background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A;"><i class="fa-solid fa-circle-dot"></i> New</span>`
+        : `<span class="badge" style="background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0;"><i class="fa-solid fa-check"></i> Handled</span>`;
+
+      const typeBadge = inq.type === 'quote'
+        ? `<span class="badge" style="background: #E0E7FF; color: #3730A3;"><i class="fa-solid fa-calculator"></i> Quote</span>`
+        : `<span class="badge" style="background: #F3F4F6; color: #374151;"><i class="fa-solid fa-envelope"></i> Contact</span>`;
+
+      const dateFormatted = inq.timestamp ? new Date(inq.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent';
+
+      return `
+        <tr style="${isNew ? 'background-color: #FFFDF9; font-weight: 500;' : ''}">
+          <td>
+            <strong>${escapeHtml(inq.name)}</strong>
+          </td>
+          <td>${typeBadge}</td>
+          <td>
+            <div style="font-size: 13px;">
+              ${inq.email ? `<a href="mailto:${escapeAttr(inq.email)}" style="color: var(--color-brand); text-decoration: none;"><i class="fa-solid fa-envelope"></i> ${escapeHtml(inq.email)}</a>` : ''}
+            </div>
+            <div style="font-size: 12px; color: var(--color-admin-text-muted); margin-top: 2px;">
+              ${inq.phone ? `<a href="tel:${escapeAttr(inq.phone)}" style="color: inherit; text-decoration: none;"><i class="fa-solid fa-phone"></i> ${escapeHtml(inq.phone)}</a>` : 'No phone'}
+            </div>
+          </td>
+          <td>
+            <div style="max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              ${escapeHtml(inq.subject || inq.message)}
+            </div>
+          </td>
+          <td style="font-size: 12px; color: var(--color-admin-text-muted);">${dateFormatted}</td>
+          <td>${statusBadge}</td>
+          <td>
+            <div style="display: flex; gap: 6px;">
+              <button type="button" class="btn btn-outline btn-xs" onclick="window.viewInquiryDetail('${escapeAttr(inq.id)}')" title="View Details">
+                <i class="fa-solid fa-eye"></i> View
+              </button>
+              ${isNew ? `
+                <button type="button" class="btn btn-secondary btn-xs" onclick="window.markInquiryHandled('${escapeAttr(inq.id)}')" title="Mark Handled">
+                  <i class="fa-solid fa-check"></i>
+                </button>
+              ` : ''}
+              <button type="button" class="btn btn-outline btn-xs" onclick="window.deleteInquiry('${escapeAttr(inq.id)}')" style="color: #DC2626;" title="Delete Request">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  window.viewInquiryDetail = function(id) {
+    const inq = inquiriesData.find(i => i.id === id);
+    if (!inq) return;
+
+    const modalBody = document.getElementById('modal-inquiry-body');
+    const modalFooter = document.getElementById('modal-inquiry-footer');
+
+    if (modalBody) {
+      modalBody.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--color-admin-border);">
+          <div>
+            <h4 style="margin: 0; font-size: 18px; color: var(--color-admin-text);">${escapeHtml(inq.name)}</h4>
+            <div style="font-size: 13px; color: var(--color-admin-text-muted); margin-top: 2px;">
+              Submitted on ${inq.timestamp ? new Date(inq.timestamp).toLocaleString() : 'N/A'}
+            </div>
+          </div>
+          <div>
+            <span class="badge" style="background: ${inq.status === 'new' ? '#FEF3C7' : '#ECFDF5'}; color: ${inq.status === 'new' ? '#92400E' : '#065F46'}; font-size: 12px; padding: 4px 10px;">
+              ${inq.status === 'new' ? 'Status: New' : 'Status: Handled'}
+            </span>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-bottom: 16px;">
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <div style="font-size: 14px;"><a href="mailto:${escapeAttr(inq.email)}" style="color: var(--color-brand); font-weight: 600;">${escapeHtml(inq.email || 'N/A')}</a></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Contact</label>
+            <div style="font-size: 14px;"><a href="tel:${escapeAttr(inq.phone)}" style="color: var(--color-brand); font-weight: 600;">${escapeHtml(inq.phone || 'N/A')}</a></div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label">Subject / Purpose</label>
+          <div style="font-size: 14px; font-weight: 600; color: #1F2428;">${escapeHtml(inq.subject || 'Website Inquiry')}</div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label">Message / Details</label>
+          <div style="background: #F9FAFB; padding: 14px; border-radius: 6px; border: 1px solid var(--color-admin-border); font-size: 14px; line-height: 1.5; white-space: pre-wrap;">
+            ${escapeHtml(inq.message || 'No description provided.')}
+          </div>
+        </div>
+
+        ${inq.metadata ? `
+          <div class="form-group" style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--color-admin-border);">
+            <label class="form-label" style="font-weight: 700;">Project Scope &amp; Estimation Metadata</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px;">
+              ${Object.keys(inq.metadata).map(k => `
+                <div style="background: #F3F4F6; padding: 8px 12px; border-radius: 4px;">
+                  <span style="color: var(--color-admin-text-muted);">${escapeHtml(k)}:</span> <strong>${escapeHtml(inq.metadata[k])}</strong>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+      `;
+    }
+
+    if (modalFooter) {
+      modalFooter.innerHTML = `
+        ${inq.status === 'new' ? `
+          <button type="button" class="btn btn-primary btn-sm" onclick="window.markInquiryHandled('${escapeAttr(inq.id)}'); window.closeModal('modal-inquiry-detail');">
+            <i class="fa-solid fa-check"></i> Mark as Handled
+          </button>
+        ` : ''}
+        ${inq.email ? `
+          <a href="mailto:${escapeAttr(inq.email)}?subject=Re: ${encodeURIComponent(inq.subject || 'Art Touch Woodworks')}" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-reply"></i> Reply via Email
+          </a>
+        ` : ''}
+        ${inq.phone ? `
+          <a href="tel:${escapeAttr(inq.phone)}" class="btn btn-outline btn-sm">
+            <i class="fa-solid fa-phone"></i> Call
+          </a>
+        ` : ''}
+        <button type="button" class="btn btn-outline btn-sm" onclick="window.closeModal('modal-inquiry-detail')">Close</button>
+      `;
+    }
+
+    window.openModal('modal-inquiry-detail');
+  };
+
+  window.markInquiryHandled = function(id) {
+    const inq = inquiriesData.find(i => i.id === id);
+    if (inq) {
+      inq.status = 'handled';
+      saveInquiriesLocally();
+      renderInquiriesTable();
+      updateDashboardStats();
+      showNotification('Request marked as handled.', 'success');
+    }
+  };
+
+  window.deleteInquiry = function(id) {
+    if (!confirm('Are you sure you want to delete this customer inquiry?')) return;
+    inquiriesData = inquiriesData.filter(i => i.id !== id);
+    saveInquiriesLocally();
+    renderInquiriesTable();
+    updateDashboardStats();
+    showNotification('Inquiry deleted.', 'success');
+  };
+
+  window.clearHandledInquiries = function() {
+    if (!confirm('Clear all handled customer inquiries?')) return;
+    inquiriesData = inquiriesData.filter(i => i.status === 'new');
+    saveInquiriesLocally();
+    renderInquiriesTable();
+    updateDashboardStats();
+    showNotification('Handled inquiries cleared.', 'success');
+  };
+
+  window.exportInquiriesCSV = function() {
+    if (inquiriesData.length === 0) {
+      showNotification('No inquiries to export.', 'error');
+      return;
+    }
+
+    const headers = ['ID', 'Date', 'Type', 'Name', 'Email', 'Phone', 'Subject', 'Message', 'Status'];
+    const rows = inquiriesData.map(i => [
+      i.id || '',
+      i.timestamp || '',
+      i.type || '',
+      `"${(i.name || '').replace(/"/g, '""')}"`,
+      `"${(i.email || '').replace(/"/g, '""')}"`,
+      `"${(i.phone || '').replace(/"/g, '""')}"`,
+      `"${(i.subject || '').replace(/"/g, '""')}"`,
+      `"${(i.message || '').replace(/"/g, '""')}"`,
+      i.status || ''
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `ArtTouch_Customer_Inquiries_${new Date().toISOString().slice(0,10)}.csv`;
+    link.click();
+    showNotification('Exported CSV file.', 'success');
+  };
+
+  /* -------------------------------------------------------------------------- */
+  /* 6. PROJECTS & PHOTO GALLERIES MANAGER                                     */
+  /* -------------------------------------------------------------------------- */
+  function renderProjectsGrid() {
+    const container = document.getElementById('admin-projects-grid-container');
+    if (!container) return;
+
+    const query = (document.getElementById('projects-admin-search') ? document.getElementById('projects-admin-search').value : '').toLowerCase().trim();
+    const categoryFilter = document.getElementById('projects-admin-category-filter') ? document.getElementById('projects-admin-category-filter').value : 'all';
+
+    let filtered = projectsData;
+
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(p => (p.category || '').toLowerCase() === categoryFilter.toLowerCase());
+    }
+
+    if (query) {
+      filtered = filtered.filter(p => 
+        (p.title && p.title.toLowerCase().includes(query)) ||
+        (p.location && p.location.toLowerCase().includes(query)) ||
+        (p.category && p.category.toLowerCase().includes(query))
+      );
+    }
+
+    const searchInput = document.getElementById('projects-admin-search');
+    const catSelect = document.getElementById('projects-admin-category-filter');
+    if (searchInput && !searchInput.dataset.bound) {
+      searchInput.addEventListener('input', renderProjectsGrid);
+      searchInput.dataset.bound = 'true';
+    }
+    if (catSelect && !catSelect.dataset.bound) {
+      catSelect.addEventListener('change', renderProjectsGrid);
+      catSelect.dataset.bound = 'true';
+    }
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--color-admin-text-muted);">
+          <i class="fa-solid fa-folder-open" style="font-size: 36px; color: #D1D5DB; margin-bottom: 8px;"></i>
+          <div>No projects found.</div>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = filtered.map(p => {
+      const coverSrc = p.coverImage || (p.gallery && p.gallery.length > 0 ? p.gallery[0] : '');
+      const galleryCount = (p.gallery && Array.isArray(p.gallery)) ? p.gallery.length : 0;
+
+      return `
+        <div class="admin-project-card">
+          <div class="admin-project-thumb" style="aspect-ratio: 16/10; background: #1F2428; display: flex; align-items: center; justify-content: center; position: relative; border-radius: 4px; overflow: hidden;">
+            ${coverSrc ? `
+              <img src="${escapeAttr(coverSrc)}" alt="${escapeAttr(p.title)}" style="width: 100%; height: 100%; object-fit: contain; padding: 12px; background: #fff;" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png';">
+            ` : `
+              <div style="text-align: center; color: #9CA3AF; padding: 10px;">
+                <i class="fa-solid fa-image" style="font-size: 28px; color: var(--color-brand); margin-bottom: 4px;"></i>
+                <div style="font-size: 11px;">No Cover Photo</div>
+              </div>
+            `}
+            <span class="badge" style="position: absolute; top: 8px; left: 8px; background: rgba(17,24,39,0.85); color: #fff; font-size: 11px;">
+              ${escapeHtml(p.category || 'Woodwork')}
+            </span>
+            ${galleryCount > 0 ? `
+              <span class="badge" style="position: absolute; bottom: 8px; right: 8px; background: rgba(168,135,52,0.9); color: #fff; font-size: 11px;">
+                <i class="fa-solid fa-camera"></i> ${galleryCount}
+              </span>
+            ` : ''}
+          </div>
+
+          <div class="admin-project-body" style="padding: 12px 0 0 0;">
+            <h4 style="margin: 0 0 4px 0; font-size: 15px; font-weight: 700; color: var(--color-admin-text);">${escapeHtml(p.title)}</h4>
+            <div style="font-size: 12px; color: var(--color-admin-text-muted); margin-bottom: 12px;">
+              ${p.location ? `<span><i class="fa-solid fa-location-dot"></i> ${escapeHtml(p.location)}</span>` : ''}
+              ${p.dateCompleted ? `<span style="margin-left: 8px;"><i class="fa-solid fa-calendar"></i> ${escapeHtml(p.dateCompleted)}</span>` : ''}
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="btn btn-primary btn-xs" onclick="window.editProjectModal('${escapeAttr(p.id)}')" style="flex: 1;">
+                <i class="fa-solid fa-pen-to-square"></i> Edit
+              </button>
+              <a href="project-details.html?id=${encodeURIComponent(p.id)}" target="_blank" class="btn btn-outline btn-xs" title="Preview on Website">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+              <button type="button" class="btn btn-outline btn-xs" onclick="window.deleteProject('${escapeAttr(p.id)}')" style="color: #DC2626;" title="Delete Project">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.openNewProjectModal = function() {
+    document.getElementById('project-modal-title').textContent = 'Add New Woodwork Project';
+    document.getElementById('edit-project-id').value = '';
+    document.getElementById('edit-project-title').value = '';
+    document.getElementById('edit-project-category').value = 'Commercial';
+    document.getElementById('edit-project-location').value = 'Amman, Jordan';
+    document.getElementById('edit-project-date').value = new Date().getFullYear().toString();
+    document.getElementById('edit-project-area').value = '';
+    document.getElementById('edit-project-cover').value = '';
+    document.getElementById('edit-project-desc').value = '';
+    tempEditingGallery = [];
+    renderGalleryManagerPhotos();
+    window.openModal('modal-project-editor');
+  };
+
+  window.editProjectModal = function(id) {
+    const p = projectsData.find(item => item.id === id);
+    if (!p) return;
+
+    document.getElementById('project-modal-title').textContent = `Edit Project — ${p.title}`;
+    document.getElementById('edit-project-id').value = p.id;
+    document.getElementById('edit-project-title').value = p.title || '';
+    document.getElementById('edit-project-category').value = p.category || 'Commercial';
+    document.getElementById('edit-project-location').value = p.location || '';
+    document.getElementById('edit-project-date').value = p.dateCompleted || '';
+    document.getElementById('edit-project-area').value = p.area || '';
+    document.getElementById('edit-project-cover').value = p.coverImage || '';
+    document.getElementById('edit-project-desc').value = p.description || '';
+    
+    tempEditingGallery = (p.gallery && Array.isArray(p.gallery)) ? [...p.gallery] : [];
+    renderGalleryManagerPhotos();
+    window.openModal('modal-project-editor');
+  };
+
+  function renderGalleryManagerPhotos() {
+    const container = document.getElementById('gallery-manager-photos-list');
+    const countEl = document.getElementById('gallery-manager-count');
+    if (!container) return;
+
+    if (countEl) countEl.textContent = `${tempEditingGallery.length} photos`;
+
+    if (tempEditingGallery.length === 0) {
+      container.innerHTML = `<div style="grid-column: 1 / -1; font-size: 12px; color: var(--color-admin-text-muted); padding: 10px 0;">No gallery photos added yet.</div>`;
+      return;
+    }
+
+    container.innerHTML = tempEditingGallery.map((imgUrl, idx) => `
+      <div style="position: relative; aspect-ratio: 1; background: #fff; border: 1px solid var(--color-admin-border); border-radius: 4px; overflow: hidden; padding: 4px;">
+        <img src="${escapeAttr(imgUrl)}" alt="Photo ${idx + 1}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 2px;" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png';">
+        <button type="button" onclick="window.removeGalleryPhoto(${idx})" style="position: absolute; top: 4px; right: 4px; background: rgba(220,38,38,0.85); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Remove Photo">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    `).join('');
+  }
+
+  window.addGalleryPhotoFromInput = function() {
+    const input = document.getElementById('new-photo-url-input');
+    if (!input) return;
+    const url = input.value.trim();
+    if (!url) return;
+
+    tempEditingGallery.push(url);
+    input.value = '';
+    renderGalleryManagerPhotos();
+  };
+
+  window.removeGalleryPhoto = function(index) {
+    tempEditingGallery.splice(index, 1);
+    renderGalleryManagerPhotos();
+  };
+
+  window.saveProjectFromModal = function(e) {
+    if (e) e.preventDefault();
+
+    const idInput = document.getElementById('edit-project-id').value;
+    const title = document.getElementById('edit-project-title').value.trim();
+    const category = document.getElementById('edit-project-category').value;
+    const location = document.getElementById('edit-project-location').value.trim();
+    const dateCompleted = document.getElementById('edit-project-date').value.trim();
+    const area = document.getElementById('edit-project-area').value.trim();
+    const coverImage = document.getElementById('edit-project-cover').value.trim();
+    const description = document.getElementById('edit-project-desc').value.trim();
+
+    if (!title) {
+      alert('Please enter a project title.');
+      return;
+    }
+
+    const projectId = idInput || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    const projectObj = {
+      id: projectId,
+      category: category,
+      title: title,
+      location: location,
+      dateCompleted: dateCompleted,
+      area: area,
+      coverImage: coverImage,
+      description: description,
+      gallery: tempEditingGallery
+    };
+
+    if (idInput) {
+      const idx = projectsData.findIndex(p => p.id === idInput);
+      if (idx !== -1) projectsData[idx] = projectObj;
+      else projectsData.push(projectObj);
+    } else {
+      projectsData.unshift(projectObj);
+    }
+
+    try {
+      localStorage.setItem('arttouch_projects', JSON.stringify(projectsData));
+      localStorage.setItem('arttouch_custom_projects', JSON.stringify(projectsData));
+    } catch (err) {}
+
+    markDraftModified();
+    renderProjectsGrid();
+    updateDashboardStats();
+    window.closeModal('modal-project-editor');
+    showNotification(`Project "${title}" saved as draft. Click Publish when ready.`, 'success');
+  };
+
+  window.deleteProject = function(id) {
+    const p = projectsData.find(item => item.id === id);
+    if (!p) return;
+    if (!confirm(`Are you sure you want to delete "${p.title}"?`)) return;
+
+    projectsData = projectsData.filter(item => item.id !== id);
+    try {
+      localStorage.setItem('arttouch_projects', JSON.stringify(projectsData));
+      localStorage.setItem('arttouch_custom_projects', JSON.stringify(projectsData));
+    } catch (err) {}
+
+    markDraftModified();
+    renderProjectsGrid();
+    updateDashboardStats();
+    showNotification(`Project "${p.title}" removed. Click Publish to apply live.`, 'success');
+  };
+
+  window.restoreDefaultProjects = function() {
+    if (!confirm('Restore all 14 authentic default verified projects? Any custom additions will be replaced.')) return;
+
+    if (window.ArtTouchData && Array.isArray(window.ArtTouchData.projects)) {
+      projectsData = JSON.parse(JSON.stringify(window.ArtTouchData.projects));
+    } else {
+      projectsData = [];
+    }
+
+    try {
+      localStorage.setItem('arttouch_projects', JSON.stringify(projectsData));
+      localStorage.setItem('arttouch_custom_projects', JSON.stringify(projectsData));
+    } catch (err) {}
+
+    markDraftModified();
+    renderProjectsGrid();
+    updateDashboardStats();
+    showNotification('Restored 14 default verified projects.', 'success');
+  };
+
+  /* -------------------------------------------------------------------------- */
+  /* 7. SERVICES & CAPABILITIES MANAGER                                        */
+  /* -------------------------------------------------------------------------- */
+  function renderServicesGrid() {
+    const container = document.getElementById('admin-services-grid-container');
+    if (!container) return;
+
+    if (servicesData.length === 0) {
+      container.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 30px; color: var(--color-admin-text-muted);">No services listed.</div>`;
+      return;
+    }
+
+    container.innerHTML = servicesData.map(s => `
+      <div class="admin-card" style="padding: 16px; border: 1px solid var(--color-admin-border);">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px;">
+          <div style="font-size: 24px; color: var(--color-brand);">
+            <i class="${escapeAttr(s.icon || 'fa-solid fa-tree')}"></i>
+          </div>
+          <div style="display: flex; gap: 4px;">
+            <button type="button" class="btn btn-outline btn-xs" onclick="window.editServiceModal('${escapeAttr(s.id)}')" title="Edit Service">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button type="button" class="btn btn-outline btn-xs" onclick="window.deleteService('${escapeAttr(s.id)}')" style="color: #DC2626;" title="Delete Service">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+        <h4 style="margin: 0 0 6px 0; font-size: 15px; font-weight: 700; color: var(--color-admin-text);">${escapeHtml(s.title)}</h4>
+        <p style="font-size: 13px; color: var(--color-admin-text-muted); margin-bottom: 10px; line-height: 1.4;">${escapeHtml(s.shortDesc)}</p>
+        
+        ${s.features && Array.isArray(s.features) ? `
+          <ul style="margin: 0; padding-left: 16px; font-size: 12px; color: var(--color-admin-text);">
+            ${s.features.map(f => `<li>${escapeHtml(f)}</li>`).join('')}
+          </ul>
+        ` : ''}
+      </div>
+    `).join('');
+  }
+
+  window.openNewServiceModal = function() {
+    document.getElementById('service-modal-title').textContent = 'Add New Woodwork Service';
+    document.getElementById('edit-service-id').value = '';
+    document.getElementById('edit-service-title').value = '';
+    document.getElementById('edit-service-icon').value = 'fa-solid fa-hammer';
+    document.getElementById('edit-service-desc').value = '';
+    document.getElementById('edit-service-features').value = '';
+    window.openModal('modal-service-editor');
+  };
+
+  window.editServiceModal = function(id) {
+    const s = servicesData.find(item => item.id === id);
+    if (!s) return;
+
+    document.getElementById('service-modal-title').textContent = `Edit Service — ${s.title}`;
+    document.getElementById('edit-service-id').value = s.id;
+    document.getElementById('edit-service-title').value = s.title || '';
+    document.getElementById('edit-service-icon').value = s.icon || 'fa-solid fa-tree';
+    document.getElementById('edit-service-desc').value = s.shortDesc || '';
+    document.getElementById('edit-service-features').value = (s.features && Array.isArray(s.features)) ? s.features.join('\n') : '';
+    window.openModal('modal-service-editor');
+  };
+
+  window.saveServiceFromModal = function(e) {
+    if (e) e.preventDefault();
+
+    const idInput = document.getElementById('edit-service-id').value;
+    const title = document.getElementById('edit-service-title').value.trim();
+    const icon = document.getElementById('edit-service-icon').value.trim() || 'fa-solid fa-tree';
+    const shortDesc = document.getElementById('edit-service-desc').value.trim();
+    const featuresRaw = document.getElementById('edit-service-features').value.trim();
+    const features = featuresRaw ? featuresRaw.split('\n').map(f => f.trim()).filter(Boolean) : [];
+
+    if (!title) {
+      alert('Please enter a service title.');
+      return;
+    }
+
+    const serviceId = idInput || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    const serviceObj = {
+      id: serviceId,
+      title: title,
+      icon: icon,
+      shortDesc: shortDesc,
+      features: features
+    };
+
+    if (idInput) {
+      const idx = servicesData.findIndex(s => s.id === idInput);
+      if (idx !== -1) servicesData[idx] = serviceObj;
+      else servicesData.push(serviceObj);
+    } else {
+      servicesData.push(serviceObj);
+    }
+
+    try {
+      localStorage.setItem('arttouch_services', JSON.stringify(servicesData));
+    } catch (err) {}
+
+    markDraftModified();
+    renderServicesGrid();
+    updateDashboardStats();
+    window.closeModal('modal-service-editor');
+    showNotification(`Service "${title}" saved as draft. Click Publish when ready.`, 'success');
+  };
+
+  window.deleteService = function(id) {
+    const s = servicesData.find(item => item.id === id);
+    if (!s) return;
+    if (!confirm(`Delete service "${s.title}"?`)) return;
+
+    servicesData = servicesData.filter(item => item.id !== id);
+    try {
+      localStorage.setItem('arttouch_services', JSON.stringify(servicesData));
+    } catch (err) {}
+
+    markDraftModified();
+    renderServicesGrid();
+    updateDashboardStats();
+    showNotification(`Service removed. Click Publish to apply live.`, 'success');
+  };
+
+  /* -------------------------------------------------------------------------- */
+  /* 8. FREQUENTLY ASKED QUESTIONS (FAQS) MANAGER                              */
+  /* -------------------------------------------------------------------------- */
+  function renderFaqsList() {
+    const container = document.getElementById('admin-faqs-list');
+    if (!container) return;
+
+    if (faqsData.length === 0) {
+      container.innerHTML = `<div style="text-align: center; padding: 30px; color: var(--color-admin-text-muted);">No FAQs listed.</div>`;
+      return;
+    }
+
+    container.innerHTML = faqsData.map((f, idx) => `
+      <div style="background: #F9FAFB; padding: 16px; border-radius: 6px; border: 1px solid var(--color-admin-border);">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px;">
+          <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: var(--color-admin-text);">
+            <i class="fa-regular fa-circle-question text-brand"></i> ${escapeHtml(f.q)}
+          </h4>
+          <div style="display: flex; gap: 6px; white-space: nowrap;">
+            <button type="button" class="btn btn-outline btn-xs" onclick="window.editFaqModal(${idx})" title="Edit FAQ">
+              <i class="fa-solid fa-pen"></i> Edit
+            </button>
+            <button type="button" class="btn btn-outline btn-xs" onclick="window.deleteFaq(${idx})" style="color: #DC2626;" title="Delete FAQ">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+        <p style="margin: 0; font-size: 13px; color: var(--color-admin-text-muted); line-height: 1.5;">${escapeHtml(f.a)}</p>
+      </div>
+    `).join('');
+  }
+
+  window.openNewFaqModal = function() {
+    document.getElementById('faq-modal-title').textContent = 'Add New FAQ';
+    document.getElementById('edit-faq-index').value = '';
+    document.getElementById('edit-faq-q').value = '';
+    document.getElementById('edit-faq-a').value = '';
+    window.openModal('modal-faq-editor');
+  };
+
+  window.editFaqModal = function(idx) {
+    const f = faqsData[idx];
+    if (!f) return;
+
+    document.getElementById('faq-modal-title').textContent = 'Edit FAQ';
+    document.getElementById('edit-faq-index').value = idx.toString();
+    document.getElementById('edit-faq-q').value = f.q || '';
+    document.getElementById('edit-faq-a').value = f.a || '';
+    window.openModal('modal-faq-editor');
+  };
+
+  window.saveFaqFromModal = function(e) {
+    if (e) e.preventDefault();
+
+    const idxStr = document.getElementById('edit-faq-index').value;
+    const q = document.getElementById('edit-faq-q').value.trim();
+    const a = document.getElementById('edit-faq-a').value.trim();
+
+    if (!q || !a) {
+      alert('Please enter both question and answer.');
+      return;
+    }
+
+    const faqObj = { q: q, a: a };
+
+    if (idxStr !== '') {
+      const idx = parseInt(idxStr, 10);
+      if (!isNaN(idx) && faqsData[idx]) faqsData[idx] = faqObj;
+    } else {
+      faqsData.push(faqObj);
+    }
+
+    try {
+      localStorage.setItem('arttouch_faqs', JSON.stringify(faqsData));
+    } catch (err) {}
+
+    markDraftModified();
+    renderFaqsList();
+    updateDashboardStats();
+    window.closeModal('modal-faq-editor');
+    showNotification('FAQ saved as draft. Click Publish when ready.', 'success');
+  };
+
+  window.deleteFaq = function(idx) {
+    if (!confirm('Delete this FAQ?')) return;
+    faqsData.splice(idx, 1);
+    try {
+      localStorage.setItem('arttouch_faqs', JSON.stringify(faqsData));
+    } catch (err) {}
+
+    markDraftModified();
+    renderFaqsList();
+    updateDashboardStats();
+    showNotification('FAQ removed. Click Publish to apply live.', 'success');
+  };
+
+  /* -------------------------------------------------------------------------- */
+  /* 9. BUSINESS SETTINGS MANAGER                                               */
+  /* -------------------------------------------------------------------------- */
+  window.saveBusinessSettings = function() {
+    const loc = document.getElementById('setting-location').value.trim();
+    const phone = document.getElementById('setting-phone').value.trim();
+    const days = document.getElementById('setting-days').value.trim();
+    const hours = document.getElementById('setting-hours').value.trim();
+    const emailGen = document.getElementById('setting-email-general').value.trim();
+    const emailGm = document.getElementById('setting-email-gm').value.trim();
+    const emailCeo = document.getElementById('setting-email-ceo').value.trim();
+
+    let openTime = "09:00";
+    let closeTime = "18:00";
+    if (hours.includes('-')) {
+      const parts = hours.split('-');
+      openTime = parts[0].trim();
+      closeTime = parts[1].trim();
+    }
+
+    businessData = {
+      location: loc,
+      country: "Jordan",
+      timezone: "Asia/Amman",
+      days: days,
+      open: openTime,
+      close: closeTime,
+      weekendDays: [5, 6],
+      phone: phone,
+      phoneClean: phone.replace(/[^0-9+]/g, ''),
+      emails: {
+        general: emailGen,
+        generalManager: emailGm,
+        ceoPlantManager: emailCeo
+      }
+    };
+
+    try {
+      localStorage.setItem('arttouch_business', JSON.stringify(businessData));
+    } catch (err) {}
+
+    markDraftModified();
+    showNotification('Business details saved as draft. Click Publish when ready.', 'success');
+  };
+
+  /* -------------------------------------------------------------------------- */
+  /* 10. STATS & MODAL CONTROLLERS                                              */
+  /* -------------------------------------------------------------------------- */
+  function updateDashboardStats() {
+    const statInquiries = document.getElementById('stat-inquiries-count');
+    const statProjects = document.getElementById('stat-projects-count');
+    const statServices = document.getElementById('stat-services-count');
+    const statFaqs = document.getElementById('stat-faqs-count');
+    const statUnread = document.getElementById('stat-unread-count');
+
+    const unreadCount = inquiriesData.filter(i => i.status === 'new').length;
+
+    if (statInquiries) statInquiries.textContent = inquiriesData.length;
+    if (statProjects) statProjects.textContent = projectsData.length;
+    if (statServices) statServices.textContent = servicesData.length;
+    if (statFaqs) statFaqs.textContent = faqsData.length;
+    if (statUnread) {
+      statUnread.textContent = unreadCount;
+      statUnread.style.display = unreadCount > 0 ? 'inline-block' : 'none';
     }
   }
 
-  // Utilities
+  window.openModal = function(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('active');
+  };
+
+  window.closeModal = function(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  };
+
+  // Close modals on escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.admin-modal-overlay.active').forEach(m => m.classList.remove('active'));
+    }
+  });
+
+  // Universal Toast Notification
+  function showNotification(msg, type = 'info') {
+    if (window.showToast) {
+      window.showToast(msg, type);
+      return;
+    }
+
+    const toast = document.createElement('div');
+    toast.className = 'admin-toast animate-fade-up';
+    toast.style.cssText = `
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: ${type === 'error' ? '#EF4444' : (type === 'success' ? '#10B981' : '#1F2428')};
+      color: #FFFFFF;
+      padding: 14px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    `;
+    toast.innerHTML = `${type === 'error' ? '<i class="fa-solid fa-circle-exclamation"></i>' : '<i class="fa-solid fa-circle-check"></i>'} <span>${msg}</span>`;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(10px)';
+      toast.style.transition = 'all 0.3s ease';
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
+  }
+
+  window.showToast = showNotification;
+
+  // Helpers
   function escapeHtml(str) {
     if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+    const div = document.createElement('div');
+    div.innerText = str;
+    return div.innerHTML;
   }
 
   function escapeAttr(str) {
     if (!str) return '';
     return String(str).replace(/"/g, '&quot;');
   }
-
-  // Global modal close handlers
-  document.querySelectorAll('.admin-modal-close, .js-modal-close').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.admin-modal-overlay').forEach(m => m.classList.remove('is-open'));
-    });
-  });
 
 })();

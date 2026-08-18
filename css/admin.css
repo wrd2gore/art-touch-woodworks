@@ -498,7 +498,8 @@ body.admin-body {
   transition: all var(--transition-fast);
 }
 
-.admin-modal-overlay.is-open {
+.admin-modal-overlay.is-open,
+.admin-modal-overlay.active {
   opacity: 1;
   visibility: visible;
 }
@@ -517,7 +518,8 @@ body.admin-body {
   transition: transform var(--transition-fast);
 }
 
-.admin-modal-overlay.is-open .admin-modal {
+.admin-modal-overlay.is-open .admin-modal,
+.admin-modal-overlay.active .admin-modal {
   transform: translateY(0);
 }
 

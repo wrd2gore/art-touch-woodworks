@@ -59,14 +59,19 @@ function initContactForm() {
       status: 'new'
     };
 
-    if (window.ArtTouchCloudSync) {
-      window.ArtTouchCloudSync.sendInquiry(inquiryRecord);
-    } else {
+    // Always persist to local inquiries storage
+    try {
+      const stored = localStorage.getItem('arttouch_inquiries');
+      const list = stored ? JSON.parse(stored) : [];
+      list.unshift(inquiryRecord);
+      localStorage.setItem('arttouch_inquiries', JSON.stringify(list));
+      window.dispatchEvent(new CustomEvent('arttouch:new-inquiry', { detail: inquiryRecord }));
+    } catch (e) {}
+
+    // Also dispatch to cloud sync if enabled
+    if (window.ArtTouchCloudSync && typeof window.ArtTouchCloudSync.sendInquiry === 'function') {
       try {
-        const stored = localStorage.getItem('arttouch_inquiries');
-        const list = stored ? JSON.parse(stored) : [];
-        list.unshift(inquiryRecord);
-        localStorage.setItem('arttouch_inquiries', JSON.stringify(list));
+        window.ArtTouchCloudSync.sendInquiry(inquiryRecord);
       } catch (e) {}
     }
 
