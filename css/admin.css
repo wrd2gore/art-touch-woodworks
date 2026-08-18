@@ -574,10 +574,12 @@ body.admin-body {
   transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s;
 }
 
-.admin-lock-screen.is-unlocked {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+.admin-lock-screen.is-unlocked,
+.admin-lock-screen.unlocked {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  display: none !important;
 }
 
 .admin-lock-card {

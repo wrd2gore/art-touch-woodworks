@@ -162,7 +162,8 @@
     const lockInput = document.getElementById('admin-lock-input');
 
     if (isUnlocked && lockScreen) {
-      lockScreen.classList.add('unlocked');
+      lockScreen.classList.add('is-unlocked', 'unlocked');
+      lockScreen.style.display = 'none';
     }
 
     // Lock Screen Submit
@@ -210,7 +211,10 @@
     if (val === correctPin || val === '7707') {
       sessionStorage.setItem('arttouch_session_unlocked', 'true');
       if (errorEl) errorEl.style.display = 'none';
-      if (lockScreen) lockScreen.classList.add('unlocked');
+      if (lockScreen) {
+        lockScreen.classList.add('is-unlocked', 'unlocked');
+        lockScreen.style.display = 'none';
+      }
       input.value = '';
     } else {
       if (errorEl) {
@@ -231,7 +235,6 @@
     if (input) {
       input.value += digit;
       if (input.value.length >= 4 && input.value.length <= 6) {
-        // Auto-check if length matches
         if (input.value === getStoredPin() || input.value === '7707') {
           window.submitPinUnlock();
         }
@@ -261,7 +264,12 @@
   window.lockAdminControlCenter = function() {
     sessionStorage.removeItem('arttouch_session_unlocked');
     const lockScreen = document.getElementById('admin-lock-screen');
-    if (lockScreen) lockScreen.classList.remove('unlocked');
+    if (lockScreen) {
+      lockScreen.classList.remove('is-unlocked', 'unlocked');
+      lockScreen.style.display = 'flex';
+      lockScreen.style.opacity = '1';
+      lockScreen.style.visibility = 'visible';
+    }
     const input = document.getElementById('admin-lock-input');
     if (input) {
       input.value = '';
