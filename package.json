@@ -1,9 +1,0 @@
-{
-  "name": "art-touch-woodworks",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Art Touch Woodworks & Architectural Joinery — Amman, Jordan",
-  "scripts": {
-    "build": "echo Output directory is root"
-  }
-}
