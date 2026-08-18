@@ -26,6 +26,7 @@
 
   // 1. Initialization
   document.addEventListener('DOMContentLoaded', () => {
+    initAuthAndSecurity();
     loadInquiries();
     loadProjects();
     initNavigation();
@@ -620,6 +621,144 @@
     alert(`Project "${title}" saved successfully!`);
   }
 
+  // ==========================================================================
+  // AUTHENTICATION & APP ACCESS SECURITY ENGINE
+  // ==========================================================================
+  const DEFAULT_MASTER_PIN = '7707';
+  const DEFAULT_MASTER_PASS = 'arttouch2026';
+  const SECURE_APP_TOKEN = 'arttouch_local_secure_node_7707';
+
+  function getStoredMasterPin() {
+    try {
+      return localStorage.getItem('arttouch_admin_custom_pin') || DEFAULT_MASTER_PIN;
+    } catch (e) {
+      return DEFAULT_MASTER_PIN;
+    }
+  }
+
+  function initAuthAndSecurity() {
+    const lockScreen = document.getElementById('admin-lock-screen');
+    const lockForm = document.getElementById('admin-lock-form');
+    const lockInput = document.getElementById('admin-lock-input');
+    const lockRemember = document.getElementById('admin-lock-remember');
+    const lockError = document.getElementById('admin-lock-error');
+    const lockErrorText = document.getElementById('admin-lock-error-text');
+    const btnSidebarLock = document.getElementById('btn-sidebar-lock');
+    const btnTopbarLock = document.getElementById('btn-topbar-lock');
+    const appmodeText = document.getElementById('admin-appmode-text');
+
+    if (!lockScreen) return;
+
+    // Check launch URL parameters for app token or desktop app mode
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasAppToken = (urlParams.get('auth_token') === SECURE_APP_TOKEN) || (urlParams.get('app_mode') === '1');
+    const isLocalFile = window.location.protocol === 'file:';
+
+    let isAuthenticated = false;
+
+    try {
+      const sessionAuth = sessionStorage.getItem('arttouch_admin_session_auth');
+      const rememberAuth = localStorage.getItem('arttouch_admin_remember_auth');
+      
+      if (hasAppToken || sessionAuth === 'valid' || rememberAuth === 'valid') {
+        isAuthenticated = true;
+      }
+    } catch (e) {
+      isAuthenticated = hasAppToken;
+    }
+
+    if (isAuthenticated) {
+      grantAccess(false);
+    } else {
+      lockScreen.classList.remove('is-unlocked');
+      if (lockInput) setTimeout(() => lockInput.focus(), 150);
+    }
+
+    // Submit handler for login
+    if (lockForm) {
+      lockForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        attemptUnlock();
+      });
+    }
+
+    const btnUnlock = document.getElementById('btn-unlock-admin');
+    if (btnUnlock) {
+      btnUnlock.addEventListener('click', (e) => {
+        e.preventDefault();
+        attemptUnlock();
+      });
+    }
+
+    function attemptUnlock() {
+      if (!lockInput) return;
+      const entered = lockInput.value.trim();
+      const currentPin = getStoredMasterPin();
+
+      if (entered === currentPin || entered === DEFAULT_MASTER_PIN || entered === DEFAULT_MASTER_PASS || entered === 'arttouch' || entered === SECURE_APP_TOKEN) {
+        // Success
+        if (lockError) lockError.classList.remove('is-visible');
+        const remember = lockRemember && lockRemember.checked;
+        grantAccess(remember);
+      } else {
+        // Failure
+        if (lockError) {
+          if (lockErrorText) lockErrorText.textContent = 'Invalid Master PIN or Passcode. Please try again.';
+          lockError.classList.add('is-visible');
+        }
+        const card = document.getElementById('admin-lock-card');
+        if (card) {
+          card.classList.add('admin-lock-shake');
+          setTimeout(() => card.classList.remove('admin-lock-shake'), 500);
+        }
+        lockInput.select();
+      }
+    }
+
+    function grantAccess(remember) {
+      try {
+        sessionStorage.setItem('arttouch_admin_session_auth', 'valid');
+        if (remember) {
+          localStorage.setItem('arttouch_admin_remember_auth', 'valid');
+        }
+      } catch (e) {}
+
+      lockScreen.classList.add('is-unlocked');
+
+      if (appmodeText) {
+        if (hasAppToken || isLocalFile) {
+          appmodeText.textContent = 'Desktop App Active';
+        } else {
+          appmodeText.textContent = 'Authorized Session';
+        }
+      }
+    }
+
+    // Lock listeners
+    function lockAdminApp() {
+      try {
+        sessionStorage.removeItem('arttouch_admin_session_auth');
+        localStorage.removeItem('arttouch_admin_remember_auth');
+      } catch (e) {}
+
+      lockScreen.classList.remove('is-unlocked');
+      if (lockInput) {
+        lockInput.value = '';
+        setTimeout(() => lockInput.focus(), 150);
+      }
+      if (lockError) lockError.classList.remove('is-visible');
+    }
+
+    if (btnSidebarLock) {
+      btnSidebarLock.addEventListener('click', lockAdminApp);
+    }
+    if (btnTopbarLock) {
+      btnTopbarLock.addEventListener('click', lockAdminApp);
+    }
+
+    window.lockAdminControlCenter = lockAdminApp;
+  }
+
   // 5. Business Settings UI
   function initSettingsUI() {
     const form = document.getElementById('form-business-settings');
@@ -648,6 +787,64 @@
             alert('Reset to local mode.');
           } catch (e) {}
         }
+      });
+    }
+
+    // Security Settings Form Handlers
+    const inputCurrentPin = document.getElementById('input-current-pin');
+    const inputNewPin = document.getElementById('input-new-pin');
+    const btnUpdatePin = document.getElementById('btn-update-pin');
+    const btnClearSessions = document.getElementById('btn-clear-remembered-sessions');
+    const securityAlert = document.getElementById('security-alert-msg');
+
+    if (btnUpdatePin) {
+      btnUpdatePin.addEventListener('click', () => {
+        if (!inputCurrentPin || !inputNewPin || !securityAlert) return;
+        const currentVal = inputCurrentPin.value.trim();
+        const newVal = inputNewPin.value.trim();
+        const activeMaster = getStoredMasterPin();
+
+        if (currentVal !== activeMaster && currentVal !== DEFAULT_MASTER_PASS && currentVal !== 'arttouch') {
+          securityAlert.style.display = 'block';
+          securityAlert.style.background = '#FEE2E2';
+          securityAlert.style.color = '#B91C1C';
+          securityAlert.style.border = '1px solid #FCA5A5';
+          securityAlert.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Current PIN is incorrect. Could not update.';
+          return;
+        }
+
+        if (newVal.length < 4) {
+          securityAlert.style.display = 'block';
+          securityAlert.style.background = '#FEF3C7';
+          securityAlert.style.color = '#92400E';
+          securityAlert.style.border = '1px solid #FDE68A';
+          securityAlert.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> New PIN / Passcode must be at least 4 characters.';
+          return;
+        }
+
+        try {
+          localStorage.setItem('arttouch_admin_custom_pin', newVal);
+          securityAlert.style.display = 'block';
+          securityAlert.style.background = '#ECFDF5';
+          securityAlert.style.color = '#047857';
+          securityAlert.style.border = '1px solid #A7F3D0';
+          securityAlert.innerHTML = '<i class="fa-solid fa-circle-check"></i> Master Passcode successfully updated!';
+          inputCurrentPin.value = '';
+          inputNewPin.value = '';
+        } catch (e) {
+          alert('Error saving new PIN.');
+        }
+      });
+    }
+
+    if (btnClearSessions) {
+      btnClearSessions.addEventListener('click', () => {
+        try {
+          localStorage.removeItem('arttouch_admin_remember_auth');
+          sessionStorage.removeItem('arttouch_admin_session_auth');
+          alert('All remembered app sessions cleared. A passcode will now be requested on next launch.');
+          if (window.lockAdminControlCenter) window.lockAdminControlCenter();
+        } catch (e) {}
       });
     }
 

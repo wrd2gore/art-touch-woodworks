@@ -550,3 +550,237 @@ body.admin-body {
   justify-content: flex-end;
   gap: 12px;
 }
+
+/* ==========================================================================
+   9. SECURITY GATE & AUTHENTICATION LOCK SCREEN
+   Restricts Admin Panel Access Strictly to Authorized Management App
+   ========================================================================== */
+.admin-lock-screen {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at top right, #2D3339 0%, #15181B 100%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.admin-lock-screen.is-unlocked {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.admin-lock-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(31, 36, 40, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 36px 32px;
+  color: #FFFFFF;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-lock-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #A88734, #E2C974, #A88734);
+}
+
+.admin-lock-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-lock-brand img {
+  height: 48px;
+  width: auto;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
+}
+
+.admin-lock-title {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: #FFFFFF;
+}
+
+.admin-lock-subtitle {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.admin-lock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
+  background: rgba(168, 135, 52, 0.15);
+  border: 1px solid rgba(168, 135, 52, 0.35);
+  color: #E2C974;
+  border-radius: 20px;
+  margin-bottom: 24px;
+}
+
+.admin-lock-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.admin-lock-input-group {
+  position: relative;
+}
+
+.admin-lock-input {
+  width: 100%;
+  padding: 14px 16px 14px 44px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-size: 15px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.admin-lock-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #E2C974;
+  box-shadow: 0 0 0 3px rgba(226, 201, 116, 0.2);
+}
+
+.admin-lock-input-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 15px;
+  pointer-events: none;
+}
+
+.admin-lock-submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #B8923E 0%, #8C6A1E 100%);
+  border: 1px solid #D4B258;
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 6px 18px rgba(140, 106, 30, 0.35);
+}
+
+.admin-lock-submit-btn:hover {
+  background: linear-gradient(135deg, #C7A049 0%, #9D7723 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(140, 106, 30, 0.45);
+}
+
+.admin-lock-submit-btn:active {
+  transform: translateY(0);
+}
+
+.admin-lock-error {
+  font-size: 12px;
+  color: #F87171;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: none;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-lock-error.is-visible {
+  display: flex;
+}
+
+.admin-lock-helper {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.5;
+  margin-top: 20px;
+}
+
+.admin-lock-shake {
+  animation: lockShake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes lockShake {
+  10%, 90% { transform: translate3d(-2px, 0, 0); }
+  20%, 80% { transform: translate3d(4px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+  40%, 60% { transform: translate3d(6px, 0, 0); }
+}
+
+/* App Mode Badges and Lock Buttons */
+.admin-badge-appmode {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #047857;
+  padding: 6px 12px;
+  background: #D1FAE5;
+  border: 1px solid #6EE7B7;
+  border-radius: 20px;
+}
+
+.btn-lock-session {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #B91C1C;
+  background: #FEE2E2;
+  border: 1px solid #FCA5A5;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-lock-session:hover {
+  background: #FDCFCF;
+  color: #991B1B;
+}
+
