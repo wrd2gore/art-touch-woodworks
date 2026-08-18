@@ -421,17 +421,33 @@
     if (document.getElementById('publish-sum-phone')) document.getElementById('publish-sum-phone').textContent = businessData.phone || '+962 (6) 222 3 707';
   }
 
+    const tokenInput = document.getElementById('input-gh-token');
+    if (tokenInput) {
+      tokenInput.value = localStorage.getItem('arttouch_gh_token') || '';
+    }
+  }
+
   function updateTopbarPublishPill() {
     const pill = document.getElementById('topbar-status-pill');
     if (!pill) return;
     if (hasDraftChanges) {
       pill.innerHTML = '<i class="fa-solid fa-circle-dot" style="color: var(--color-warning);"></i> <span>Draft Changes Pending</span>';
-      pill.className = 'btn btn-outline';
     } else {
       pill.innerHTML = '<i class="fa-solid fa-circle-check" style="color: var(--color-success);"></i> <span>Website Synchronized</span>';
-      pill.className = 'btn btn-outline';
     }
   }
+
+  window.saveGitHubToken = function() {
+    const input = document.getElementById('input-gh-token');
+    if (!input) return;
+    const val = input.value.trim();
+    if (!val) {
+      alert('Please enter a GitHub Personal Access Token.');
+      return;
+    }
+    localStorage.setItem('arttouch_gh_token', val);
+    showToast('GitHub Token saved securely in this app!', 'success');
+  };
 
   /* -------------------------------------------------------------------------- */
   /* 3. NAVIGATION CONTROLLER                                                   */
@@ -1087,12 +1103,31 @@ window.ArtTouchData = {
       // Step 2: HTML Compilation
       setStep(2, 'active', 'Compiling projects.html, services.html, index.html...');
       
-      // Helper: Fetch GitHub file content
+      // Helper: Fetch GitHub file content (local first, then raw GitHub CDN, then API)
       const getGhFile = async (path) => {
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}?ref=main`, {
-          headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
-        });
-        if (!res.ok) throw new Error(`Could not fetch ${path} from GitHub`);
+        // 1. Try local file if available in app
+        try {
+          const locRes = await fetch(path);
+          if (locRes.ok) {
+            const txt = await locRes.text();
+            if (txt && txt.includes('<!DOCTYPE html>')) return txt;
+          }
+        } catch(e) {}
+
+        // 2. Try raw public GitHub CDN (100% public, CORS-enabled, no auth required)
+        try {
+          const rawRes = await fetch(`https://raw.githubusercontent.com/${GITHUB_REPO}/main/${path}?_cb=${Date.now()}`);
+          if (rawRes.ok) {
+            const txt = await rawRes.text();
+            if (txt && txt.includes('<!DOCTYPE html>')) return txt;
+          }
+        } catch(e) {}
+
+        // 3. Fallback to GitHub API
+        const token = localStorage.getItem('arttouch_gh_token') || '';
+        const headers = token ? { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' } : { 'Accept': 'application/vnd.github.v3+json' };
+        const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${path}?ref=main`, { headers });
+        if (!res.ok) throw new Error(`Could not fetch ${path} from GitHub (HTTP ${res.status})`);
         const json = await res.json();
         return decodeURIComponent(escape(atob(json.content.replace(/\s/g, ''))));
       };
@@ -1147,6 +1182,19 @@ window.ArtTouchData = {
       setStep(2, 'done', '4 files compiled');
 
       // Step 3: Git Tree
+      setStep(3, 'active', 'Authenticating with GitHub...');
+      
+      let token = localStorage.getItem('arttouch_gh_token');
+      if (!token) {
+        token = prompt('Please enter your GitHub Personal Access Token (ghp_...) to publish changes to the live website:');
+        if (token && token.trim()) {
+          token = token.trim();
+          localStorage.setItem('arttouch_gh_token', token);
+        } else {
+          throw new Error('Publishing cancelled: A GitHub Personal Access Token is required to push live updates.');
+        }
+      }
+
       setStep(3, 'active', 'Creating Git Tree...');
       const treePayload = {
         base_tree: undefined,
@@ -1160,16 +1208,22 @@ window.ArtTouchData = {
 
       // Get main ref SHA
       const refRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/git/refs/heads/main`, {
-        headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+        headers: { 'Authorization': `token ${token}` }
       });
+      if (refRes.status === 401 || refRes.status === 403) {
+        localStorage.removeItem('arttouch_gh_token');
+        throw new Error('GitHub token authentication failed. Please verify your Personal Access Token has "repo" write permissions.');
+      }
+      if (!refRes.ok) throw new Error(`Could not access repository branch (HTTP ${refRes.status})`);
       const refJson = await refRes.json();
       const parentCommitSha = refJson.object.sha;
 
       const treeRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/git/trees`, {
         method: 'POST',
-        headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ base_tree: parentCommitSha, tree: treePayload.tree })
       });
+      if (!treeRes.ok) throw new Error(`Git Tree creation failed (HTTP ${treeRes.status})`);
       const treeJson = await treeRes.json();
       setStep(3, 'done', 'Tree created');
 
@@ -1177,25 +1231,26 @@ window.ArtTouchData = {
       setStep(4, 'active', 'Pushing to main & master...');
       const commitRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/git/commits`, {
         method: 'POST',
-        headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: `Update live website content via Art Touch Control Center [Build: ${targetBuildId}]`,
           tree: treeJson.sha,
           parents: [parentCommitSha]
         })
       });
+      if (!commitRes.ok) throw new Error(`Commit creation failed (HTTP ${commitRes.status})`);
       const commitJson = await commitRes.json();
 
       // Update main and master
       await fetch(`https://api.github.com/repos/${GITHUB_REPO}/git/refs/heads/main`, {
         method: 'PATCH',
-        headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ sha: commitJson.sha, force: true })
       });
 
       await fetch(`https://api.github.com/repos/${GITHUB_REPO}/git/refs/heads/master`, {
         method: 'PATCH',
-        headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ sha: commitJson.sha, force: true })
       });
 
