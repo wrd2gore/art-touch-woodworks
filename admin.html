@@ -148,26 +148,10 @@
 
         <div class="admin-lock-input-wrapper">
           <span class="admin-lock-key-icon"><i class="fa-solid fa-lock"></i></span>
-          <input type="password" id="admin-lock-input" class="admin-lock-input" placeholder="Enter PIN (7707)" autocomplete="off" autofocus maxlength="20" oninput="if(this.value.trim()==='7707'||this.value.trim()===window.getStoredPinSafe()||this.value.trim()==='admin'){window.submitPinUnlock();}">
+          <input type="password" id="admin-lock-input" class="admin-lock-input" placeholder="Enter PIN (7707)" autocomplete="off" autofocus maxlength="20" oninput="if(this.value.trim()==='7707'||this.value.trim()===window.getStoredPinSafe()||this.value.trim()==='admin'){window.submitPinUnlock();}" onkeydown="if(event.key==='Enter'){event.preventDefault();window.submitPinUnlock();}">
           <button type="button" class="admin-lock-eye-btn" onclick="window.togglePinVisibility('admin-lock-input', this)" title="Show/Hide PIN">
             <i class="fa-solid fa-eye"></i>
           </button>
-        </div>
-
-        <!-- 0-9 Keypad -->
-        <div class="admin-pin-keypad" id="admin-pin-keypad">
-          <button type="button" class="pin-key" data-digit="1" onclick="window.typePinDigit('1')">1</button>
-          <button type="button" class="pin-key" data-digit="2" onclick="window.typePinDigit('2')">2</button>
-          <button type="button" class="pin-key" data-digit="3" onclick="window.typePinDigit('3')">3</button>
-          <button type="button" class="pin-key" data-digit="4" onclick="window.typePinDigit('4')">4</button>
-          <button type="button" class="pin-key" data-digit="5" onclick="window.typePinDigit('5')">5</button>
-          <button type="button" class="pin-key" data-digit="6" onclick="window.typePinDigit('6')">6</button>
-          <button type="button" class="pin-key" data-digit="7" onclick="window.typePinDigit('7')">7</button>
-          <button type="button" class="pin-key" data-digit="8" onclick="window.typePinDigit('8')">8</button>
-          <button type="button" class="pin-key" data-digit="9" onclick="window.typePinDigit('9')">9</button>
-          <button type="button" class="pin-key pin-key-action" onclick="window.clearPinDigit()" title="Delete digit"><i class="fa-solid fa-delete-left"></i></button>
-          <button type="button" class="pin-key" data-digit="0" onclick="window.typePinDigit('0')">0</button>
-          <button type="button" class="pin-key pin-key-submit" onclick="window.submitPinUnlock()" title="Unlock"><i class="fa-solid fa-arrow-right"></i></button>
         </div>
 
         <button type="button" class="admin-lock-submit-btn" id="btn-unlock-admin" onclick="window.submitPinUnlock()">
