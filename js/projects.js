@@ -1,9 +1,26 @@
-/**
- * ART TOUCH WOODWORKS — PROJECTS & INDEPENDENT GALLERY CONTROLLER
- * Pure Vanilla ES6+ (No frameworks, zero bloat, peak performance)
- */
+function getActiveProjectsList() {
+  if (window.ArtTouchData && Array.isArray(window.ArtTouchData.projects) && window.ArtTouchData.projects.length > 0) {
+    return window.ArtTouchData.projects;
+  }
+  try {
+    const cached = localStorage.getItem('arttouch_projects') || localStorage.getItem('arttouch_custom_projects');
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        if (window.ArtTouchData) window.ArtTouchData.projects = parsed;
+        return parsed;
+      }
+    }
+  } catch (e) {}
+  return [];
+}
 
 document.addEventListener('DOMContentLoaded', () => {
+  // 1. Initial immediate render from current available data
+  initProjectsFilterPage();
+  initProjectDetailsPage();
+
+  // 2. Fetch live updates in background if cloud sync is enabled
   if (window.ArtTouchCloudSync && window.ArtTouchCloudSync.fetchLiveProjects) {
     window.ArtTouchCloudSync.fetchLiveProjects((liveList) => {
       if (Array.isArray(liveList) && liveList.length > 0) {
@@ -13,8 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-  initProjectsFilterPage();
-  initProjectDetailsPage();
 });
 
 /* 1. Projects Portfolio Archive (projects.html) */
@@ -24,10 +39,22 @@ function initProjectsFilterPage() {
   const searchInput = document.querySelector('#projects-search-input');
   const pageTitleEl = document.querySelector('#projects-page-title');
 
-  if (!filterContainer || !window.ArtTouchData) return;
+  if (!filterContainer) return;
 
-  const categories = window.ArtTouchData.getAllCategories();
-  const allProjects = window.ArtTouchData.projects;
+  const allProjects = getActiveProjectsList();
+  if (allProjects.length === 0) {
+    filterContainer.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--color-text-muted);">
+        <i class="fa-solid fa-folder-open" style="font-size: 40px; color: var(--color-brand); margin-bottom: 12px;"></i>
+        <h3 style="font-size: var(--text-xl); color: var(--color-text-main); margin-bottom: 4px;">No Projects Loaded</h3>
+        <p style="font-size: var(--text-sm);">Default projects can be restored from the Admin Control Center.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const rawCategories = Array.from(new Set(allProjects.map(p => p && p.category).filter(Boolean)));
+  const categories = rawCategories.length > 0 ? rawCategories : ['Commercial', 'Residential', 'Banks', 'Embassies', 'Government Projects'];
 
   // 1.1 Render Filter Pills
   if (filterNav) {
@@ -36,9 +63,10 @@ function initProjectsFilterPage() {
         All Projects <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(${allProjects.length})</span>
       </button>
       ${categories.map(cat => {
-        const count = allProjects.filter(p => p.category.toLowerCase() === cat.toLowerCase()).length;
+        const count = allProjects.filter(p => p && (p.category || '').toLowerCase() === (cat || '').toLowerCase()).length;
+        const normFilter = (cat || '').toLowerCase().replace(/\s+/g, '-');
         return `
-          <button class="filter-btn" data-filter="${escapeAttr(cat.toLowerCase().replace(/\s+/g, '-'))}" role="tab" aria-selected="false">
+          <button class="filter-btn" data-filter="${escapeAttr(normFilter)}" role="tab" aria-selected="false">
             ${escapeHtml(cat)} <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(${count})</span>
           </button>
         `;
@@ -50,25 +78,26 @@ function initProjectsFilterPage() {
   const renderCards = (category = 'all', searchQuery = '') => {
     let filtered = allProjects;
 
-    if (category !== 'all') {
+    if (category && category !== 'all') {
+      const targetCatNorm = category.toLowerCase().replace(/\s+/g, '-');
       filtered = filtered.filter(p => {
-        const normCat = p.category.toLowerCase().replace(/\s+/g, '-');
-        return normCat === category.toLowerCase();
+        const normCat = (p.category || '').toLowerCase().replace(/\s+/g, '-');
+        return normCat === targetCatNorm;
       });
     }
 
-    if (searchQuery.trim()) {
+    if (searchQuery && searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       filtered = filtered.filter(p => 
-        p.title.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
+        (p.title && p.title.toLowerCase().includes(q)) ||
+        (p.category && p.category.toLowerCase().includes(q)) ||
         (p.location && p.location.toLowerCase().includes(q)) ||
         (p.description && p.description.toLowerCase().includes(q))
       );
     }
 
     if (pageTitleEl) {
-      if (category === 'all') pageTitleEl.textContent = 'Projects';
+      if (!category || category === 'all') pageTitleEl.textContent = 'Projects';
       else if (category.toLowerCase() === 'banks') pageTitleEl.textContent = 'Banks';
       else if (category.toLowerCase() === 'commercial') pageTitleEl.textContent = 'Commercial Projects';
       else if (category.toLowerCase() === 'residential') pageTitleEl.textContent = 'Residential Projects';
@@ -98,11 +127,13 @@ function initProjectsFilterPage() {
               <img src="${escapeAttr(coverSrc)}" 
                    alt="${escapeAttr(p.title)}" 
                    loading="lazy" 
-                   decoding="async">
+                   decoding="async"
+                   onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
             ` : `
-              <div style="text-align: center; color: var(--color-text-muted); padding: 24px;">
-                <i class="fa-solid fa-layer-group" style="font-size: 32px; color: var(--color-brand); margin-bottom: 8px;"></i>
+              <div style="text-align: center; color: var(--color-text-muted); padding: 40px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                <i class="fa-solid fa-layer-group" style="font-size: 36px; color: var(--color-brand); margin-bottom: 10px;"></i>
                 <div style="font-size: 14px; font-weight: 600; color: var(--color-text-main);">${escapeHtml(p.title)}</div>
+                <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 4px;">${escapeHtml(p.category || 'Woodwork')}</div>
               </div>
             `}
           </a>
@@ -123,7 +154,7 @@ function initProjectsFilterPage() {
 
   // Set active class on corresponding button
   if (filterNav && initialCategory !== 'all') {
-    const matchingBtn = filterNav.querySelector(`[data-filter="${initialCategory.toLowerCase()}"]`);
+    const matchingBtn = filterNav.querySelector(`[data-filter="${initialCategory.toLowerCase().replace(/\s+/g, '-')}"]`);
     if (matchingBtn) {
       filterNav.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       matchingBtn.classList.add('active');
@@ -136,7 +167,7 @@ function initProjectsFilterPage() {
       btn.addEventListener('click', () => {
         filterNav.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        const cat = btn.getAttribute('data-filter');
+        const cat = btn.getAttribute('data-filter') || 'all';
         const query = searchInput ? searchInput.value : '';
         renderCards(cat, query);
       });
@@ -232,8 +263,8 @@ function initProjectDetailsPage() {
           </div>
 
           <div style="margin-top: var(--space-3xl); text-align: center;">
-            <a href="projects.html?cat=${encodeURIComponent(project.category.toLowerCase().replace(/\s+/g, '-'))}" class="btn btn-secondary btn-sm">
-              <i class="fa-solid fa-arrow-left"></i> Back to ${escapeHtml(project.category)}
+            <a href="projects.html?cat=${encodeURIComponent((project.category || 'Commercial').toLowerCase().replace(/\s+/g, '-'))}" class="btn btn-secondary btn-sm">
+              <i class="fa-solid fa-arrow-left"></i> Back to ${escapeHtml(project.category || 'Projects')}
             </a>
           </div>
 

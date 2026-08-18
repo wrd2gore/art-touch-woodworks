@@ -87,22 +87,25 @@ const ArtTouchCloudSync = (function() {
       console.warn('Cloud database projects fetch error:', err);
     }
 
-    // 2. Check local storage cache if cloud is slow
-    if (!projects) {
+    // 2. Check local storage cache
+    if (!Array.isArray(projects) || projects.length === 0) {
       try {
         const cached = localStorage.getItem(STORAGE_PROJECTS_KEY) || localStorage.getItem('arttouch_custom_projects');
         if (cached) {
-          projects = JSON.parse(cached);
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            projects = parsed;
+          }
         }
       } catch (e) {}
     }
 
     // 3. Fallback to default bundled projects
-    if (!projects && window.ArtTouchData && Array.isArray(window.ArtTouchData.projects)) {
+    if ((!Array.isArray(projects) || projects.length === 0) && window.ArtTouchData && Array.isArray(window.ArtTouchData.projects) && window.ArtTouchData.projects.length > 0) {
       projects = window.ArtTouchData.projects;
     }
 
-    if (typeof callback === 'function' && projects) {
+    if (typeof callback === 'function' && Array.isArray(projects) && projects.length > 0) {
       callback(projects);
     }
 

@@ -198,18 +198,20 @@ const ArtTouchData = {
 
   // 3. Helper Functions
   getAllCategories: function() {
-    return Array.from(new Set(this.projects.map(p => p.category))).filter(Boolean);
+    if (!Array.isArray(this.projects)) return [];
+    return Array.from(new Set(this.projects.map(p => p && p.category).filter(Boolean)));
   },
 
   getProjectsByCategory: function(category) {
+    if (!Array.isArray(this.projects)) return [];
     if (!category || category === 'all') return this.projects;
-    const catNorm = category.toLowerCase().replace(/\s+/g, '-');
-    return this.projects.filter(p => p.category.toLowerCase().replace(/\s+/g, '-') === catNorm);
+    const catNorm = (category || '').toLowerCase().replace(/\s+/g, '-');
+    return this.projects.filter(p => p && (p.category || '').toLowerCase().replace(/\s+/g, '-') === catNorm);
   },
 
   getProjectById: function(id) {
-    if (!id) return null;
-    return this.projects.find(p => p.id === id) || null;
+    if (!id || !Array.isArray(this.projects)) return null;
+    return this.projects.find(p => p && p.id === id) || null;
   }
 };
 
