@@ -428,54 +428,89 @@
 
       <!-- SECTION 6: PUBLISH & DEPLOYMENT CENTER -->
       <section id="section-sync" style="display: none;">
-        <!-- Big 1-Click Publishing Hub -->
+        <!-- Live Website Real-Time Preview Card -->
         <div class="admin-card" style="margin-bottom: 24px;">
-          <div class="admin-card-header" style="background: #FDFCF9; border-bottom: 1px solid #E8DFCE;">
+          <div class="admin-card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <div>
-              <h3 class="admin-card-title" style="font-size: 18px; color: #1F2428;">
-                <i class="fa-solid fa-cloud-arrow-up text-brand"></i> 1-Click Live Website Publisher
-              </h3>
-              <p style="font-size: 13px; color: var(--color-admin-text-muted); margin: 4px 0 0 0;">
-                Clicking Publish automatically updates your live website (<a href="https://wrd2gore.github.io/art-touch-woodworks/" target="_blank" style="color: var(--color-brand); font-weight: 600;">wrd2gore.github.io/art-touch-woodworks</a>) in seconds.
+              <h3 class="admin-card-title"><i class="fa-solid fa-desktop text-brand"></i> Live Website Real-Time Preview</h3>
+              <p style="font-size: 12px; color: var(--color-admin-text-muted); margin: 2px 0 0 0;">
+                Direct live view of your deployed public website hosted on GitHub Pages (<a href="https://wrd2gore.github.io/art-touch-woodworks/" target="_blank" style="color: var(--color-brand); font-weight: 600;">wrd2gore.github.io/art-touch-woodworks</a>).
               </p>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <div class="btn-group" style="display: flex; border: 1px solid var(--color-admin-border); border-radius: 6px; overflow: hidden; background: #fff;">
+                <button type="button" class="btn btn-xs btn-primary" id="btn-preview-home" onclick="window.switchLivePreviewPage('index.html', this)" style="padding: 6px 12px; font-weight: 600;">Home</button>
+                <button type="button" class="btn btn-xs btn-outline" id="btn-preview-projects" onclick="window.switchLivePreviewPage('projects.html', this)" style="padding: 6px 12px; font-weight: 600;">Portfolio</button>
+                <button type="button" class="btn btn-xs btn-outline" id="btn-preview-services" onclick="window.switchLivePreviewPage('services.html', this)" style="padding: 6px 12px; font-weight: 600;">Services</button>
+                <button type="button" class="btn btn-xs btn-outline" id="btn-preview-contact" onclick="window.switchLivePreviewPage('contact.html', this)" style="padding: 6px 12px; font-weight: 600;">Contact</button>
+              </div>
+              <button type="button" class="btn btn-outline btn-xs" onclick="window.refreshLivePreviewIframe()" title="Refresh Preview">
+                <i class="fa-solid fa-rotate-right"></i> Refresh
+              </button>
+              <a href="https://wrd2gore.github.io/art-touch-woodworks/" target="_blank" class="btn btn-primary btn-xs">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Website ↗
+              </a>
             </div>
           </div>
-          <div class="admin-card-body" style="padding: 24px;">
-            <!-- Status Card -->
-            <div id="publish-status-box" style="display: flex; align-items: center; justify-content: space-between; padding: 20px; background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 8px; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
-              <div>
-                <div style="font-size: 16px; font-weight: 700; color: #065F46; margin-bottom: 4px;" id="publish-box-title">
-                  <i class="fa-solid fa-circle-check"></i> Live Website Is Fully Synchronized
-                </div>
-                <div style="font-size: 13px; color: #047857;" id="publish-box-subtitle">
-                  All your projects, services, and business information are live on the public website.
-                </div>
-                <div style="font-size: 12px; color: #6B7280; margin-top: 6px;" id="publish-last-timestamp">
-                  Last Published: Never
-                </div>
-              </div>
 
-              <button type="button" class="btn btn-primary" id="btn-publish-main" onclick="window.publishToLiveWebsite()" style="font-size: 15px; padding: 12px 24px;">
-                <i class="fa-solid fa-cloud-arrow-up"></i> <span>Publish to Live Website</span>
-              </button>
+          <!-- Live Status Bar -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; background: #F9FAFB; padding: 14px 20px; border-bottom: 1px solid var(--color-admin-border); font-size: 12px;">
+            <div>
+              <span style="color: var(--color-admin-text-muted);">Website Status:</span>
+              <span id="live-status-pill" style="font-weight: 700; color: #059669; margin-left: 6px;"><i class="fa-solid fa-circle text-success" style="font-size: 8px;"></i> Online &amp; Live</span>
             </div>
+            <div>
+              <span style="color: var(--color-admin-text-muted);">Live Build ID:</span>
+              <strong id="live-build-id-display" style="font-family: var(--font-mono); margin-left: 6px;">Checking...</strong>
+            </div>
+            <div>
+              <span style="color: var(--color-admin-text-muted);">Live Content:</span>
+              <strong id="live-content-counts" style="margin-left: 6px;">14 Projects &bull; 6 Services &bull; 5 FAQs</strong>
+            </div>
+            <div>
+              <span style="color: var(--color-admin-text-muted);">Last Verified:</span>
+              <span id="live-last-checked-time" style="margin-left: 6px; font-weight: 600;">Just now</span>
+            </div>
+          </div>
 
-            <!-- GitHub Token Configuration for Staff -->
-            <div style="background: #F9FAFB; padding: 18px; border-radius: 8px; border: 1px solid var(--color-admin-border);">
-              <label class="form-label" style="font-size: 13px; font-weight: 700;">GitHub Connection Token</label>
-              <p style="font-size: 12px; color: var(--color-admin-text-muted); margin-bottom: 10px;">
-                Stored securely on this computer only. Never shared with website visitors.
-              </p>
-              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <input type="password" id="input-gh-token" class="form-control" placeholder="GitHub Personal Access Token" style="font-size: 13px; flex: 1; min-width: 260px;">
-                <button type="button" class="btn btn-secondary btn-sm" id="btn-save-gh-token" onclick="window.saveGitHubToken()" style="white-space: nowrap;">
-                  <i class="fa-solid fa-floppy-disk"></i> Save Token
-                </button>
-                <button type="button" class="btn btn-outline btn-sm" id="btn-test-gh-token" onclick="window.testGitHubTokenConnection()" style="white-space: nowrap;">
-                  <i class="fa-solid fa-bolt"></i> Test Connection
-                </button>
+          <!-- Embedded iframe -->
+          <div class="admin-card-body" style="padding: 0; background: #E5E7EB; position: relative;">
+            <iframe id="live-website-preview-iframe" src="https://wrd2gore.github.io/art-touch-woodworks/" style="width: 100%; height: 580px; border: none; display: block; background: #FFFFFF;" title="Live Website Preview"></iframe>
+          </div>
+        </div>
+
+        <!-- Draft vs. Live Synchronization Inspector -->
+        <div class="admin-card" style="margin-bottom: 24px;">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title"><i class="fa-solid fa-scale-balanced"></i> Draft vs. Live Content Synchronization</h3>
+          </div>
+          <div class="admin-card-body" style="padding: 20px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+              <!-- Live State Column -->
+              <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 8px; padding: 16px;">
+                <div style="font-size: 14px; font-weight: 700; color: #065F46; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-globe"></i> CURRENT LIVE WEBSITE
+                </div>
+                <div style="font-size: 13px; color: #047857; line-height: 1.6;" id="live-summary-box">
+                  <div><strong>Live Projects:</strong> <span id="live-sum-projects">14 verified projects</span></div>
+                  <div><strong>Live Services:</strong> <span id="live-sum-services">6 core services</span></div>
+                  <div><strong>Live FAQs:</strong> <span id="live-sum-faqs">5 client FAQs</span></div>
+                  <div><strong>Live Phone:</strong> <span id="live-sum-phone">+962 (6) 222 3 707</span></div>
+                </div>
               </div>
-              <div id="gh-token-test-result" style="display: none; padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-top: 10px;"></div>
+
+              <!-- Draft State Column -->
+              <div style="background: #FFFDF9; border: 1px solid #FDE68A; border-radius: 8px; padding: 16px;">
+                <div style="font-size: 14px; font-weight: 700; color: #92400E; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-pen-ruler"></i> YOUR WORKSPACE / DRAFT
+                </div>
+                <div style="font-size: 13px; color: #78350F; line-height: 1.6;" id="draft-summary-box">
+                  <div><strong>Draft Projects:</strong> <span id="draft-sum-projects">14 projects</span></div>
+                  <div><strong>Draft Services:</strong> <span id="draft-sum-services">6 services</span></div>
+                  <div><strong>Draft FAQs:</strong> <span id="draft-sum-faqs">5 FAQs</span></div>
+                  <div><strong>Draft Phone:</strong> <span id="draft-sum-phone">+962 (6) 222 3 707</span></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
