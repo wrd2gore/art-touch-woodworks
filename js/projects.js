@@ -129,7 +129,7 @@ function initProjectsFilterPage() {
       const coverSrc = p.coverImage || (p.gallery && p.gallery.length > 0 ? p.gallery[0] : null);
 
       return `
-        <article class="authentic-project-card" data-reveal="fade-up">
+        <article class="authentic-project-card">
           <a href="project-details.html?id=${encodeURIComponent(p.id)}" class="project-thumb-box" title="${escapeAttr(p.title)}">
             ${coverSrc ? `
               <img src="${escapeAttr(coverSrc)}" 

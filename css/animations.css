@@ -92,3 +92,12 @@
     transition: none !important;
   }
 }
+
+/* Guaranteed Visibility for Portfolio Grid */
+.authentic-project-card,
+.filter-tabs,
+#projects-filter-nav,
+#projects-grid-container {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
