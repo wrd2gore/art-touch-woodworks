@@ -8,19 +8,7 @@
 
 const ArtTouchData = {
   // 1. Projects Database with Dedicated Independent Galleries
-  projects: [
-  {
-    "id": "dddddd",
-    "category": "Commercial",
-    "title": "dddddd",
-    "location": "Amman, Jordan",
-    "dateCompleted": "2026",
-    "area": "",
-    "coverImage": "",
-    "description": "",
-    "gallery": []
-  }
-],
+  projects: [],
 
   // 2. Official Core Services
   services: [],
