@@ -3,17 +3,20 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "routes": [
-    {
-      "src": "/api/inquiries",
-      "dest": "/api/inquiries.js"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
+    { "src": "/api/inquiries", "dest": "/api/inquiries.js" },
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/projects", "dest": "/projects.html" },
+    { "src": "/project-details", "dest": "/project-details.html" },
+    { "src": "/contact", "dest": "/contact.html" },
+    { "src": "/team", "dest": "/team.html" },
+    { "src": "/about", "dest": "/about.html" },
+    { "src": "/services", "dest": "/services.html" },
+    { "src": "/process", "dest": "/process.html" },
+    { "src": "/quote", "dest": "/quote.html" },
+    { "src": "/faq", "dest": "/faq.html" },
+    { "src": "/privacy", "dest": "/privacy.html" },
+    { "src": "/terms", "dest": "/terms.html" },
+    { "src": "/admin", "dest": "/admin.html" },
+    { "src": "/(.*)", "dest": "/$1" }
   ]
 }

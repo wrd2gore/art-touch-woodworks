@@ -27,7 +27,8 @@ const ArtTouchCloudSync = (function() {
       return '/api/inquiries';
     }
 
-    return null;
+    // Default fallback for desktop app: connect directly to live Vercel deployment
+    return 'https://arttouchjo.vercel.app/api/inquiries';
   }
 
   /**
