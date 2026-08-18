@@ -429,6 +429,13 @@
     if (draftServ) draftServ.textContent = `${servicesData.length} core services`;
     if (draftFaqs) draftFaqs.textContent = `${faqsData.length} client FAQs`;
     if (draftPhone) draftPhone.textContent = businessData.phone || '+962 (6) 222 3 707';
+
+    const syncProj = document.getElementById('sync-sum-projects');
+    const syncServ = document.getElementById('sync-sum-services');
+    const syncFaqs = document.getElementById('sync-sum-faqs');
+    if (syncProj) syncProj.textContent = `${projectsData.length} Projects`;
+    if (syncServ) syncServ.textContent = `${servicesData.length} Divisions`;
+    if (syncFaqs) syncFaqs.textContent = `${faqsData.length} FAQs`;
   }
 
   /* -------------------------------------------------------------------------- */
