@@ -425,11 +425,11 @@ function initProjectDetailsPage() {
 
 // Utility escape helpers
 function escapeHtml(str) {
-  if (typeof str !== 'string') return '';
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
 function escapeAttr(str) {
-  if (typeof str !== 'string') return '';
-  return str.replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
