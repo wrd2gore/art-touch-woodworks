@@ -4,16 +4,6 @@
   "private": true,
   "description": "Art Touch Woodworks & Architectural Joinery — Amman, Jordan",
   "scripts": {
-    "build": "echo Building static site...",
-    "start": "npx serve ."
-  },
-  "keywords": [
-    "art-touch",
-    "woodworks",
-    "joinery",
-    "jordan",
-    "amman"
-  ],
-  "author": "Art Touch",
-  "license": "ISC"
+    "build": "echo Output directory is root"
+  }
 }
