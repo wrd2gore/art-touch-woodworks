@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="64" height="64">
+  <rect width="100" height="100" rx="20" fill="#FFFFFF"/>
+  <!-- House Outline in Burgundy -->
+  <path d="M 22 46 L 22 30 L 29 30 L 29 39 L 50 16 L 82 46 L 82 72 L 77 72 L 77 48 L 50 23 L 28 48 L 28 66 L 23 66 Z" fill="#7A1828"/>
+  <!-- Waves: Pink/Red, Burgundy, Orange, Crimson -->
+  <path d="M 12 65 C 24 74 38 72 54 60 C 70 48 84 50 94 62 C 86 52 72 48 56 58 C 40 68 26 70 12 65 Z" fill="#E51943"/>
+  <path d="M 20 62 C 34 68 46 62 60 52 C 74 42 84 46 92 54 C 84 46 72 42 58 50 C 44 58 32 64 20 62 Z" fill="#58101E"/>
+  <path d="M 28 58 C 40 62 52 54 66 44 C 80 34 86 38 92 46 C 84 40 74 36 62 44 C 50 52 38 58 28 58 Z" fill="#F05323"/>
+  <path d="M 38 52 C 48 54 58 46 70 38 C 82 30 86 34 90 40 C 84 34 76 30 66 36 C 56 42 46 48 38 52 Z" fill="#D81B28"/>
+</svg>

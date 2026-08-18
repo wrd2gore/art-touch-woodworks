@@ -1,0 +1,107 @@
+/* ==========================================================================
+   ART TOUCH WOODWORKS — REFINED ARCHITECTURAL DESIGN TOKENS
+   Clean, Elegant, Luxury Architectural Aesthetic (White & Deep Burgundy)
+   ========================================================================== */
+
+:root {
+  /* Brand Identity (From Official Art Touch Logo) */
+  --color-brand: #8B1E2F;
+  --color-brand-hover: #A82035;
+  --color-brand-active: #6E1523;
+  --color-brand-light: #FDF2F4;
+  --color-brand-muted: rgba(139, 30, 47, 0.08);
+
+  /* Charcoal & Neutrals */
+  --color-dark: #222222;
+  --color-dark-hover: #333333;
+  --color-dark-surface: #1A1A1A;
+  --color-pill-bg: #2C2C2C;
+  --color-pill-hover: #111111;
+
+  /* Clean Light Canvas */
+  --color-bg: #FFFFFF;
+  --color-bg-alt: #F9FAFB;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-card: #FFFFFF;
+  --color-bg-subtle: #F3F4F6;
+
+  /* Subtle Hairline Borders */
+  --color-border: #E5E7EB;
+  --color-border-light: #F0F2F5;
+  --color-border-hover: #D1D5DB;
+  --color-border-dark: #333333;
+
+  /* High-Legibility Typography */
+  --color-text-main: #111827;
+  --color-text-body: #374151;
+  --color-text-muted: #6B7280;
+  --color-text-dim: #9CA3AF;
+  --color-text-white: #FFFFFF;
+  --color-text-white-muted: rgba(255, 255, 255, 0.75);
+
+  /* Status */
+  --color-success: #059669;
+  --color-success-bg: #ECFDF5;
+  --color-error: #DC2626;
+  --color-error-bg: #FEF2F2;
+
+  /* Typography Families */
+  --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+  /* Font Sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.875rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 3rem;
+  --text-5xl: clamp(2.5rem, 5vw, 4rem);
+
+  /* Spacing */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4.5rem;
+  --space-4xl: 6rem;
+
+  /* Radii */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.12);
+
+  /* Layout */
+  --container-sm: 640px;
+  --container-md: 860px;
+  --container-lg: 1120px;
+  --container-xl: 1280px;
+  --header-height: 80px;
+
+  /* Transitions */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 150ms var(--ease-out-expo);
+  --transition-normal: 250ms var(--ease-out-expo);
+
+  /* Z-Index */
+  --z-header: 1000;
+  --z-drawer: 1100;
+  --z-modal: 1200;
+  --z-lightbox: 1300;
+  --z-toast: 1400;
+}

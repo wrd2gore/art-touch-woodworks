@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio &amp; Projects | Art Touch Woodworks</title>
+  <meta name="description" content="Explore Art Touch's completed luxury architectural joinery and custom furniture projects across luxury residential estates, commercial headquarters, and hospitality venues.">
+  
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+<!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand-logo" aria-label="Art Touch Home">
+        <img src="images/logo/art-touch-logo.png" alt="Art Touch Woodworks Logo">
+        <span class="brand-logo-text">Art Touch</span>
+      </a>
+      <nav class="nav-desktop" aria-label="Main Navigation">
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+          <li class="nav-item">
+            <a href="projects.html" class="nav-link">Projects <i class="fa-solid fa-chevron-down" style="font-size: 11px;"></i></a>
+            <div class="nav-dropdown">
+              <a href="projects.html?cat=banks" class="dropdown-link">
+                <div class="dropdown-icon"><i class="fa-solid fa-chevron-down"></i></div>
+                <span class="dropdown-title">BANKS</span>
+              </a>
+              <a href="projects.html?cat=commercial" class="dropdown-link">
+                <div class="dropdown-icon"><i class="fa-solid fa-chevron-down"></i></div>
+                <span class="dropdown-title">Commercial</span>
+              </a>
+              <a href="projects.html?cat=residential" class="dropdown-link">
+                <div class="dropdown-icon"><i class="fa-solid fa-chevron-down"></i></div>
+                <span class="dropdown-title">Residential</span>
+              </a>
+              <a href="projects.html?cat=embassies" class="dropdown-link">
+                <div class="dropdown-icon"><i class="fa-solid fa-chevron-down"></i></div>
+                <span class="dropdown-title">EMBASSIES</span>
+              </a>
+              <a href="projects.html?cat=government-projects" class="dropdown-link">
+                <div class="dropdown-icon"><i class="fa-solid fa-chevron-down"></i></div>
+                <span class="dropdown-title">Government Projects</span>
+              </a>
+            </div>
+          </li>
+          <li class="nav-item"><a href="team.html" class="nav-link">Our Team</a></li>
+          <li class="nav-item"><a href="contact.html" class="nav-link">Contact Us</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button type="button" class="btn-search-trigger js-search-trigger" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <button type="button" class="btn-hamburger" aria-label="Menu"><span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Menu -->
+  <div class="mobile-drawer-overlay">
+    <div class="mobile-drawer">
+      <div class="mobile-drawer-header">
+        <img src="images/logo/art-touch-logo.png" alt="Art Touch Woodworks" style="height: 44px; width: auto; object-fit: contain;">
+        <button type="button" class="mobile-drawer-close" aria-label="Close Menu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <ul class="mobile-nav-list">
+        <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+        <li>
+          <a href="projects.html" class="mobile-nav-link mobile-nav-toggle">
+            <span>Projects</span> <i class="fa-solid fa-chevron-down" style="font-size: 12px;"></i>
+          </a>
+          <div class="mobile-nav-sublist">
+            <a href="projects.html?cat=all" class="mobile-nav-link" style="font-size: var(--text-sm);">All Projects</a>
+            <a href="projects.html?cat=banks" class="mobile-nav-link" style="font-size: var(--text-sm);">Banks</a>
+            <a href="projects.html?cat=commercial" class="mobile-nav-link" style="font-size: var(--text-sm);">Commercial Projects</a>
+            <a href="projects.html?cat=residential" class="mobile-nav-link" style="font-size: var(--text-sm);">Residential Projects</a>
+            <a href="projects.html?cat=embassies" class="mobile-nav-link" style="font-size: var(--text-sm);">EMBASSIES</a>
+            <a href="projects.html?cat=government-projects" class="mobile-nav-link" style="font-size: var(--text-sm);">Government Projects</a>
+          </div>
+        </li>
+        <li><a href="team.html" class="mobile-nav-link">Our Team</a></li>
+        <li><a href="contact.html" class="mobile-nav-link">Contact Us</a></li>
+      </ul>
+      <div class="mobile-drawer-footer">
+        <a href="tel:+96262223707" class="btn btn-secondary btn-block">
+          <i class="fa-solid fa-phone"></i> Call +962 (6) 222 3 707
+        </a>
+      </div>
+  </div>
+  </div>
+
+  <!-- Page Title (Matches Screenshot media_1787015494968.png) -->
+  <section style="padding: var(--space-3xl) 0 var(--space-xl) 0; text-align: center;" data-reveal="fade-up">
+    <div class="container">
+      <h1 id="projects-page-title" style="font-family: var(--font-heading); font-size: var(--text-4xl); font-weight: 600; color: var(--color-text-main); margin-bottom: var(--space-xs);">
+        Projects
+      </h1>
+    </div>
+  </section>
+
+  <!-- Projects Filter & Grid Section -->
+  <section class="section" style="padding-top: 0; padding-bottom: var(--space-4xl);">
+    <div class="container">
+      <!-- Live Search Bar -->
+      <div style="max-width: 480px; margin: 0 auto var(--space-xl) auto; position: relative;" data-reveal="fade-up" data-delay="100">
+        <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); font-size: 14px;"></i>
+        <input type="text" id="projects-search-input" class="form-control" placeholder="Search projects by name, category, or location..." style="padding-left: 44px; border-radius: var(--radius-sm);">
+      </div>
+
+      <!-- Filter Tabs (Dynamically populated from ArtTouchData.getAllCategories()) -->
+      <div class="filter-tabs" id="projects-filter-nav" role="tablist" data-reveal="fade-up" data-delay="150">
+        <!-- Rendered dynamically by js/projects.js -->
+      </div>
+
+      <!-- Project Cards Grid (Rendered and Filtered by js/projects.js) -->
+      <div class="grid grid-3 gap-xl" id="projects-grid-container">
+        <!-- Rendered dynamically by js/projects.js from ArtTouchData.projects -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="section section-dark" data-reveal="fade-up" style="background: #222222; color: #FFFFFF; padding: var(--space-3xl) 0;">
+    <div class="container text-center" style="max-width: 800px;">
+      <h2 style="font-size: var(--text-3xl); color: #FFFFFF; margin-bottom: var(--space-md);">
+        Submit Shop Drawings or Inquire
+      </h2>
+      <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: var(--space-xl); font-size: var(--text-base);">
+        Our workshop is located on Nadhmi Abdul Hadi St., Amman, Jordan.
+      </p>
+      <div class="flex justify-center gap-md" style="flex-wrap: wrap;">
+        <a href="tel:+96262223707" class="btn btn-primary btn-lg"><i class="fa-solid fa-phone"></i> +962 (6) 222 3 707</a>
+        <a href="contact.html" class="btn btn-outline-white btn-lg"><i class="fa-solid fa-envelope"></i> Contact Us</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-brand-logo"><img src="images/logo/art-touch-logo.png" alt="Art Touch Logo"></a>
+          <p>Custom architectural woodwork, bespoke furniture, and commercial interior fit-outs in Amman, Jordan.</p>
+          <div class="footer-social-links">
+            <a href="https://www.instagram.com/arttouchjo/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" aria-label="Art Touch Instagram" title="Instagram @arttouchjo"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://jo.linkedin.com/jobs/view/designer-at-art-touch-for-wood-works-3946056332" target="_blank" rel="noopener noreferrer" class="footer-social-btn" aria-label="Art Touch LinkedIn" title="LinkedIn Profile"><i class="fa-brands fa-linkedin-in"></i></a>
+            <a href="https://www.google.com/maps/place/Art+touch+for+wood+works/@31.89789,35.9684667,17z/data=!3m1!4b1!4m6!3m5!1s0x151b5ecfb5920e9f:0xd71e64a8826292ac!8m2!3d31.8978855!4d35.9710416!16s%2Fg%2F11f2wdpxt7?entry=ttu&g_ep=EgoyMDI2MDgxMi4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" class="footer-social-btn" aria-label="Google Maps" title="Google Maps"><i class="fa-solid fa-map-location-dot"></i></a>
+          </div>
+        </div>
+        <div>
+          <h4 class="footer-title">Projects</h4>
+          <ul class="footer-links">
+            <li><a href="projects.html?cat=banks">Banks</a></li>
+            <li><a href="projects.html?cat=commercial">Commercial Projects</a></li>
+            <li><a href="projects.html?cat=residential">Residential Projects</a></li>
+            <li><a href="projects.html?cat=embassies">EMBASSIES</a></li>
+            <li><a href="projects.html?cat=government-projects">Government Projects</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="projects.html">Projects Portfolio</a></li>
+            <li><a href="team.html">Our Team</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Contact &amp; Workshop</h4>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-location-dot"></i>
+            <div>
+              <span>Nadhmi Abdul Hadi St., Amman, Jordan</span>
+              <div style="margin-top: 4px;">
+                <a href="https://www.google.com/maps/place/Art+touch+for+wood+works/@31.89789,35.9684667,17z/data=!3m1!4b1!4m6!3m5!1s0x151b5ecfb5920e9f:0xd71e64a8826292ac!8m2!3d31.8978855!4d35.9710416!16s%2Fg%2F11f2wdpxt7?entry=ttu&g_ep=EgoyMDI2MDgxMi4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" style="color: var(--color-wood-gold-light); font-size: var(--text-xs); text-decoration: underline;">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i> View on Google Maps
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-regular fa-clock"></i>
+            <div>
+              <span>Sun–Thu: 9:00 AM – 6:00 PM (Jordan Time)</span>
+              <div style="font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px;">Fri &amp; Sat: Closed</div>
+            </div>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-phone"></i>
+            <a href="tel:+96262223707" style="color: inherit;">+962 (6) 222 3 707</a>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-envelope"></i>
+            <a href="mailto:info@arttouchjo.com" style="color: inherit;">info@arttouchjo.com</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; <span id="current-year">2026</span> Art Touch for Wood Works. All rights reserved.
+        </div>
+        <div class="footer-legal-links">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms &amp; Conditions</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  
+  <button type="button" class="btn-scroll-top" aria-label="Top"><i class="fa-solid fa-chevron-up"></i></button>
+
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/projects.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    // Handle category filter passed via URL query parameter (e.g., ?cat=residential)
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const cat = urlParams.get('cat');
+      if (cat) {
+        const btn = document.querySelector(`.filter-btn[data-filter="${cat}"]`);
+        if (btn) btn.click();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# Executables & Temporary build files
+*.exe
+*.zip
+*.ps1
+*.cs
+.tempmediaStorage/
+.user_uploaded/
+.system_generated/
+*.log
+deploy_desktop.ps1
+build_portable.ps1
+create_ico.ps1

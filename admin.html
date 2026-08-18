@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Art Touch Control Center — Project &amp; Requests Management</title>
+  
+  <!-- Typography & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Core & Admin Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="icon" type="image/png" href="images/logo/art-touch-logo.png">
+</head>
+<body class="admin-body">
+
+  <!-- 1. Admin Sidebar Navigation -->
+  <aside class="admin-sidebar">
+    <a href="index.html" class="admin-sidebar-brand" title="Open Public Website">
+      <img src="images/logo/art-touch-logo.png" alt="Art Touch">
+      <div class="admin-sidebar-title">
+        Art Touch
+        <small>Control Center</small>
+      </div>
+    </a>
+
+    <nav class="admin-nav">
+      <button type="button" class="admin-nav-item active" data-tab="inquiries">
+        <i class="fa-solid fa-inbox"></i>
+        <span>Requests &amp; Inquiries</span>
+        <span class="admin-nav-badge" id="stat-unread-count">0</span>
+      </button>
+
+      <button type="button" class="admin-nav-item" data-tab="projects">
+        <i class="fa-solid fa-layer-group"></i>
+        <span>Projects &amp; Galleries</span>
+      </button>
+
+      <button type="button" class="admin-nav-item" data-tab="settings">
+        <i class="fa-solid fa-sliders"></i>
+        <span>Business Settings</span>
+      </button>
+
+      <button type="button" class="admin-nav-item" data-tab="sync">
+        <i class="fa-solid fa-floppy-disk"></i>
+        <span>Website Sync &amp; Export</span>
+      </button>
+    </nav>
+
+    <div class="admin-sidebar-footer">
+      <a href="index.html" target="_blank">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Website
+      </a>
+      <a href="projects.html" target="_blank">
+        <i class="fa-solid fa-images"></i> View Portfolio
+      </a>
+    </div>
+  </aside>
+
+  <!-- 2. Main Admin Workspace -->
+  <main class="admin-main">
+    <!-- Topbar -->
+    <header class="admin-topbar">
+      <div class="admin-page-heading">
+        <h2 id="admin-page-title">Customer Inquiries &amp; Requests</h2>
+        <p id="admin-page-sub">View and manage contact form submissions and quote requests.</p>
+      </div>
+      <div class="admin-topbar-actions">
+        <button type="button" class="btn btn-outline btn-sm" onclick="location.reload()" title="Refresh Data">
+          <i class="fa-solid fa-rotate"></i> Refresh
+        </button>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="admin-content">
+      
+      <!-- Top Overview Stats -->
+      <div class="admin-stats-grid">
+        <div class="admin-stat-card">
+          <div class="admin-stat-info">
+            <div class="stat-num" id="stat-inquiries-count">0</div>
+            <div class="stat-lbl">Total Requests</div>
+          </div>
+          <div class="admin-stat-icon primary"><i class="fa-solid fa-inbox"></i></div>
+        </div>
+
+        <div class="admin-stat-card">
+          <div class="admin-stat-info">
+            <div class="stat-num" id="stat-projects-count">14</div>
+            <div class="stat-lbl">Active Projects</div>
+          </div>
+          <div class="admin-stat-icon success"><i class="fa-solid fa-folder-tree"></i></div>
+        </div>
+
+        <div class="admin-stat-card">
+          <div class="admin-stat-info">
+            <div class="stat-num" id="stat-categories-count">5</div>
+            <div class="stat-lbl">Categories</div>
+          </div>
+          <div class="admin-stat-info-icon admin-stat-icon dark"><i class="fa-solid fa-tags"></i></div>
+        </div>
+
+        <div class="admin-stat-card">
+          <div class="admin-stat-info">
+            <div class="stat-num" style="color: var(--color-success);">Ready</div>
+            <div class="stat-lbl">Offline-First Engine</div>
+          </div>
+          <div class="admin-stat-icon warning"><i class="fa-solid fa-bolt"></i></div>
+        </div>
+      </div>
+
+      <!-- SECTION 1: INQUIRIES & REQUESTS HUB -->
+      <section id="section-inquiries">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">Submitted Client Requests</h3>
+            
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <input type="text" id="inquiries-search" class="form-control" placeholder="Search by name, email, subject..." style="width: 240px; padding: 8px 12px; font-size: 13px;">
+              
+              <select id="inquiries-filter" class="form-control" style="width: 150px; padding: 8px 12px; font-size: 13px;">
+                <option value="all">All Inquiries</option>
+                <option value="contact">Contact Forms</option>
+                <option value="quote">Quote Estimates</option>
+              </select>
+
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-export-csv">
+                <i class="fa-solid fa-file-export"></i> Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Client Name</th>
+                  <th>Type</th>
+                  <th>Contact Info</th>
+                  <th>Subject / Scope</th>
+                  <th>Submitted At</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inquiries-tbody">
+                <!-- Dynamically populated by js/admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: PROJECTS & DEDICATED GALLERIES -->
+      <section id="section-projects" style="display: none;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">Portfolio Projects &amp; Independent Galleries</h3>
+            
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <input type="text" id="projects-admin-search" class="form-control" placeholder="Search projects..." style="width: 220px; padding: 8px 12px; font-size: 13px;">
+              
+              <select id="projects-admin-category-filter" class="form-control" style="width: 180px; padding: 8px 12px; font-size: 13px;">
+                <option value="all">All Categories</option>
+                <option value="banks">BANKS</option>
+                <option value="commercial">Commercial</option>
+                <option value="residential">Residential</option>
+                <option value="embassies">EMBASSIES</option>
+                <option value="government-projects">Government Projects</option>
+              </select>
+
+              <button type="button" class="btn btn-primary btn-sm" id="btn-add-new-project">
+                <i class="fa-solid fa-plus"></i> Add New Project
+              </button>
+            </div>
+          </div>
+
+          <div class="admin-card-body">
+            <div class="admin-projects-grid" id="admin-projects-grid-container">
+              <!-- Dynamically populated by js/admin.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: BUSINESS SETTINGS -->
+      <section id="section-settings" style="display: none;">
+        <div class="admin-card" style="max-width: 800px;">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">Business Hours &amp; Centralized Company Profile</h3>
+          </div>
+          <div class="admin-card-body">
+            <form id="form-business-settings">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Company Location</label>
+                  <input type="text" class="form-control" value="Nadhmi Abdul Hadi St., Amman, Jordan" readonly>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Phone Contact</label>
+                  <input type="text" class="form-control" value="+962 (6) 222 3 707" readonly>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Working Days</label>
+                  <input type="text" class="form-control" value="Sunday - Thursday" readonly>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Operating Hours (Jordan Local Time)</label>
+                  <input type="text" class="form-control" value="09:00 AM - 06:00 PM" readonly>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">General Manager Email</label>
+                <input type="email" class="form-control" value="m.shaheen@arttouchjo.com" readonly>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">CEO — Plant Manager Email</label>
+                <input type="email" class="form-control" value="m.maghari@arttouchjo.com" readonly>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 4: WEBSITE SYNC & EXPORT -->
+      <section id="section-sync" style="display: none;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title">Sync Edits to js/data.js</h3>
+            <div style="display: flex; gap: 10px;">
+              <button type="button" class="btn btn-primary btn-sm" id="btn-save-direct">
+                <i class="fa-solid fa-floppy-disk"></i> Direct Save (File Picker)
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-download-datajs">
+                <i class="fa-solid fa-download"></i> Download data.js
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" id="btn-copy-datajs">
+                <i class="fa-solid fa-copy"></i> Copy Code
+              </button>
+            </div>
+          </div>
+          <div class="admin-card-body">
+            <p style="font-size: 14px; color: var(--color-admin-text-muted); margin-bottom: 16px;">
+              The box below contains the live, formatted JavaScript code for your website's <code>js/data.js</code> file.
+              Whenever you add or edit projects and galleries, click <strong>Direct Save</strong> or <strong>Download data.js</strong> to update your local website files permanently.
+            </p>
+            <pre id="datajs-code-preview" style="background: #1F2428; color: #F3F4F6; padding: 20px; border-radius: 4px; font-family: var(--font-mono); font-size: 13px; max-height: 400px; overflow-y: auto; white-space: pre;"></pre>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- MODAL 1: Project Editor & Dedicated Gallery Manager -->
+  <div class="admin-modal-overlay" id="modal-project-editor" role="dialog" aria-modal="true">
+    <div class="admin-modal">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title" id="project-modal-title">Edit Project</h3>
+        <button type="button" class="btn-close admin-modal-close" style="font-size: 18px; color: #9CA3AF;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="admin-modal-body">
+        <form id="form-project-editor">
+          <input type="hidden" id="edit-project-id">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Project Title <span class="req">*</span></label>
+              <input type="text" id="edit-project-title" class="form-control" placeholder="e.g. Bank al Etihad" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category <span class="req">*</span></label>
+              <select id="edit-project-category" class="form-control" required>
+                <option value="Banks">BANKS</option>
+                <option value="Commercial">Commercial</option>
+                <option value="Residential">Residential</option>
+                <option value="EMBASSIES">EMBASSIES</option>
+                <option value="Government Projects">Government Projects</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <input type="text" id="edit-project-location" class="form-control" placeholder="e.g. Amman - QAIA Airport">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date Completed / Year</label>
+              <input type="text" id="edit-project-date" class="form-control" placeholder="e.g. 2023">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Area (sqm)</label>
+              <input type="text" id="edit-project-area" class="form-control" placeholder="e.g. 200 sqm">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Cover Image Path</label>
+              <input type="text" id="edit-project-cover" class="form-control" placeholder="images/projects/.../01.png">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="edit-project-desc" class="form-control" rows="2" placeholder="Describe the woodwork details, materials, or scope..."></textarea>
+          </div>
+
+          <!-- Dedicated Gallery Photo Array Manager -->
+          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-admin-border);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <label class="form-label" style="margin: 0;">Dedicated Gallery Photos</label>
+              <span id="gallery-manager-count" style="font-size: 12px; color: var(--color-brand); font-weight: 600;">0 photos</span>
+            </div>
+            <p style="font-size: 12px; color: var(--color-admin-text-muted); margin-bottom: 12px;">
+              Add image paths located in your <code>images/projects/</code> folder. Photos will automatically appear in this project's isolated gallery on the website.
+            </p>
+
+            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+              <input type="text" id="new-photo-url-input" class="form-control" placeholder="e.g. images/projects/commercial/pwc/02.png" style="font-size: 13px;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-add-gallery-photo" style="white-space: nowrap;">
+                <i class="fa-solid fa-plus"></i> Add Photo
+              </button>
+            </div>
+
+            <div class="gallery-manager-grid" id="gallery-manager-photos-list">
+              <!-- Dynamically populated by js/admin.js -->
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn btn-outline btn-sm admin-modal-close">Cancel</button>
+        <button type="submit" form="form-project-editor" class="btn btn-primary btn-sm">
+          <i class="fa-solid fa-check"></i> Save Project &amp; Gallery
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Inquiry Full Detail Viewer -->
+  <div class="admin-modal-overlay" id="modal-inquiry-detail" role="dialog" aria-modal="true">
+    <div class="admin-modal">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title">Customer Request Details</h3>
+        <button type="button" class="btn-close admin-modal-close" style="font-size: 18px; color: #9CA3AF;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="admin-modal-body" id="modal-inquiry-body">
+        <!-- Dynamically populated by js/admin.js -->
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm admin-modal-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+/* ==========================================================================
+   ART TOUCH WOODWORKS — REFINED MOTION & TRANSITIONS
+   Lightweight, Non-Intrusive, Hardware Accelerated Transitions
+   ========================================================================== */
+
+/* Scroll Reveal */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s var(--ease-out-expo),
+              transform 0.5s var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+
+[data-reveal].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+[data-reveal="scale-up"] {
+  transform: scale(0.97) translateY(10px);
+}
+
+[data-reveal="scale-up"].is-revealed {
+  transform: scale(1) translateY(0);
+}
+
+[data-delay="100"] { transition-delay: 0.1s; }
+[data-delay="150"] { transition-delay: 0.15s; }
+[data-delay="200"] { transition-delay: 0.2s; }
+[data-delay="250"] { transition-delay: 0.25s; }
+[data-delay="300"] { transition-delay: 0.3s; }
+
+/* Clean Slider Controls */
+.slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 10;
+  transition: all var(--transition-fast);
+}
+
+.slider-arrow:hover {
+  background: #000000;
+  border-color: #FFFFFF;
+  transform: translateY(-50%) scale(1.05);
+}
+
+.slider-arrow.prev { left: 16px; }
+.slider-arrow.next { right: 16px; }
+
+.slider-dots-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: var(--space-md);
+}
+
+.slider-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: #D1D5DB;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast);
+}
+
+.slider-dot.active {
+  background: #333333;
+  width: 20px;
+  border-radius: 4px;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

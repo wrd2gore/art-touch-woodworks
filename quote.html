@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request a Quote | Art Touch Woodworks</title>
+  <meta name="description" content="Calculate and submit your woodwork project requirements with Art Touch's 5-step interactive quote estimator for residential and commercial joinery.">
+  
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+<!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand-logo" aria-label="Art Touch Home">
+        <img src="images/logo/art-touch-logo.png" alt="Art Touch Woodworks Logo">
+        <span class="brand-logo-text">Art Touch</span>
+      </a>
+      <nav class="nav-desktop" aria-label="Main Navigation">
+        <ul class="nav-list">
+          <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+          <li class="nav-item">
+            <a href="projects.html" class="nav-link">Projects <i class="fa-solid fa-chevron-down" style="font-size: 11px;"></i></a>
+            <div class="nav-dropdown">
+              <a href="projects.html?cat=banks" class="dropdown-link">
+                <div class="dropdown-icon"><i class="fa-solid fa-chevron-down"></i></div>
+                <span class="dropdown-title">BANKS</span>
+              </a>
+              <a href="projects.html?cat=commercial" class="dropdown-link">
+                <div class="dropdown-icon"><i class="fa-solid fa-chevron-down"></i></div>
+                <span class="dropdown-title">Commercial</span>
+              </a>
+              <a href="projects.html?cat=residential" class="dropdown-link">
+                <div class="dropdown-icon"><i class="fa-solid fa-chevron-down"></i></div>
+                <span class="dropdown-title">Residential</span>
+              </a>
+              <a href="projects.html?cat=embassies" class="dropdown-link">
+                <div class="dropdown-icon"><i class="fa-solid fa-chevron-down"></i></div>
+                <span class="dropdown-title">EMBASSIES</span>
+              </a>
+              <a href="projects.html?cat=government-projects" class="dropdown-link">
+                <div class="dropdown-icon"><i class="fa-solid fa-chevron-down"></i></div>
+                <span class="dropdown-title">Government Projects</span>
+              </a>
+            </div>
+          </li>
+          <li class="nav-item"><a href="team.html" class="nav-link">Our Team</a></li>
+          <li class="nav-item"><a href="contact.html" class="nav-link">Contact Us</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button type="button" class="btn-search-trigger js-search-trigger" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <a href="quote.html" class="btn btn-primary btn-sm active"><i class="fa-solid fa-file-signature"></i> Request a Quote</a>
+        <button type="button" class="btn-hamburger" aria-label="Menu"><span class="hamburger-line"></span><span class="hamburger-line"></span><span class="hamburger-line"></span></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Menu -->
+  <div class="mobile-drawer-overlay">
+    <div class="mobile-drawer">
+      <div class="mobile-drawer-header">
+        <img src="images/logo/art-touch-logo.png" alt="Art Touch Woodworks" style="height: 44px; width: auto; object-fit: contain;">
+        <button type="button" class="mobile-drawer-close" aria-label="Close Menu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <ul class="mobile-nav-list">
+        <li><a href="index.html" class="mobile-nav-link">Home</a></li>
+        <li>
+          <a href="projects.html" class="mobile-nav-link mobile-nav-toggle">
+            <span>Projects</span> <i class="fa-solid fa-chevron-down" style="font-size: 12px;"></i>
+          </a>
+          <div class="mobile-nav-sublist">
+            <a href="projects.html?cat=all" class="mobile-nav-link" style="font-size: var(--text-sm);">All Projects</a>
+            <a href="projects.html?cat=banks" class="mobile-nav-link" style="font-size: var(--text-sm);">Banks</a>
+            <a href="projects.html?cat=commercial" class="mobile-nav-link" style="font-size: var(--text-sm);">Commercial Projects</a>
+            <a href="projects.html?cat=residential" class="mobile-nav-link" style="font-size: var(--text-sm);">Residential Projects</a>
+            <a href="projects.html?cat=embassies" class="mobile-nav-link" style="font-size: var(--text-sm);">EMBASSIES</a>
+            <a href="projects.html?cat=government-projects" class="mobile-nav-link" style="font-size: var(--text-sm);">Government Projects</a>
+          </div>
+        </li>
+        <li><a href="team.html" class="mobile-nav-link">Our Team</a></li>
+        <li><a href="contact.html" class="mobile-nav-link">Contact Us</a></li>
+      </ul>
+      <div class="mobile-drawer-footer">
+        <a href="tel:+96262223707" class="btn btn-secondary btn-block">
+          <i class="fa-solid fa-phone"></i> Call +962 (6) 222 3 707
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <div class="page-header-content">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <a href="index.html">Home</a> / <span>Request a Quote</span>
+        </nav>
+        <h1>Interactive Project Quote Estimator</h1>
+        <p>Step through our 5-phase estimator to outline your architectural joinery scope and receive an itemized proposal.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5-Step Quote Wizard Section -->
+  <section class="section">
+    <div class="container">
+      <div class="quote-wizard-container">
+        
+        <!-- Progress Steps Tabs -->
+        <div class="wizard-progress-bar" role="tablist">
+          <div class="wizard-step-tab active" data-step="1">
+            <span>01</span> <span class="tab-title">About You</span>
+          </div>
+          <div class="wizard-step-tab" data-step="2">
+            <span>02</span> <span class="tab-title">Project Type</span>
+          </div>
+          <div class="wizard-step-tab" data-step="3">
+            <span>03</span> <span class="tab-title">Details</span>
+          </div>
+          <div class="wizard-step-tab" data-step="4">
+            <span>04</span> <span class="tab-title">Upload Files</span>
+          </div>
+          <div class="wizard-step-tab" data-step="5">
+            <span>05</span> <span class="tab-title">Review &amp; Submit</span>
+          </div>
+        </div>
+
+        <!-- Wizard Body -->
+        <div class="wizard-body">
+          <form id="quote-wizard-form" novalidate>
+            
+            <!-- Step 1: Contact Information -->
+            <div class="wizard-step-content active" id="step-1-content">
+              <h3 style="font-size: var(--text-xl); margin-bottom: var(--space-xs);">Step 1: Contact &amp; Project Location</h3>
+              <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-xl);">
+                Provide your primary contact details so our engineering estimation office can address your proposal.
+              </p>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="quote-name">Full Name <span class="req">*</span></label>
+                  <input type="text" id="quote-name" class="form-control" placeholder="Your Full Name" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="quote-company">Company / Architecture Firm</label>
+                  <input type="text" id="quote-company" class="form-control" placeholder="Company Name or Private Owner">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="quote-email">Email Address <span class="req">*</span></label>
+                  <input type="email" id="quote-email" class="form-control" placeholder="yourname@domain.com" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="quote-phone">Phone Number <span class="req">*</span></label>
+                  <input type="tel" id="quote-phone" class="form-control" placeholder="+962 7 ... / +962 (6) 222 3 707" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="quote-whatsapp">WhatsApp Number</label>
+                  <input type="tel" id="quote-whatsapp" class="form-control" placeholder="+962 (6) 222 3 707 (Optional)">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="quote-location">Project Location / City</label>
+                  <input type="text" id="quote-location" class="form-control" placeholder="e.g. Abdoun, Amman / Dabouq / Dead Sea">
+                </div>
+  </div>
+
+  <!-- Step 2: Project Category Selection -->
+            <div class="wizard-step-content" id="step-2-content">
+              <h3 style="font-size: var(--text-xl); margin-bottom: var(--space-xs);">Step 2: Select Project Scope</h3>
+              <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-xl);">
+                Select the primary category of woodwork or joinery required.
+              </p>
+
+              <div class="selection-grid">
+                <div class="selectable-card is-selected" data-type="Architectural Woodwork">
+                  <i class="fa-solid fa-compass-drafting"></i>
+                  <span>Architectural Woodwork</span>
+                  <p style="font-size: 11px; color: var(--color-text-muted); margin-top: 4px;">Ceilings, beams &amp; louvers</p>
+                </div>
+                <div class="selectable-card" data-type="Custom Luxury Furniture">
+                  <i class="fa-solid fa-couch"></i>
+                  <span>Custom Furniture</span>
+                  <p style="font-size: 11px; color: var(--color-text-muted); margin-top: 4px;">Tables, desks &amp; credenzas</p>
+                </div>
+                <div class="selectable-card" data-type="High-End Kitchens">
+                  <i class="fa-solid fa-utensils"></i>
+                  <span>High-End Kitchens</span>
+                  <p style="font-size: 11px; color: var(--color-text-muted); margin-top: 4px;">Islands, sculleries &amp; pantries</p>
+                </div>
+                <div class="selectable-card" data-type="Doors & Frames">
+                  <i class="fa-solid fa-door-open"></i>
+                  <span>Doors &amp; Frames</span>
+                  <p style="font-size: 11px; color: var(--color-text-muted); margin-top: 4px;">Pivot &amp; frameless entries</p>
+                </div>
+                <div class="selectable-card" data-type="Wall & Ceiling Cladding">
+                  <i class="fa-solid fa-layer-group"></i>
+                  <span>Wall &amp; Ceiling Cladding</span>
+                  <p style="font-size: 11px; color: var(--color-text-muted); margin-top: 4px;">Veneers, fluted &amp; slatted</p>
+                </div>
+                <div class="selectable-card" data-type="Commercial / Hospitality Fit-Out">
+                  <i class="fa-solid fa-briefcase"></i>
+                  <span>Commercial / Hospitality</span>
+                  <p style="font-size: 11px; color: var(--color-text-muted); margin-top: 4px;">Offices, hotels &amp; restaurants</p>
+                </div>
+                <div class="selectable-card" data-type="Complete Luxury Residential Joinery">
+                  <i class="fa-solid fa-house-chimney"></i>
+                  <span>Full Luxury Villa Joinery</span>
+                  <p style="font-size: 11px; color: var(--color-text-muted); margin-top: 4px;">Turnkey millwork package</p>
+                </div>
+                <div class="selectable-card" data-type="Bespoke Other">
+                  <i class="fa-solid fa-cube"></i>
+                  <span>Other Custom Commission</span>
+                  <p style="font-size: 11px; color: var(--color-text-muted); margin-top: 4px;">Specialized sculptural woodwork</p>
+                </div>
+  </div>
+
+  <!-- Step 3: Project Specifications & Budget -->
+            <div class="wizard-step-content" id="step-3-content">
+              <h3 style="font-size: var(--text-xl); margin-bottom: var(--space-xs);">Step 3: Dimensions, Budget &amp; Timeline</h3>
+              <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-xl);">
+                Provide approximate scale and preferences to help us size the engineering allocation.
+              </p>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="quote-dimensions">Approx. Dimensions / Area (sq.m or linear meters)</label>
+                  <input type="text" id="quote-dimensions" class="form-control" placeholder="e.g. 450 sq.m Villa / 14-Seat Table / 3.6m High Door">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="quote-budget">Estimated Budget Range</label>
+                  <select id="quote-budget" class="form-control">
+                    <option value="$10,000 - $25,000">$10,000 - $25,000 (AED 35k - 90k)</option>
+                    <option value="$25,000 - $50,000" selected>$25,000 - $50,000 (AED 90k - 180k)</option>
+                    <option value="$50,000 - $150,000">$50,000 - $150,000 (AED 180k - 550k)</option>
+                    <option value="$150,000+">$150,000+ (AED 550k+ Major Fit-Out)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="quote-timeline">Desired Completion Timeline</label>
+                  <select id="quote-timeline" class="form-control">
+                    <option value="Urgent (Within 1 Month)">Urgent (Within 1 Month)</option>
+                    <option value="Standard (1 - 3 Months)" selected>Standard (1 - 3 Months)</option>
+                    <option value="Planning Phase (3 - 6 Months)">Planning Phase (3 - 6 Months)</option>
+                    <option value="Flexible">Flexible / Long-Term</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="quote-description">Scope Details &amp; Material Preferences</label>
+                <textarea id="quote-description" class="form-control" rows="4" placeholder="Detail any preferred hardwoods (Walnut, Oak, Teak), special hardware, acoustic requirements, or reference notes..."></textarea>
+              </div>
+            </div>
+
+            <!-- Step 4: Upload Drawings / References Simulation -->
+            <div class="wizard-step-content" id="step-4-content">
+              <h3 style="font-size: var(--text-xl); margin-bottom: var(--space-xs);">Step 4: Upload Drawings &amp; Photos</h3>
+              <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-xl);">
+                Attach architectural CAD drawings, PDFs, sketches, moodboards, or site photos (Optional).
+              </p>
+
+              <div class="file-upload-zone" id="file-drop-zone">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <h4 style="font-size: var(--text-base); margin-bottom: 4px;">Click to Browse or Drag &amp; Drop Files</h4>
+                <p style="font-size: var(--text-xs); color: var(--color-text-muted); margin: 0;">Supports DWG, DXF, PDF, JPG, PNG, ZIP (Max 50MB total)</p>
+                <input type="file" id="quote-file-input" multiple style="display: none;" accept=".pdf,.dwg,.dxf,.jpg,.png,.jpeg,.zip">
+              </div>
+
+              <div class="uploaded-files-list" id="uploaded-files-list">
+                <!-- Dynamically listed by js/quote-wizard.js -->
+              </div>
+            </div>
+
+            <!-- Step 5: Review & Submit -->
+            <div class="wizard-step-content" id="step-5-content">
+              <h3 style="font-size: var(--text-xl); margin-bottom: var(--space-xs);">Step 5: Review Summary &amp; Submit</h3>
+              <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-xl);">
+                Please confirm your entered specifications before submitting to our engineering desk.
+              </p>
+
+              <div class="wizard-summary-box" id="quote-review-summary">
+                <!-- Injected dynamically by js/quote-wizard.js -->
+              </div>
+
+              <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-bottom: var(--space-lg);">
+                <i class="fa-solid fa-lock text-brand" style="margin-right: 4px;"></i> By submitting, your drawings and information remain strictly confidential under Art Touch non-disclosure policy.
+              </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="wizard-footer">
+              <button type="button" class="btn btn-secondary" id="wizard-prev-btn" style="display: none;">
+                <i class="fa-solid fa-arrow-left"></i> Previous Step
+              </button>
+              <button type="button" class="btn btn-primary" id="wizard-next-btn">
+                Next Step <i class="fa-solid fa-arrow-right"></i>
+              </button>
+              <button type="submit" class="btn btn-primary" id="wizard-submit-btn" style="display: none;">
+                <i class="fa-solid fa-paper-plane"></i> Submit Quote Request
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-brand-logo"><img src="images/logo/art-touch-logo.png" alt="Art Touch Logo"></a>
+          <p>Custom architectural woodwork, bespoke furniture, and commercial interior fit-outs in Amman, Jordan.</p>
+          <div class="footer-social-links">
+            <a href="https://www.instagram.com/arttouchjo/" target="_blank" rel="noopener noreferrer" class="footer-social-btn" aria-label="Art Touch Instagram" title="Instagram @arttouchjo"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://jo.linkedin.com/jobs/view/designer-at-art-touch-for-wood-works-3946056332" target="_blank" rel="noopener noreferrer" class="footer-social-btn" aria-label="Art Touch LinkedIn" title="LinkedIn Profile"><i class="fa-brands fa-linkedin-in"></i></a>
+            <a href="https://www.google.com/maps/place/Art+touch+for+wood+works/@31.89789,35.9684667,17z/data=!3m1!4b1!4m6!3m5!1s0x151b5ecfb5920e9f:0xd71e64a8826292ac!8m2!3d31.8978855!4d35.9710416!16s%2Fg%2F11f2wdpxt7?entry=ttu&g_ep=EgoyMDI2MDgxMi4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" class="footer-social-btn" aria-label="Google Maps" title="Google Maps"><i class="fa-solid fa-map-location-dot"></i></a>
+          </div>
+        </div>
+        <div>
+          <h4 class="footer-title">Projects</h4>
+          <ul class="footer-links">
+            <li><a href="projects.html?cat=banks">Banks</a></li>
+            <li><a href="projects.html?cat=commercial">Commercial Projects</a></li>
+            <li><a href="projects.html?cat=residential">Residential Projects</a></li>
+            <li><a href="projects.html?cat=embassies">EMBASSIES</a></li>
+            <li><a href="projects.html?cat=government-projects">Government Projects</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="projects.html">Projects Portfolio</a></li>
+            <li><a href="team.html">Our Team</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Contact &amp; Workshop</h4>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-location-dot"></i>
+            <div>
+              <span>Nadhmi Abdul Hadi St., Amman, Jordan</span>
+              <div style="margin-top: 4px;">
+                <a href="https://www.google.com/maps/place/Art+touch+for+wood+works/@31.89789,35.9684667,17z/data=!3m1!4b1!4m6!3m5!1s0x151b5ecfb5920e9f:0xd71e64a8826292ac!8m2!3d31.8978855!4d35.9710416!16s%2Fg%2F11f2wdpxt7?entry=ttu&g_ep=EgoyMDI2MDgxMi4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" style="color: var(--color-wood-gold-light); font-size: var(--text-xs); text-decoration: underline;">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i> View on Google Maps
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-regular fa-clock"></i>
+            <div>
+              <span>Sun–Thu: 9:00 AM – 6:00 PM (Jordan Time)</span>
+              <div style="font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px;">Fri &amp; Sat: Closed</div>
+            </div>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-phone"></i>
+            <a href="tel:+96262223707" style="color: inherit;">+962 (6) 222 3 707</a>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-envelope"></i>
+            <a href="mailto:info@arttouchjo.com" style="color: inherit;">info@arttouchjo.com</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; <span id="current-year">2026</span> Art Touch for Wood Works. All rights reserved.
+        </div>
+        <div class="footer-legal-links">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms &amp; Conditions</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  
+  <button type="button" class="btn-scroll-top" aria-label="Top"><i class="fa-solid fa-chevron-up"></i></button>
+
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/quote-wizard.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
