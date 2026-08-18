@@ -489,7 +489,8 @@ body.admin-body {
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
   z-index: 1000;
-  display: flex;
+  display: none !important;
+  pointer-events: none !important;
   align-items: center;
   justify-content: center;
   padding: 20px;
@@ -500,8 +501,10 @@ body.admin-body {
 
 .admin-modal-overlay.is-open,
 .admin-modal-overlay.active {
-  opacity: 1;
-  visibility: visible;
+  display: flex !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .admin-modal {

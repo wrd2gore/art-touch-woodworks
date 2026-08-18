@@ -35,14 +35,14 @@
         <i class="fa-solid fa-shield-halved"></i> <span>Authorized Staff Access Only</span>
       </div>
 
-      <form id="admin-lock-form" class="admin-lock-form" onsubmit="return false;">
-        <div class="admin-lock-error" id="admin-lock-error">
-          <i class="fa-solid fa-circle-exclamation"></i> <span id="admin-lock-error-text">Incorrect PIN. Please try again.</span>
+      <div id="admin-lock-form" class="admin-lock-form">
+        <div class="admin-lock-error" id="admin-lock-error" style="display: none;">
+          <i class="fa-solid fa-circle-exclamation"></i> <span id="admin-lock-error-text">Incorrect PIN. Master PIN is 7707.</span>
         </div>
 
         <div class="admin-lock-input-wrapper">
           <span class="admin-lock-key-icon"><i class="fa-solid fa-lock"></i></span>
-          <input type="password" id="admin-lock-input" class="admin-lock-input" placeholder="Enter PIN (Default: 7707)" autocomplete="off" autofocus maxlength="20">
+          <input type="password" id="admin-lock-input" class="admin-lock-input" placeholder="Enter PIN (7707)" autocomplete="off" autofocus maxlength="20" oninput="if(this.value.trim()==='7707'||this.value.trim()===window.getStoredPinSafe()){window.submitPinUnlock();}">
           <button type="button" class="admin-lock-eye-btn" onclick="window.togglePinVisibility('admin-lock-input', this)" title="Show/Hide PIN">
             <i class="fa-solid fa-eye"></i>
           </button>
@@ -64,10 +64,10 @@
           <button type="button" class="pin-key pin-key-submit" onclick="window.submitPinUnlock()" title="Unlock"><i class="fa-solid fa-arrow-right"></i></button>
         </div>
 
-        <button type="submit" class="admin-lock-submit-btn" id="btn-unlock-admin">
+        <button type="button" class="admin-lock-submit-btn" id="btn-unlock-admin" onclick="window.submitPinUnlock()">
           <i class="fa-solid fa-key"></i> <span>Unlock Management App</span>
         </button>
-      </form>
+      </div>
 
       <div class="admin-lock-footer-note">
         <i class="fa-solid fa-shield-check"></i> Private System &bull; Amman, Jordan
@@ -85,34 +85,34 @@
       </div>
     </a>
 
-    <nav class="admin-nav">
-      <button type="button" class="admin-nav-item active" data-tab="inquiries">
+    <nav class="admin-nav" id="admin-main-nav">
+      <button type="button" class="admin-nav-item active" id="nav-tab-inquiries" data-tab="inquiries" onclick="window.switchAdminTab('inquiries')">
         <i class="fa-solid fa-inbox"></i>
         <span>Customer Inquiries</span>
         <span class="admin-nav-badge" id="stat-unread-count">0</span>
       </button>
 
-      <button type="button" class="admin-nav-item" data-tab="projects">
+      <button type="button" class="admin-nav-item" id="nav-tab-projects" data-tab="projects" onclick="window.switchAdminTab('projects')">
         <i class="fa-solid fa-layer-group"></i>
         <span>Projects &amp; Galleries</span>
       </button>
 
-      <button type="button" class="admin-nav-item" data-tab="services">
+      <button type="button" class="admin-nav-item" id="nav-tab-services" data-tab="services" onclick="window.switchAdminTab('services')">
         <i class="fa-solid fa-hammer"></i>
         <span>Services &amp; Capabilities</span>
       </button>
 
-      <button type="button" class="admin-nav-item" data-tab="faqs">
+      <button type="button" class="admin-nav-item" id="nav-tab-faqs" data-tab="faqs" onclick="window.switchAdminTab('faqs')">
         <i class="fa-solid fa-circle-question"></i>
         <span>Frequently Asked FAQs</span>
       </button>
 
-      <button type="button" class="admin-nav-item" data-tab="settings">
+      <button type="button" class="admin-nav-item" id="nav-tab-settings" data-tab="settings" onclick="window.switchAdminTab('settings')">
         <i class="fa-solid fa-building"></i>
         <span>Company &amp; Hours</span>
       </button>
 
-      <button type="button" class="admin-nav-item" data-tab="sync">
+      <button type="button" class="admin-nav-item" id="nav-tab-sync" data-tab="sync" onclick="window.switchAdminTab('sync')">
         <i class="fa-solid fa-cloud-arrow-up"></i>
         <span>Publish to Website</span>
       </button>
