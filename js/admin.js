@@ -982,6 +982,134 @@
     }
   }
 
+  window.testGitHubTokenConnection = async function() {
+    const inputGhToken = document.getElementById('input-gh-token');
+    const resultBox = document.getElementById('gh-token-test-result');
+    const token = (inputGhToken ? inputGhToken.value.trim() : '') || localStorage.getItem('arttouch_gh_token');
+    
+    if (!token) {
+      if (resultBox) {
+        resultBox.style.display = 'block';
+        resultBox.style.background = '#FEF3C7';
+        resultBox.style.color = '#92400E';
+        resultBox.style.border = '1px solid #FDE68A';
+        resultBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Please paste a GitHub Personal Access Token first.';
+      }
+      alert('Please enter or save a GitHub Personal Access Token first.');
+      return;
+    }
+
+    if (resultBox) {
+      resultBox.style.display = 'block';
+      resultBox.style.background = '#EFF6FF';
+      resultBox.style.color = '#1E40AF';
+      resultBox.style.border = '1px solid #BFDBFE';
+      resultBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Testing connection to wrd2gore/art-touch-woodworks...';
+    }
+
+    try {
+      const authHeader = token.startsWith('github_pat_') || token.startsWith('ghp_') ? `Bearer ${token}` : `token ${token}`;
+      const res = await fetch('https://api.github.com/repos/wrd2gore/art-touch-woodworks', {
+        headers: {
+          'Authorization': authHeader,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+      if (res.ok) {
+        const repoData = await res.json();
+        const permissions = repoData.permissions || {};
+        const canPush = permissions.push !== false;
+        if (resultBox) {
+          resultBox.style.background = '#ECFDF5';
+          resultBox.style.color = '#047857';
+          resultBox.style.border = '1px solid #A7F3D0';
+          resultBox.innerHTML = `<i class="fa-solid fa-circle-check"></i> Connected successfully to <strong>${escapeHtml(repoData.full_name)}</strong>! (Push Permission: ${canPush ? 'YES' : 'READ-ONLY'})`;
+        }
+        alert('Connected successfully to wrd2gore/art-touch-woodworks!\n\nYour GitHub publishing token is active and working.');
+      } else {
+        const err = await res.json();
+        if (resultBox) {
+          resultBox.style.background = '#FEE2E2';
+          resultBox.style.color = '#B91C1C';
+          resultBox.style.border = '1px solid #FCA5A5';
+          resultBox.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Connection failed (${res.status}): ${escapeHtml(err.message || res.statusText)}`;
+        }
+        alert('GitHub Token Error: ' + (err.message || 'Authorization failed'));
+      }
+    } catch (e) {
+      if (resultBox) {
+        resultBox.style.background = '#FEE2E2';
+        resultBox.style.color = '#B91C1C';
+        resultBox.style.border = '1px solid #FCA5A5';
+        resultBox.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Network Error: ${escapeHtml(e.message)}`;
+      }
+      alert('Network Error testing GitHub Token: ' + e.message);
+    }
+  };
+
+  window.syncDirectlyToGitHub = async function(customCommitMessage) {
+    const inputGhToken = document.getElementById('input-gh-token');
+    const token = (inputGhToken ? inputGhToken.value.trim() : '') || localStorage.getItem('arttouch_gh_token');
+    if (!token) return false;
+
+    const sourceCode = generateDataJsSource();
+    const encodedContent = btoa(unescape(encodeURIComponent(sourceCode)));
+    const commitMsg = customCommitMessage || `Auto-update portfolio via Art Touch Control Center [${new Date().toLocaleTimeString()}]`;
+    const authHeader = token.startsWith('github_pat_') || token.startsWith('ghp_') ? `Bearer ${token}` : `token ${token}`;
+
+    const updateBranch = async (branchName) => {
+      try {
+        let sha = null;
+        const getRes = await fetch(`https://api.github.com/repos/wrd2gore/art-touch-woodworks/contents/js/data.js?ref=${branchName}`, {
+          headers: {
+            'Authorization': authHeader,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        });
+        if (getRes.ok) {
+          const fileInfo = await getRes.json();
+          sha = fileInfo.sha;
+        }
+
+        const putBody = {
+          message: commitMsg,
+          content: encodedContent,
+          branch: branchName
+        };
+        if (sha) putBody.sha = sha;
+
+        const putRes = await fetch(`https://api.github.com/repos/wrd2gore/art-touch-woodworks/contents/js/data.js`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': authHeader,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          body: JSON.stringify(putBody)
+        });
+
+        return putRes.ok;
+      } catch (e) {
+        console.warn(`GitHub push to branch ${branchName} error:`, e);
+        return false;
+      }
+    };
+
+    const mainSuccess = await updateBranch('main');
+    const masterSuccess = await updateBranch('master');
+
+    if (mainSuccess || masterSuccess) {
+      console.log('Successfully published to GitHub Pages!');
+      const toast = document.createElement('div');
+      toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#065F46;color:#fff;padding:14px 24px;border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,0.3);z-index:99999;font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px;';
+      toast.innerHTML = '<i class="fa-solid fa-circle-check"></i> Published live to GitHub &amp; Pages!';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+      return true;
+    }
+    return false;
+  };
+
   function generateDataJsSource() {
     const serializedProjects = JSON.stringify(projectsData, null, 2);
 
