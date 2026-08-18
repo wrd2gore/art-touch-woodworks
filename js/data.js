@@ -164,6 +164,17 @@ const ArtTouchData = {
     "coverImage": "",
     "description": "Branch joinery, counters, and architectural woodwork for Jordan Islamic Bank.",
     "gallery": []
+  },
+  {
+    "id": "testggiggmjgmajmgjiamjiga",
+    "category": "Banks",
+    "title": "testggiggmjgmajmgjiamjiga",
+    "location": "",
+    "dateCompleted": "",
+    "area": "",
+    "coverImage": "",
+    "description": "",
+    "gallery": []
   }
 ],
 
