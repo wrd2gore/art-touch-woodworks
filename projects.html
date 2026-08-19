@@ -135,13 +135,13 @@
       <!-- Filter Tabs -->
       <div class="filter-tabs" id="projects-filter-nav" role="tablist">
         <button type="button" class="filter-btn active" data-filter="all" onclick="filterProjects('all', this)" role="tab" aria-selected="true">
-          All Projects <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(14)</span>
+          All Projects <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(15)</span>
         </button>
         <button type="button" class="filter-btn" data-filter="banks" onclick="filterProjects('banks', this)" role="tab" aria-selected="false">
           Banks <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(5)</span>
         </button>
         <button type="button" class="filter-btn" data-filter="commercial" onclick="filterProjects('commercial', this)" role="tab" aria-selected="false">
-          Commercial <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(3)</span>
+          Commercial <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(4)</span>
         </button>
         <button type="button" class="filter-btn" data-filter="residential" onclick="filterProjects('residential', this)" role="tab" aria-selected="false">
           Residential <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(2)</span>
@@ -156,6 +156,21 @@
 
       <!-- Project Cards Grid (14 Verified Projects) -->
       <div class="grid grid-3 gap-xl" id="projects-grid-container">
+
+        <article class="authentic-project-card" data-category="commercial">
+          <a href="project-details.html?id=testing" class="project-thumb-box" title="testing">
+            <img src="images/logo/art-touch-logo.png" 
+                 alt="testing" 
+                 loading="lazy" 
+                 decoding="async" 
+                 style="padding: 40px; object-fit: contain;"
+                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+          </a>
+          <a href="project-details.html?id=testing" class="project-pill-btn">
+            testing
+          </a>
+        </article>
+      
 
         <article class="authentic-project-card" data-category="government-projects">
           <a href="project-details.html?id=qaia-government-services-center" class="project-thumb-box" title="QAIA Government Services Center">

@@ -8,15 +8,26 @@
 
 const ArtTouchData = {
   // Master Version & Build Signature for CDN Verification
-  version: "2026.08.18.1439",
-  buildId: "build-at-mt00rpn3-yyz5",
-  publishedAt: "2026-08-19T11:39:50.799Z",
-  totalProjects: 14,
+  version: "2026.08.18.1442",
+  buildId: "build-at-mt00v0x0-533v",
+  publishedAt: "2026-08-19T11:42:25.381Z",
+  totalProjects: 15,
   totalServices: 6,
   totalFaqs: 5,
 
   // 1. Projects Database (14 Verified Authentic Projects with Photo Galleries)
   projects: [
+  {
+    "id": "testing",
+    "category": "Commercial",
+    "title": "testing",
+    "location": "Amman, Jordan",
+    "dateCompleted": "2026",
+    "area": "",
+    "coverImage": "",
+    "description": "",
+    "gallery": []
+  },
   {
     "id": "qaia-government-services-center",
     "category": "Government Projects",
