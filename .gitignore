@@ -1,12 +1,33 @@
-# Executables & Temporary build files
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs & Distributables
+dist/
+build/
 *.exe
 *.zip
+*.msi
+*.bin
+*.dat
+
+# Local environment & sensitive data
+.env
+.env.*
+auth.dat
+secure_auth.enc
+
+# Local Admin & Desktop Control Center Files (Not served publicly)
+admin.html
+js/admin.js
+css/admin.css
 *.ps1
-*.cs
+*.bat
+
+# Temporary IDE & System files
 .tempmediaStorage/
 .user_uploaded/
 .system_generated/
 *.log
-deploy_desktop.ps1
-build_portable.ps1
-create_ico.ps1
+.DS_Store
+Thumbs.db

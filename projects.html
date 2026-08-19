@@ -62,6 +62,9 @@
         </ul>
       </nav>
       <div class="header-actions">
+        <button type="button" class="theme-toggle-btn" onclick="ArtTouchTheme.toggleTheme()" aria-label="Toggle Dark/Light Theme" title="Toggle Theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
         <button type="button" class="lang-switch-btn" onclick="ArtTouchI18n.toggleLanguage()" title="Switch Language">
           <i class="fa-solid fa-globe"></i> <span>العربية</span>
         </button>
@@ -135,13 +138,13 @@
       <!-- Filter Tabs -->
       <div class="filter-tabs" id="projects-filter-nav" role="tablist">
         <button type="button" class="filter-btn active" data-filter="all" onclick="filterProjects('all', this)" role="tab" aria-selected="true">
-          All Projects <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(15)</span>
+          All Projects <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(14)</span>
         </button>
         <button type="button" class="filter-btn" data-filter="banks" onclick="filterProjects('banks', this)" role="tab" aria-selected="false">
           Banks <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(5)</span>
         </button>
         <button type="button" class="filter-btn" data-filter="commercial" onclick="filterProjects('commercial', this)" role="tab" aria-selected="false">
-          Commercial <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(4)</span>
+          Commercial <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(3)</span>
         </button>
         <button type="button" class="filter-btn" data-filter="residential" onclick="filterProjects('residential', this)" role="tab" aria-selected="false">
           Residential <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(2)</span>
@@ -152,236 +155,150 @@
         <button type="button" class="filter-btn" data-filter="government-projects" onclick="filterProjects('government-projects', this)" role="tab" aria-selected="false">
           Government Projects <span style="opacity: 0.6; font-size: 11px; margin-left: 4px;">(2)</span>
         </button>
-    </div>
+      </div>
 
       <!-- Project Cards Grid (14 Verified Projects) -->
       <div class="grid grid-3 gap-xl" id="projects-grid-container">
-
-        <article class="authentic-project-card" data-category="commercial">
-          <a href="project-details.html?id=testing" class="project-thumb-box" title="testing">
-            <img src="images/logo/art-touch-logo.png" 
-                 alt="testing" 
-                 loading="lazy" 
-                 decoding="async" 
-                 style="padding: 40px; object-fit: contain;"
-                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
-          </a>
-          <a href="project-details.html?id=testing" class="project-pill-btn">
-            testing
-          </a>
-        </article>
-      
-
+        <!-- QAIA Government Services Center -->
         <article class="authentic-project-card" data-category="government-projects">
           <a href="project-details.html?id=qaia-government-services-center" class="project-thumb-box" title="QAIA Government Services Center">
-            <img src="images/projects/government-projects/qaia-government-services-center/01.png" 
-                 alt="QAIA Government Services Center" 
-                 loading="lazy" 
-                 decoding="async" 
-                 
-                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+            <img src="images/projects/government-projects/qaia-government-services-center/01.png" alt="QAIA Government Services Center" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
           </a>
           <a href="project-details.html?id=qaia-government-services-center" class="project-pill-btn">
             QAIA Government Services Center
           </a>
         </article>
-      
 
+        <!-- Water Awareness Center -->
         <article class="authentic-project-card" data-category="government-projects">
           <a href="project-details.html?id=water-awareness-center" class="project-thumb-box" title="Water Awareness Center">
-            <img src="images/projects/project-02/01.png" 
-                 alt="Water Awareness Center" 
-                 loading="lazy" 
-                 decoding="async" 
-                 
-                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+            <img src="images/projects/project-02/01.png" alt="Water Awareness Center" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
           </a>
           <a href="project-details.html?id=water-awareness-center" class="project-pill-btn">
             Water Awareness Center
           </a>
         </article>
-      
 
+        <!-- Embassy of Qatar -->
         <article class="authentic-project-card" data-category="embassies">
           <a href="project-details.html?id=embassy-of-qatar" class="project-thumb-box" title="Embassy of Qatar">
-            <img src="images/projects/project-01/01.png" 
-                 alt="Embassy of Qatar" 
-                 loading="lazy" 
-                 decoding="async" 
-                 
-                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+            <img src="images/projects/project-01/01.png" alt="Embassy of Qatar" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
           </a>
           <a href="project-details.html?id=embassy-of-qatar" class="project-pill-btn">
             Embassy of Qatar
           </a>
         </article>
-      
 
+        <!-- Embassy of Ireland -->
         <article class="authentic-project-card" data-category="embassies">
           <a href="project-details.html?id=embassy-of-ireland" class="project-thumb-box" title="Embassy of Ireland">
-            <img src="images/projects/project-02/01.png" 
-                 alt="Embassy of Ireland" 
-                 loading="lazy" 
-                 decoding="async" 
-                 
-                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+            <img src="images/projects/project-01/02.png" alt="Embassy of Ireland" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
           </a>
           <a href="project-details.html?id=embassy-of-ireland" class="project-pill-btn">
             Embassy of Ireland
           </a>
         </article>
-      
 
+        <!-- Rajha Villa -->
         <article class="authentic-project-card" data-category="residential">
           <a href="project-details.html?id=rajha-villa" class="project-thumb-box" title="Rajha Villa">
-            <img src="images/projects/project-01/01.png" 
-                 alt="Rajha Villa" 
-                 loading="lazy" 
-                 decoding="async" 
-                 
-                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+            <img src="images/projects/project-01/01.png" alt="Rajha Villa" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
           </a>
           <a href="project-details.html?id=rajha-villa" class="project-pill-btn">
             Rajha Villa
           </a>
         </article>
-      
 
+        <!-- Al Hasan Villa -->
         <article class="authentic-project-card" data-category="residential">
           <a href="project-details.html?id=al-hasan-villa" class="project-thumb-box" title="Al Hasan Villa">
-            <img src="images/projects/project-02/01.png" 
-                 alt="Al Hasan Villa" 
-                 loading="lazy" 
-                 decoding="async" 
-                 
-                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+            <img src="images/projects/project-01/02.png" alt="Al Hasan Villa" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
           </a>
           <a href="project-details.html?id=al-hasan-villa" class="project-pill-btn">
             Al Hasan Villa
           </a>
         </article>
-      
 
+        <!-- PwC -->
         <article class="authentic-project-card" data-category="commercial">
           <a href="project-details.html?id=pwc" class="project-thumb-box" title="PwC">
-            <img src="images/projects/project-01/01.png" 
-                 alt="PwC" 
-                 loading="lazy" 
-                 decoding="async" 
-                 
-                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+            <img src="images/projects/project-02/01.png" alt="PwC" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
           </a>
           <a href="project-details.html?id=pwc" class="project-pill-btn">
             PwC
           </a>
         </article>
-      
 
+        <!-- Specialized Leasing Company -->
         <article class="authentic-project-card" data-category="commercial">
           <a href="project-details.html?id=specialized-leasing-company" class="project-thumb-box" title="Specialized Leasing Company">
-            <img src="images/projects/project-02/01.png" 
-                 alt="Specialized Leasing Company" 
-                 loading="lazy" 
-                 decoding="async" 
-                 
-                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+            <img src="images/projects/government-projects/qaia-government-services-center/01.png" alt="Specialized Leasing Company" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
           </a>
           <a href="project-details.html?id=specialized-leasing-company" class="project-pill-btn">
             Specialized Leasing Company
           </a>
         </article>
-      
 
+        <!-- Yousef Afandi -->
         <article class="authentic-project-card" data-category="commercial">
-          <a href="project-details.html?id=al-ghad-newspaper" class="project-thumb-box" title="Al Ghad Newspaper">
-            <img src="images/projects/project-01/01.png" 
-                 alt="Al Ghad Newspaper" 
-                 loading="lazy" 
-                 decoding="async" 
-                 
-                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+          <a href="project-details.html?id=yousef-afandi" class="project-thumb-box" title="Yousef Afandi">
+            <img src="images/projects/project-01/01.png" alt="Yousef Afandi" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
           </a>
-          <a href="project-details.html?id=al-ghad-newspaper" class="project-pill-btn">
-            Al Ghad Newspaper
+          <a href="project-details.html?id=yousef-afandi" class="project-pill-btn">
+            Yousef Afandi
           </a>
         </article>
-      
 
+        <!-- Safwa Islamic Bank -->
         <article class="authentic-project-card" data-category="banks">
-          <a href="project-details.html?id=bank-al-etihad" class="project-thumb-box" title="Bank al Etihad">
-            <img src="images/projects/project-01/01.png" 
-                 alt="Bank al Etihad" 
-                 loading="lazy" 
-                 decoding="async" 
-                 
-                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+          <a href="project-details.html?id=safwa-islamic-bank" class="project-thumb-box" title="Safwa Islamic Bank">
+            <img src="images/projects/government-projects/qaia-government-services-center/01.png" alt="Safwa Islamic Bank" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
           </a>
-          <a href="project-details.html?id=bank-al-etihad" class="project-pill-btn">
-            Bank al Etihad
+          <a href="project-details.html?id=safwa-islamic-bank" class="project-pill-btn">
+            Safwa Islamic Bank
           </a>
         </article>
-      
 
-        <article class="authentic-project-card" data-category="banks">
-          <a href="project-details.html?id=arab-bank" class="project-thumb-box" title="Arab Bank">
-            <img src="images/projects/project-02/01.png" 
-                 alt="Arab Bank" 
-                 loading="lazy" 
-                 decoding="async" 
-                 
-                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
-          </a>
-          <a href="project-details.html?id=arab-bank" class="project-pill-btn">
-            Arab Bank
-          </a>
-        </article>
-      
-
+        <!-- Jordan Kuwait Bank -->
         <article class="authentic-project-card" data-category="banks">
           <a href="project-details.html?id=jordan-kuwait-bank" class="project-thumb-box" title="Jordan Kuwait Bank">
-            <img src="images/projects/project-01/01.png" 
-                 alt="Jordan Kuwait Bank" 
-                 loading="lazy" 
-                 decoding="async" 
-                 
-                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+            <img src="images/projects/project-02/01.png" alt="Jordan Kuwait Bank" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
           </a>
           <a href="project-details.html?id=jordan-kuwait-bank" class="project-pill-btn">
             Jordan Kuwait Bank
           </a>
         </article>
-      
 
+        <!-- Bank al Etihad -->
+        <article class="authentic-project-card" data-category="banks">
+          <a href="project-details.html?id=bank-al-etihad" class="project-thumb-box" title="Bank al Etihad">
+            <img src="images/projects/project-01/02.png" alt="Bank al Etihad" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+          </a>
+          <a href="project-details.html?id=bank-al-etihad" class="project-pill-btn">
+            Bank al Etihad
+          </a>
+        </article>
+
+        <!-- Invest Bank -->
         <article class="authentic-project-card" data-category="banks">
           <a href="project-details.html?id=invest-bank" class="project-thumb-box" title="Invest Bank">
-            <img src="images/projects/project-02/01.png" 
-                 alt="Invest Bank" 
-                 loading="lazy" 
-                 decoding="async" 
-                 
-                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+            <img src="images/projects/project-01/01.png" alt="Invest Bank" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
           </a>
           <a href="project-details.html?id=invest-bank" class="project-pill-btn">
             Invest Bank
           </a>
         </article>
-      
 
+        <!-- Jordan Islamic Bank -->
         <article class="authentic-project-card" data-category="banks">
           <a href="project-details.html?id=jordan-islamic-bank" class="project-thumb-box" title="Jordan Islamic Bank">
-            <img src="images/projects/project-01/01.png" 
-                 alt="Jordan Islamic Bank" 
-                 loading="lazy" 
-                 decoding="async" 
-                 
-                 onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
+            <img src="images/projects/government-projects/qaia-government-services-center/01.png" alt="Jordan Islamic Bank" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='images/logo/art-touch-logo.png'; this.style.padding='40px'; this.style.objectFit='contain';">
           </a>
           <a href="project-details.html?id=jordan-islamic-bank" class="project-pill-btn">
             Jordan Islamic Bank
           </a>
         </article>
-      
-</div>
+      </div>
     </div>
   </section>
 
@@ -480,7 +397,7 @@
   <button type="button" class="btn-scroll-top" aria-label="Top"><i class="fa-solid fa-chevron-up"></i></button>
 
   <script src="js/config.js"></script>
-  <script src="js/data.js"></script>
+  <script src="js/data.js?v=2026.08.19.01"></script>
   <script src="js/i18n.js"></script>
   <script src="js/components.js"></script>
   <script src="js/search.js"></script>

@@ -48,7 +48,7 @@ body[dir="rtl"] {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #F3F4F6;
+  background: var(--color-bg-subtle);
   color: var(--color-text-main);
   border: 1px solid var(--color-border);
   padding: 6px 12px;

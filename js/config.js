@@ -57,6 +57,13 @@ const ArtTouchConfig = {
   logoWhite: "images/logo/art-touch-logo.png",
   favicon: "images/logo/art-touch-logo.png",
 
+  // Backend & Customer Inquiries (Supabase REST API with Row-Level Security)
+  // Public anonKey is strictly INSERT-only; reading/managing inquiries is secured inside the Desktop Control Center.
+  supabase: {
+    url: "https://api.arttouchjo.com", 
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.anon"
+  },
+
   // Key Leadership
   leadership: {
     generalManager: "Mohammad Y. Shaheen",

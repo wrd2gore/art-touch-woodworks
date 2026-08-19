@@ -67,15 +67,35 @@ function initContactForm() {
       localStorage.setItem('arttouch_inquiries', JSON.stringify(list));
       window.dispatchEvent(new CustomEvent('arttouch:new-inquiry', { detail: inquiryRecord }));
     } catch (e) {}
+    // Dispatch to Supabase REST backend (Row-Level Security Insert-Only)
+    try {
+      const sb = (window.ArtTouchConfig && window.ArtTouchConfig.supabase) || {};
+      if (sb.url && sb.anonKey && sb.url.startsWith('https://')) {
+        const endpoint = `${sb.url.replace(/\/+$/, '')}/rest/v1/inquiries`;
+        fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': sb.anonKey,
+            'Authorization': `Bearer ${sb.anonKey}`,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            id: inquiryRecord.id,
+            type: inquiryRecord.type,
+            name: inquiryRecord.name,
+            email: inquiryRecord.email,
+            phone: inquiryRecord.phone,
+            subject: inquiryRecord.subject,
+            message: inquiryRecord.message,
+            status: 'new',
+            created_at: inquiryRecord.timestamp
+          })
+        }).catch(err => console.warn('Supabase inquiry dispatch notice:', err));
+      }
+    } catch (e) {}
 
-    // Also dispatch to cloud sync if enabled
-    if (window.ArtTouchCloudSync && typeof window.ArtTouchCloudSync.sendInquiry === 'function') {
-      try {
-        window.ArtTouchCloudSync.sendInquiry(inquiryRecord);
-      } catch (e) {}
-    }
-
-    // Simulate reliable dispatch
+    // Complete form submission
     setTimeout(() => {
       if (submitBtn) {
         submitBtn.disabled = false;

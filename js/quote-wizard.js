@@ -303,13 +303,35 @@ function initQuoteWizard() {
         window.dispatchEvent(new CustomEvent('arttouch:new-inquiry', { detail: quoteRecord }));
       } catch (err) {}
 
-      // Also dispatch to cloud sync if enabled
-      if (window.ArtTouchCloudSync && typeof window.ArtTouchCloudSync.sendInquiry === 'function') {
-        try {
-          window.ArtTouchCloudSync.sendInquiry(quoteRecord);
-        } catch (err) {}
-      }
-      
+      // Dispatch to Supabase REST backend (Row-Level Security Insert-Only)
+      try {
+        const sb = (window.ArtTouchConfig && window.ArtTouchConfig.supabase) || {};
+        if (sb.url && sb.anonKey && sb.url.startsWith('https://')) {
+          const endpoint = `${sb.url.replace(/\/+$/, '')}/rest/v1/inquiries`;
+          fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': sb.anonKey,
+              'Authorization': `Bearer ${sb.anonKey}`,
+              'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({
+              id: quoteRecord.id,
+              type: quoteRecord.type,
+              name: quoteRecord.name,
+              email: quoteRecord.email,
+              phone: quoteRecord.phone,
+              subject: quoteRecord.subject,
+              message: quoteRecord.message,
+              metadata: quoteRecord.metadata,
+              status: 'new',
+              created_at: quoteRecord.timestamp
+            })
+          }).catch(err => console.warn('Supabase quote dispatch notice:', err));
+        }
+      } catch (e) {}
+
       // Render Success View
       const wizardBody = document.querySelector('.wizard-body');
       if (wizardBody) {

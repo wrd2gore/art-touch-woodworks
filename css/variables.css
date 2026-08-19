@@ -1,20 +1,20 @@
 /* ==========================================================================
    ART TOUCH WOODWORKS — REFINED ARCHITECTURAL DESIGN TOKENS
-   Clean, Elegant, Luxury Architectural Aesthetic (White & Deep Burgundy)
+   Clean, Elegant, Luxury Architectural Aesthetic with Universal Dark Theme
    ========================================================================== */
 
 :root {
-  /* Brand Identity (From Official Art Touch Logo) */
-  --color-brand: #8B1E2F;
-  --color-brand-hover: #A82035;
-  --color-brand-active: #6E1523;
-  --color-brand-light: #FDF2F4;
-  --color-brand-muted: rgba(139, 30, 47, 0.08);
+  /* Brand Identity (Refined Architectural Warm Gold & Deep Wood) */
+  --color-brand: #A88734;
+  --color-brand-hover: #BF9C3E;
+  --color-brand-active: #8F7128;
+  --color-brand-light: #FBF8EE;
+  --color-brand-muted: rgba(168, 135, 52, 0.08);
 
   /* Charcoal & Neutrals */
-  --color-dark: #222222;
-  --color-dark-hover: #333333;
-  --color-dark-surface: #1A1A1A;
+  --color-dark: #1F2428;
+  --color-dark-hover: #2F363D;
+  --color-dark-surface: #181C20;
   --color-pill-bg: #2C2C2C;
   --color-pill-hover: #111111;
 
@@ -104,4 +104,109 @@
   --z-modal: 1200;
   --z-lightbox: 1300;
   --z-toast: 1400;
+
+  /* Theme Indicator */
+  color-scheme: light;
+}
+
+/* ==========================================================================
+   UNIVERSAL DARK THEME DEFINITION ([data-theme="dark"])
+   ========================================================================== */
+
+[data-theme="dark"] {
+  /* Brand Accents in Dark Mode (Vibrant architectural champagne gold) */
+  --color-brand: #C59B27;
+  --color-brand-hover: #DFB83E;
+  --color-brand-active: #A88734;
+  --color-brand-light: rgba(197, 155, 39, 0.15);
+  --color-brand-muted: rgba(197, 155, 39, 0.1);
+
+  /* Dark Theme Surfaces */
+  --color-dark: #0D1117;
+  --color-dark-hover: #161B22;
+  --color-dark-surface: #161B22;
+  --color-pill-bg: #21262D;
+  --color-pill-hover: #30363D;
+
+  /* Deep High-End Dark Canvas */
+  --color-bg: #090D12;
+  --color-bg-alt: #0F141C;
+  --color-bg-surface: #141A24;
+  --color-bg-card: #171E2A;
+  --color-bg-subtle: #1C2433;
+
+  /* Dark Theme Borders */
+  --color-border: #2B3545;
+  --color-border-light: #222B38;
+  --color-border-hover: #414F66;
+  --color-border-dark: #6B7280;
+
+  /* Dark Theme Typography */
+  --color-text-main: #F9FAFB;
+  --color-text-body: #E5E7EB;
+  --color-text-muted: #9CA3AF;
+  --color-text-dim: #6B7280;
+  --color-text-white: #FFFFFF;
+  --color-text-white-muted: rgba(255, 255, 255, 0.85);
+
+  /* Status Colors */
+  --color-success: #10B981;
+  --color-success-bg: rgba(16, 185, 129, 0.15);
+  --color-error: #EF4444;
+  --color-error-bg: rgba(239, 68, 68, 0.15);
+
+  /* Dark Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.65);
+
+  color-scheme: dark;
+}
+
+/* Automatic OS dark preference support when user has not set an explicit override */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-brand: #C59B27;
+    --color-brand-hover: #DFB83E;
+    --color-brand-active: #A88734;
+    --color-brand-light: rgba(197, 155, 39, 0.15);
+    --color-brand-muted: rgba(197, 155, 39, 0.1);
+
+    --color-dark: #0D1117;
+    --color-dark-hover: #161B22;
+    --color-dark-surface: #161B22;
+    --color-pill-bg: #21262D;
+    --color-pill-hover: #30363D;
+
+    --color-bg: #090D12;
+    --color-bg-alt: #0F141C;
+    --color-bg-surface: #141A24;
+    --color-bg-card: #171E2A;
+    --color-bg-subtle: #1C2433;
+
+    --color-border: #2B3545;
+    --color-border-light: #222B38;
+    --color-border-hover: #414F66;
+    --color-border-dark: #6B7280;
+
+    --color-text-main: #F9FAFB;
+    --color-text-body: #E5E7EB;
+    --color-text-muted: #9CA3AF;
+    --color-text-dim: #6B7280;
+    --color-text-white: #FFFFFF;
+    --color-text-white-muted: rgba(255, 255, 255, 0.85);
+
+    --color-success: #10B981;
+    --color-success-bg: rgba(16, 185, 129, 0.15);
+    --color-error: #EF4444;
+    --color-error-bg: rgba(239, 68, 68, 0.15);
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.65);
+
+    color-scheme: dark;
+  }
 }

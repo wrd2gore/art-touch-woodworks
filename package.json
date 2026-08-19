@@ -1,0 +1,67 @@
+{
+  "name": "art-touch-control-center",
+  "version": "1.0.0",
+  "description": "Art Touch for Wood Works — Desktop Control Center & Live Publisher",
+  "main": "electron/main.js",
+  "author": "Art Touch for Wood Works",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --dir",
+    "dist": "electron-builder --win",
+    "dist:portable": "electron-builder --win portable"
+  },
+  "build": {
+    "appId": "com.arttouch.controlcenter",
+    "productName": "Art Touch Control Center",
+    "copyright": "Copyright © 2026 Art Touch for Wood Works",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "win": {
+      "icon": "art-touch.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "shortcutName": "Art Touch Control Center",
+      "installerIcon": "art-touch.ico",
+      "uninstallerIcon": "art-touch.ico",
+      "uninstallDisplayName": "Art Touch Control Center",
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true
+    },
+    "files": [
+      "electron/**/*",
+      "css/**/*",
+      "js/**/*",
+      "images/**/*",
+      "*.html",
+      "art-touch.ico",
+      "favicon.svg",
+      "package.json"
+    ],
+    "extraResources": []
+  },
+  "devDependencies": {
+    "electron": "^35.1.1",
+    "electron-builder": "^25.1.8"
+  }
+}

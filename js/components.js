@@ -264,9 +264,96 @@ function initCardTiltEffect() {
   });
 }
 
+// ============================================================================
+// 11. UNIVERSAL COLOR THEME SYSTEM (Dark / Light / System Preference)
+// ============================================================================
+const ArtTouchTheme = (function() {
+  const THEME_KEY = 'arttouch_theme';
+
+  function getStoredTheme() {
+    try {
+      return localStorage.getItem(THEME_KEY);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function getSystemTheme() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function getActiveTheme() {
+    const stored = getStoredTheme();
+    return stored || getSystemTheme();
+  }
+
+  function applyTheme(theme, save = false) {
+    const active = theme === 'dark' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', active);
+    if (save) {
+      try {
+        localStorage.setItem(THEME_KEY, active);
+      } catch (e) {}
+    }
+    updateToggleIcons(active);
+  }
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || getActiveTheme();
+    const next = current === 'dark' ? 'light' : 'dark';
+    applyTheme(next, true);
+    if (window.showToast) {
+      window.showToast(next === 'dark' ? '🌙 Switched to Dark Theme' : '☀️ Switched to Light Theme', 'info');
+    }
+    return next;
+  }
+
+  function updateToggleIcons(theme) {
+    const buttons = document.querySelectorAll('.theme-toggle-btn');
+    buttons.forEach(btn => {
+      const icon = btn.querySelector('i');
+      if (icon) {
+        icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      }
+      btn.setAttribute('title', theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme');
+    });
+  }
+
+  function init() {
+    const active = getActiveTheme();
+    applyTheme(active, false);
+
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!getStoredTheme()) {
+          applyTheme(e.matches ? 'dark' : 'light', false);
+        }
+      });
+    }
+
+    // Bind all buttons after DOM loads
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => updateToggleIcons(getActiveTheme()));
+    } else {
+      updateToggleIcons(getActiveTheme());
+    }
+  }
+
+  // Run immediately
+  init();
+
+  return {
+    init: init,
+    toggleTheme: toggleTheme,
+    getActiveTheme: getActiveTheme,
+    applyTheme: applyTheme
+  };
+})();
+
 // Make globally accessible
 window.showToast = showToast;
 window.initBusinessHoursStatus = initBusinessHoursStatus;
 window.initScrollReveal = initScrollReveal;
+window.ArtTouchTheme = ArtTouchTheme;
 
 
