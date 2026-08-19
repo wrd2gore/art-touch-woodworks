@@ -1,170 +1,209 @@
 /* ==========================================================================
-   ART TOUCH WOODWORKS — REFINED ARCHITECTURAL DESIGN TOKENS
-   Clean, Elegant, Luxury Architectural Aesthetic with Universal Dark Theme
+   ART TOUCH CONTROL CENTER — GLOBAL ARCHITECTURAL DESIGN SYSTEM
+   Unified Design Tokens for Light and Dark Modes
    ========================================================================== */
 
 :root {
-  /* Brand Identity (Refined Architectural Warm Gold & Deep Wood) */
+  /* Brand Accents (Architectural Gold Palette) */
   --color-brand: #A88734;
   --color-brand-hover: #BF9C3E;
   --color-brand-active: #8F7128;
   --color-brand-light: #FBF8EE;
-  --color-brand-muted: rgba(168, 135, 52, 0.08);
+  --color-brand-muted: rgba(168, 135, 52, 0.1);
+  --color-brand-glow: rgba(168, 135, 52, 0.25);
 
-  /* Charcoal & Neutrals */
-  --color-dark: #1F2428;
-  --color-dark-hover: #2F363D;
-  --color-dark-surface: #181C20;
-  --color-pill-bg: #2C2C2C;
-  --color-pill-hover: #111111;
+  /* Application Layout & Canvas */
+  --color-bg-app: #F4F6F8;
+  --color-bg-topbar: #FFFFFF;
+  --color-bg-sidebar: #181D24;
+  --color-bg-sidebar-hover: #222933;
+  --color-bg-sidebar-active: rgba(168, 135, 52, 0.15);
 
-  /* Clean Light Canvas */
-  --color-bg: #FFFFFF;
-  --color-bg-alt: #F9FAFB;
-  --color-bg-surface: #FFFFFF;
+  /* Card Surfaces */
   --color-bg-card: #FFFFFF;
-  --color-bg-subtle: #F3F4F6;
+  --color-bg-card-subtle: #F9FAFB;
+  --color-bg-card-header: #FFFFFF;
+  --color-bg-empty: #F9FAFB;
+  --color-bg-stat: #FFFFFF;
 
-  /* Subtle Hairline Borders */
+  /* Tables */
+  --color-bg-table-th: #F9FAFB;
+  --color-bg-table-tr-hover: rgba(168, 135, 52, 0.04);
+  --color-bg-table-tr-new: #FFFDF7;
+
+  /* Form Controls */
+  --color-bg-input: #FFFFFF;
+  --color-border-input: #D1D5DB;
+  --color-bg-input-focus: #FFFFFF;
+  --color-border-input-focus: var(--color-brand);
+
+  /* Modals */
+  --color-bg-modal: #FFFFFF;
+  --color-bg-modal-header: #FFFFFF;
+  --color-bg-modal-footer: #F9FAFB;
+  --color-bg-modal-overlay: rgba(15, 23, 42, 0.6);
+
+  /* Borders */
   --color-border: #E5E7EB;
-  --color-border-light: #F0F2F5;
+  --color-border-subtle: #F0F2F5;
   --color-border-hover: #D1D5DB;
-  --color-border-dark: #333333;
+  --color-border-dark: #374151;
 
-  /* High-Legibility Typography */
+  /* Typography */
   --color-text-main: #111827;
   --color-text-body: #374151;
   --color-text-muted: #6B7280;
   --color-text-dim: #9CA3AF;
-  --color-text-white: #FFFFFF;
-  --color-text-white-muted: rgba(255, 255, 255, 0.75);
+  --color-text-placeholder: #9CA3AF;
+  --color-text-sidebar: #E5E7EB;
+  --color-text-sidebar-muted: rgba(255, 255, 255, 0.6);
+  --color-text-inverse: #FFFFFF;
 
-  /* Status */
-  --color-success: #059669;
-  --color-success-bg: #ECFDF5;
-  --color-error: #DC2626;
-  --color-error-bg: #FEF2F2;
+  /* Badges */
+  --color-badge-new-bg: #FEF3C7;
+  --color-badge-new-text: #92400E;
+  --color-badge-new-border: #FDE68A;
+  --color-badge-handled-bg: #ECFDF5;
+  --color-badge-handled-text: #065F46;
+  --color-badge-handled-border: #A7F3D0;
+  --color-badge-brand-bg: var(--color-brand-light);
+  --color-badge-brand-text: var(--color-brand);
+  --color-badge-brand-border: rgba(168, 135, 52, 0.3);
+
+  /* Buttons */
+  --color-btn-pri-bg: var(--color-brand);
+  --color-btn-pri-text: #FFFFFF;
+  --color-btn-pri-hover: var(--color-brand-hover);
+  --color-btn-sec-bg: #2C3440;
+  --color-btn-sec-text: #FFFFFF;
+  --color-btn-sec-hover: #1A2028;
+  --color-btn-outline-bg: transparent;
+  --color-btn-outline-text: var(--color-text-main);
+  --color-btn-outline-border: var(--color-border);
+  --color-btn-outline-hover-bg: var(--color-brand-light);
+  --color-btn-outline-hover-text: var(--color-brand);
+  --color-btn-outline-hover-border: var(--color-brand);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 30px rgba(0, 0, 0, 0.12);
+  --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.18);
+
+  /* Radii */
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
 
   /* Typography Families */
   --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
 
-  /* Font Sizes */
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-md: 1.125rem;
-  --text-lg: 1.25rem;
-  --text-xl: 1.5rem;
-  --text-2xl: 1.875rem;
-  --text-3xl: 2.25rem;
-  --text-4xl: 3rem;
-  --text-5xl: clamp(2.5rem, 5vw, 4rem);
-
-  /* Spacing */
-  --space-2xs: 0.25rem;
-  --space-xs: 0.5rem;
-  --space-sm: 0.75rem;
-  --space-md: 1rem;
-  --space-lg: 1.5rem;
-  --space-xl: 2rem;
-  --space-2xl: 3rem;
-  --space-3xl: 4.5rem;
-  --space-4xl: 6rem;
-
-  /* Radii */
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
-  --radius-full: 9999px;
-
-  /* Shadows */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.12);
-
-  /* Layout */
-  --container-sm: 640px;
-  --container-md: 860px;
-  --container-lg: 1120px;
-  --container-xl: 1280px;
-  --header-height: 80px;
-
   /* Transitions */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --transition-fast: 150ms var(--ease-out-expo);
   --transition-normal: 250ms var(--ease-out-expo);
 
-  /* Z-Index */
-  --z-header: 1000;
-  --z-drawer: 1100;
-  --z-modal: 1200;
-  --z-lightbox: 1300;
-  --z-toast: 1400;
-
-  /* Theme Indicator */
   color-scheme: light;
 }
 
 /* ==========================================================================
-   UNIVERSAL DARK THEME DEFINITION ([data-theme="dark"])
+   DARK THEME PALETTE ([data-theme="dark"])
    ========================================================================== */
 
 [data-theme="dark"] {
-  /* Brand Accents in Dark Mode (Vibrant architectural champagne gold) */
+  /* Brand Accents (Vibrant Champagne Gold) */
   --color-brand: #C59B27;
   --color-brand-hover: #DFB83E;
   --color-brand-active: #A88734;
   --color-brand-light: rgba(197, 155, 39, 0.15);
   --color-brand-muted: rgba(197, 155, 39, 0.1);
+  --color-brand-glow: rgba(197, 155, 39, 0.35);
 
-  /* Dark Theme Surfaces */
-  --color-dark: #0D1117;
-  --color-dark-hover: #161B22;
-  --color-dark-surface: #161B22;
-  --color-pill-bg: #21262D;
-  --color-pill-hover: #30363D;
+  /* Application Layout & Canvas (Deep Architectural Obsidian) */
+  --color-bg-app: #0A0D12;
+  --color-bg-topbar: #121722;
+  --color-bg-sidebar: #0E1218;
+  --color-bg-sidebar-hover: #171E28;
+  --color-bg-sidebar-active: rgba(197, 155, 39, 0.18);
 
-  /* Deep High-End Dark Canvas */
-  --color-bg: #090D12;
-  --color-bg-alt: #0F141C;
-  --color-bg-surface: #141A24;
-  --color-bg-card: #171E2A;
-  --color-bg-subtle: #1C2433;
+  /* Card Surfaces */
+  --color-bg-card: #151B26;
+  --color-bg-card-subtle: #19202E;
+  --color-bg-card-header: #151B26;
+  --color-bg-empty: #121722;
+  --color-bg-stat: #151B26;
 
-  /* Dark Theme Borders */
-  --color-border: #2B3545;
-  --color-border-light: #222B38;
-  --color-border-hover: #414F66;
-  --color-border-dark: #6B7280;
+  /* Tables */
+  --color-bg-table-th: #101520;
+  --color-bg-table-tr-hover: rgba(197, 155, 39, 0.08);
+  --color-bg-table-tr-new: rgba(197, 155, 39, 0.04);
 
-  /* Dark Theme Typography */
+  /* Form Controls */
+  --color-bg-input: #1A2230;
+  --color-border-input: #2D394C;
+  --color-bg-input-focus: #1E2738;
+  --color-border-input-focus: var(--color-brand);
+
+  /* Modals */
+  --color-bg-modal: #161D2A;
+  --color-bg-modal-header: #161D2A;
+  --color-bg-modal-footer: #111622;
+  --color-bg-modal-overlay: rgba(0, 0, 0, 0.75);
+
+  /* Borders */
+  --color-border: #263244;
+  --color-border-subtle: #1C2534;
+  --color-border-hover: #3C4D66;
+  --color-border-dark: #64748B;
+
+  /* Typography */
   --color-text-main: #F9FAFB;
   --color-text-body: #E5E7EB;
   --color-text-muted: #9CA3AF;
   --color-text-dim: #6B7280;
-  --color-text-white: #FFFFFF;
-  --color-text-white-muted: rgba(255, 255, 255, 0.85);
+  --color-text-placeholder: #6B7280;
+  --color-text-sidebar: #F3F4F6;
+  --color-text-sidebar-muted: #9CA3AF;
+  --color-text-inverse: #0A0D12;
 
-  /* Status Colors */
-  --color-success: #10B981;
-  --color-success-bg: rgba(16, 185, 129, 0.15);
-  --color-error: #EF4444;
-  --color-error-bg: rgba(239, 68, 68, 0.15);
+  /* Badges */
+  --color-badge-new-bg: rgba(245, 158, 11, 0.16);
+  --color-badge-new-text: #FBBF24;
+  --color-badge-new-border: rgba(245, 158, 11, 0.35);
+  --color-badge-handled-bg: rgba(16, 185, 129, 0.16);
+  --color-badge-handled-text: #34D399;
+  --color-badge-handled-border: rgba(16, 185, 129, 0.35);
+  --color-badge-brand-bg: rgba(197, 155, 39, 0.18);
+  --color-badge-brand-text: #E6CE85;
+  --color-badge-brand-border: rgba(197, 155, 39, 0.35);
 
-  /* Dark Shadows */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.65);
+  /* Buttons */
+  --color-btn-pri-bg: var(--color-brand);
+  --color-btn-pri-text: #0A0D12;
+  --color-btn-pri-hover: var(--color-brand-hover);
+  --color-btn-sec-bg: #273244;
+  --color-btn-sec-text: #F9FAFB;
+  --color-btn-sec-hover: #354359;
+  --color-btn-outline-bg: rgba(255, 255, 255, 0.03);
+  --color-btn-outline-text: var(--color-text-main);
+  --color-btn-outline-border: var(--color-border);
+  --color-btn-outline-hover-bg: rgba(197, 155, 39, 0.15);
+  --color-btn-outline-hover-text: var(--color-brand);
+  --color-btn-outline-hover-border: var(--color-brand);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.65);
+  --shadow-modal: 0 30px 80px rgba(0, 0, 0, 0.85);
 
   color-scheme: dark;
 }
 
-/* Automatic OS dark preference support when user has not set an explicit override */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --color-brand: #C59B27;
@@ -172,40 +211,75 @@
     --color-brand-active: #A88734;
     --color-brand-light: rgba(197, 155, 39, 0.15);
     --color-brand-muted: rgba(197, 155, 39, 0.1);
+    --color-brand-glow: rgba(197, 155, 39, 0.35);
 
-    --color-dark: #0D1117;
-    --color-dark-hover: #161B22;
-    --color-dark-surface: #161B22;
-    --color-pill-bg: #21262D;
-    --color-pill-hover: #30363D;
+    --color-bg-app: #0A0D12;
+    --color-bg-topbar: #121722;
+    --color-bg-sidebar: #0E1218;
+    --color-bg-sidebar-hover: #171E28;
+    --color-bg-sidebar-active: rgba(197, 155, 39, 0.18);
 
-    --color-bg: #090D12;
-    --color-bg-alt: #0F141C;
-    --color-bg-surface: #141A24;
-    --color-bg-card: #171E2A;
-    --color-bg-subtle: #1C2433;
+    --color-bg-card: #151B26;
+    --color-bg-card-subtle: #19202E;
+    --color-bg-card-header: #151B26;
+    --color-bg-empty: #121722;
+    --color-bg-stat: #151B26;
 
-    --color-border: #2B3545;
-    --color-border-light: #222B38;
-    --color-border-hover: #414F66;
-    --color-border-dark: #6B7280;
+    --color-bg-table-th: #101520;
+    --color-bg-table-tr-hover: rgba(197, 155, 39, 0.08);
+    --color-bg-table-tr-new: rgba(197, 155, 39, 0.04);
+
+    --color-bg-input: #1A2230;
+    --color-border-input: #2D394C;
+    --color-bg-input-focus: #1E2738;
+    --color-border-input-focus: var(--color-brand);
+
+    --color-bg-modal: #161D2A;
+    --color-bg-modal-header: #161D2A;
+    --color-bg-modal-footer: #111622;
+    --color-bg-modal-overlay: rgba(0, 0, 0, 0.75);
+
+    --color-border: #263244;
+    --color-border-subtle: #1C2534;
+    --color-border-hover: #3C4D66;
+    --color-border-dark: #64748B;
 
     --color-text-main: #F9FAFB;
     --color-text-body: #E5E7EB;
     --color-text-muted: #9CA3AF;
     --color-text-dim: #6B7280;
-    --color-text-white: #FFFFFF;
-    --color-text-white-muted: rgba(255, 255, 255, 0.85);
+    --color-text-placeholder: #6B7280;
+    --color-text-sidebar: #F3F4F6;
+    --color-text-sidebar-muted: #9CA3AF;
+    --color-text-inverse: #0A0D12;
 
-    --color-success: #10B981;
-    --color-success-bg: rgba(16, 185, 129, 0.15);
-    --color-error: #EF4444;
-    --color-error-bg: rgba(239, 68, 68, 0.15);
+    --color-badge-new-bg: rgba(245, 158, 11, 0.16);
+    --color-badge-new-text: #FBBF24;
+    --color-badge-new-border: rgba(245, 158, 11, 0.35);
+    --color-badge-handled-bg: rgba(16, 185, 129, 0.16);
+    --color-badge-handled-text: #34D399;
+    --color-badge-handled-border: rgba(16, 185, 129, 0.35);
+    --color-badge-brand-bg: rgba(197, 155, 39, 0.18);
+    --color-badge-brand-text: #E6CE85;
+    --color-badge-brand-border: rgba(197, 155, 39, 0.35);
 
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.65);
+    --color-btn-pri-bg: var(--color-brand);
+    --color-btn-pri-text: #0A0D12;
+    --color-btn-pri-hover: var(--color-brand-hover);
+    --color-btn-sec-bg: #273244;
+    --color-btn-sec-text: #F9FAFB;
+    --color-btn-sec-hover: #354359;
+    --color-btn-outline-bg: rgba(255, 255, 255, 0.03);
+    --color-btn-outline-text: var(--color-text-main);
+    --color-btn-outline-border: var(--color-border);
+    --color-btn-outline-hover-bg: rgba(197, 155, 39, 0.15);
+    --color-btn-outline-hover-text: var(--color-brand);
+    --color-btn-outline-hover-border: var(--color-brand);
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.65);
+    --shadow-modal: 0 30px 80px rgba(0, 0, 0, 0.85);
 
     color-scheme: dark;
   }

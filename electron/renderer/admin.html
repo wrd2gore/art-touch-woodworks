@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Art Touch Control Center GÇö Management &amp; Live Publishing</title>
+  <title>Art Touch Control Center - Management &amp; Live Publishing</title>
   
   <!-- Typography & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,8 +16,8 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/admin.css">
-  <link rel="stylesheet" href="css/rtl.css">
   <link rel="icon" type="image/png" href="images/logo/art-touch-logo.png">
+
   <script>
     window.getStoredPinSafe = function() {
       try {
@@ -44,22 +44,15 @@
       var errorEl = document.getElementById('admin-lock-error');
       var lockCard = document.getElementById('admin-lock-card');
       var lockScreen = document.getElementById('admin-lock-screen');
+      if (!input) return;
 
-      var val = input ? input.value.trim() : '7707';
-      var correctPin = window.getStoredPinSafe();
+      var val = (input.value || '').trim();
+      var validPin = window.getStoredPinSafe();
 
-      if (val === correctPin || val === '7707' || val === 'admin' || !val) {
-        try {
-          sessionStorage.setItem('arttouch_session_unlocked', 'true');
-        } catch(e) {}
-
-        if (errorEl) errorEl.style.display = 'none';
+      if (val === validPin || val === '7707' || val === 'admin') {
         if (lockScreen) {
           lockScreen.classList.add('is-unlocked', 'unlocked');
           lockScreen.style.setProperty('display', 'none', 'important');
-          lockScreen.style.setProperty('opacity', '0', 'important');
-          lockScreen.style.setProperty('visibility', 'hidden', 'important');
-          lockScreen.style.setProperty('pointer-events', 'none', 'important');
         }
         if (input) input.value = '';
       } else {
@@ -81,22 +74,18 @@
 
     window.openModal = function(id) {
       var el = document.getElementById(id);
-      if (el) {
-        el.classList.add('active', 'is-open');
-      }
+      if (el) el.classList.add('active', 'is-open');
     };
 
     window.closeModal = function(id) {
       var el = document.getElementById(id);
-      if (el) {
-        el.classList.remove('active', 'is-open');
-      }
+      if (el) el.classList.remove('active', 'is-open');
     };
   </script>
 </head>
 <body class="admin-body">
 
-  <!-- 0. ARCHITECTURAL PRIVATE LOCK SCREEN -->
+  <!-- 0. ARCHITECTURAL SECURITY LOCK SCREEN -->
   <div class="admin-lock-screen" id="admin-lock-screen">
     <div class="admin-lock-card" id="admin-lock-card">
       <div class="admin-lock-emblem">
@@ -104,31 +93,43 @@
       </div>
       
       <h1 class="admin-lock-title">ART TOUCH</h1>
-      <p class="admin-lock-sub">Architectural Woodworks &amp; Joinery GÇö Control Center</p>
+      <p class="admin-lock-sub">Architectural Woodworks &amp; Joinery - Control Center</p>
 
       <div class="admin-lock-pill">
         <i class="fa-solid fa-shield-halved"></i> <span>Authorized Staff Access Only</span>
       </div>
 
       <div id="admin-lock-form" class="admin-lock-form">
-        <div class="admin-lock-error" id="admin-lock-error" style="display: none;">
+        <div class="admin-lock-error" id="admin-lock-error" style="display: none; color: #EF4444; font-size: 12px; margin-bottom: 12px; align-items: center; justify-content: center; gap: 6px;">
           <i class="fa-solid fa-circle-exclamation"></i> <span id="admin-lock-error-text">Incorrect PIN. Master PIN is 7707.</span>
         </div>
 
         <div class="admin-lock-input-wrapper">
           <span class="admin-lock-key-icon"><i class="fa-solid fa-lock"></i></span>
           <input type="password" id="admin-lock-input" class="admin-lock-input" placeholder="Enter PIN (7707)" autocomplete="off" autofocus maxlength="20" oninput="if(this.value.trim()==='7707'||this.value.trim()===window.getStoredPinSafe()||this.value.trim()==='admin'){window.submitPinUnlock();}" onkeydown="if(event.key==='Enter'){event.preventDefault();window.submitPinUnlock();}">
-          <button type="button" class="admin-lock-eye-btn" onclick="window.togglePinVisibility('admin-lock-input', this)" title="Show/Hide PIN">
-            <i class="fa-solid fa-eye"></i>
-          </button>
         </div>
 
-        <button type="button" class="admin-lock-submit-btn" id="btn-unlock-admin" onclick="window.submitPinUnlock()">
+        <div class="admin-pin-keypad">
+          <button type="button" class="pin-key" onclick="document.getElementById('admin-lock-input').value+='1'">1</button>
+          <button type="button" class="pin-key" onclick="document.getElementById('admin-lock-input').value+='2'">2</button>
+          <button type="button" class="pin-key" onclick="document.getElementById('admin-lock-input').value+='3'">3</button>
+          <button type="button" class="pin-key" onclick="document.getElementById('admin-lock-input').value+='4'">4</button>
+          <button type="button" class="pin-key" onclick="document.getElementById('admin-lock-input').value+='5'">5</button>
+          <button type="button" class="pin-key" onclick="document.getElementById('admin-lock-input').value+='6'">6</button>
+          <button type="button" class="pin-key" onclick="document.getElementById('admin-lock-input').value+='7'">7</button>
+          <button type="button" class="pin-key" onclick="document.getElementById('admin-lock-input').value+='8'">8</button>
+          <button type="button" class="pin-key" onclick="document.getElementById('admin-lock-input').value+='9'">9</button>
+          <button type="button" class="pin-key" onclick="document.getElementById('admin-lock-input').value=''">C</button>
+          <button type="button" class="pin-key" onclick="document.getElementById('admin-lock-input').value+='0'">0</button>
+          <button type="button" class="pin-key" style="background: rgba(197, 155, 39, 0.3); color: #F9FAFB;" onclick="window.submitPinUnlock()"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+
+        <button type="button" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 4px;" id="btn-unlock-admin" onclick="window.submitPinUnlock()">
           <i class="fa-solid fa-key"></i> <span>Unlock Management App</span>
         </button>
       </div>
 
-      <div class="admin-lock-footer-note">
+      <div style="margin-top: 20px; font-size: 12px; color: #9CA3AF;">
         <i class="fa-solid fa-shield-check"></i> Private System &bull; Amman, Jordan
       </div>
     </div>
@@ -136,348 +137,304 @@
 
   <!-- 1. Admin Sidebar Navigation -->
   <aside class="admin-sidebar">
-    <a href="index.html" class="admin-sidebar-brand" title="Open Public Website">
+    <div class="admin-sidebar-brand">
       <img src="images/logo/art-touch-logo.png" alt="Art Touch">
       <div class="admin-sidebar-title">
         Art Touch
         <small>Control Center</small>
       </div>
-    </a>
+    </div>
 
     <nav class="admin-nav" id="admin-main-nav">
-      <button type="button" class="admin-nav-item active" id="nav-tab-inquiries" data-tab="inquiries" onclick="window.switchTab('inquiries')">
+      <button type="button" class="admin-nav-item active" id="nav-tab-inquiries" data-tab="inquiries">
         <i class="fa-solid fa-inbox"></i>
         <span>Customer Inquiries</span>
         <span class="admin-nav-badge" id="stat-unread-count">0</span>
       </button>
 
-      <button type="button" class="admin-nav-item" id="nav-tab-projects" data-tab="projects" onclick="window.switchTab('projects')">
+      <button type="button" class="admin-nav-item" id="nav-tab-projects" data-tab="projects">
         <i class="fa-solid fa-layer-group"></i>
         <span>Projects &amp; Galleries</span>
       </button>
 
-      <button type="button" class="admin-nav-item" id="nav-tab-services" data-tab="services" onclick="window.switchTab('services')">
+      <button type="button" class="admin-nav-item" id="nav-tab-services" data-tab="services">
         <i class="fa-solid fa-hammer"></i>
-        <span>Services &amp; Capabilities</span>
+        <span>Services</span>
       </button>
 
-      <button type="button" class="admin-nav-item" id="nav-tab-faqs" data-tab="faqs" onclick="window.switchTab('faqs')">
+      <button type="button" class="admin-nav-item" id="nav-tab-faqs" data-tab="faqs">
         <i class="fa-solid fa-circle-question"></i>
-        <span>Frequently Asked FAQs</span>
+        <span>FAQs</span>
       </button>
 
-      <button type="button" class="admin-nav-item" id="nav-tab-settings" data-tab="settings" onclick="window.switchTab('settings')">
+      <button type="button" class="admin-nav-item" id="nav-tab-settings" data-tab="settings">
         <i class="fa-solid fa-building"></i>
         <span>Company &amp; Hours</span>
       </button>
 
-      <button type="button" class="admin-nav-item" id="nav-tab-sync" data-tab="sync" onclick="window.switchTab('sync')">
+      <button type="button" class="admin-nav-item" id="nav-tab-sync" data-tab="sync">
         <i class="fa-solid fa-cloud-arrow-up"></i>
         <span>Publish to Website</span>
       </button>
     </nav>
 
     <div class="admin-sidebar-footer">
-      <button type="button" class="admin-sidebar-lock-btn" id="btn-sidebar-lock">
-        <i class="fa-solid fa-lock"></i> <span>Lock Control Center</span>
+      <div>
+        <span class="badge badge-brand"><i class="fa-solid fa-circle-check"></i> v1.0.0</span>
+      </div>
+      <button type="button" class="btn-lock-session" onclick="document.getElementById('admin-lock-screen').style.display='flex'; document.getElementById('admin-lock-screen').classList.remove('is-unlocked', 'unlocked');" title="Lock Screen">
+        <i class="fa-solid fa-lock"></i>
       </button>
-      <a href="https://wrd2gore.github.io/art-touch-woodworks/" target="_blank">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Website
-      </a>
-      <a href="https://wrd2gore.github.io/art-touch-woodworks/projects.html" target="_blank">
-        <i class="fa-solid fa-images"></i> View Live Portfolio
-      </a>
     </div>
   </aside>
 
-  <!-- 2. Main Admin Workspace -->
+  <!-- 2. Main Administration Area -->
   <main class="admin-main">
-    <!-- Topbar with Live Publish Action & Draft Indicator -->
+    <!-- Topbar -->
     <header class="admin-topbar">
       <div class="admin-page-heading">
-        <h2 id="admin-page-title">Customer Inquiries &amp; Requests</h2>
+        <h1 id="admin-page-title">Customer Inquiries &amp; Requests</h1>
         <p id="admin-page-sub">View and manage contact form submissions and quote requests.</p>
       </div>
-      
+
       <div class="admin-topbar-actions">
-        <!-- Draft vs. Published Indicator Badge -->
-        <div id="publish-status-badge" style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46;">
-          <i class="fa-solid fa-circle-check"></i> <span id="publish-status-text">Live Website Up to Date</span>
-        </div>
-
-        <!-- 1-Click Publish to Live Website Button -->
-        <button type="button" class="btn btn-primary btn-sm" id="btn-publish-header" onclick="window.publishToLiveWebsite()" style="box-shadow: 0 2px 6px rgba(168, 135, 52, 0.3);">
-          <i class="fa-solid fa-cloud-arrow-up"></i> <span>Publish Changes</span>
+        <button type="button" class="theme-toggle-btn" id="theme-toggle" title="Toggle Light / Dark Mode" aria-label="Toggle Theme">
+          <i class="fa-solid fa-moon"></i>
         </button>
 
-        <a href="https://wrd2gore.github.io/art-touch-woodworks/" target="_blank" class="btn btn-outline btn-sm" title="View Live Public Website">
-          <i class="fa-solid fa-globe"></i> <span>View Live Site</span>
-        </a>
-
-        <button type="button" class="lang-switch-btn" onclick="ArtTouchI18n.toggleLanguage()" title="Switch Language">
-          <i class="fa-solid fa-globe"></i> <span>+º+ä+¦+¦+¿+è+¬</span>
+        <button type="button" class="btn btn-outline btn-sm" id="btn-view-live" onclick="if(window.artTouchElectron && window.artTouchElectron.openExternal){window.artTouchElectron.openExternal('https://wrd2gore.github.io/art-touch-woodworks/');}else{window.open('https://wrd2gore.github.io/art-touch-woodworks/','_blank');}">
+          <i class="fa-solid fa-arrow-up-right-from-square text-brand"></i>
+          <span>View Live Site</span>
         </button>
 
-        <button type="button" class="btn-lock-session" id="btn-topbar-lock" title="Lock session">
-          <i class="fa-solid fa-lock"></i>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-quick-publish" onclick="window.switchTab('sync')">
+          <i class="fa-solid fa-rocket"></i>
+          <span>Publish Changes</span>
         </button>
       </div>
     </header>
 
-    <!-- Content Area -->
+    <!-- Workspace Content Area -->
     <div class="admin-content">
-      
-      <!-- Top Overview Stats -->
-      <div class="admin-stats-grid">
-        <div class="admin-stat-card">
-          <div class="admin-stat-info">
-            <div class="stat-num" id="stat-inquiries-count">0</div>
-            <div class="stat-lbl">Customer Requests</div>
+
+      <!-- ================================================================== -->
+      <!-- TAB 1: CUSTOMER INQUIRIES & QUOTES                                 -->
+      <!-- ================================================================== -->
+      <section id="section-inquiries" class="admin-section active">
+        <!-- Stats Summary Grid -->
+        <div class="admin-stats-grid">
+          <div class="admin-stat-card">
+            <div class="admin-stat-info">
+              <span class="stat-num" id="stat-total-inquiries">0</span>
+              <span class="stat-lbl">Total Inquiries</span>
+            </div>
+            <div class="admin-stat-icon primary"><i class="fa-solid fa-inbox"></i></div>
           </div>
-          <div class="admin-stat-icon primary"><i class="fa-solid fa-inbox"></i></div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-info">
+              <span class="stat-num" id="stat-new-inquiries">0</span>
+              <span class="stat-lbl">New Unread Requests</span>
+            </div>
+            <div class="admin-stat-icon warning"><i class="fa-solid fa-bell"></i></div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-info">
+              <span class="stat-num" id="stat-handled-inquiries">0</span>
+              <span class="stat-lbl">Handled / Answered</span>
+            </div>
+            <div class="admin-stat-icon success"><i class="fa-solid fa-circle-check"></i></div>
+          </div>
+
+          <div class="admin-stat-card">
+            <div class="admin-stat-info">
+              <span class="stat-num" id="stat-cloud-status">Cloud Sync</span>
+              <span class="stat-lbl" id="stat-cloud-sub">Supabase Secure RLS</span>
+            </div>
+            <div class="admin-stat-icon dark"><i class="fa-solid fa-database"></i></div>
+          </div>
         </div>
 
-        <div class="admin-stat-card">
-          <div class="admin-stat-info">
-            <div class="stat-num" id="stat-projects-count">14</div>
-            <div class="stat-lbl">Active Projects</div>
-          </div>
-          <div class="admin-stat-icon success"><i class="fa-solid fa-folder-tree"></i></div>
-        </div>
-
-        <div class="admin-stat-card">
-          <div class="admin-stat-info">
-            <div class="stat-num" id="stat-services-count">6</div>
-            <div class="stat-lbl">Core Services</div>
-          </div>
-          <div class="admin-stat-info-icon admin-stat-icon dark"><i class="fa-solid fa-hammer"></i></div>
-        </div>
-
-        <div class="admin-stat-card">
-          <div class="admin-stat-info">
-            <div class="stat-num" id="stat-faqs-count">5</div>
-            <div class="stat-lbl">Client FAQs</div>
-          </div>
-          <div class="admin-stat-icon warning"><i class="fa-solid fa-circle-question"></i></div>
-        </div>
-      </div>
-
-      <!-- SECTION 1: INQUIRIES & REQUESTS HUB -->
-      <section id="section-inquiries">
+        <!-- Inquiries Table Card -->
         <div class="admin-card">
           <div class="admin-card-header">
-            <h3 class="admin-card-title">Submitted Client Requests &amp; Quote Inquiries</h3>
-            
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-              <input type="text" id="inquiries-search" class="form-control" placeholder="Search by name, email, subject..." style="width: 240px; padding: 8px 12px; font-size: 13px;">
-              
-              <select id="inquiries-filter" class="form-control" style="width: 150px; padding: 8px 12px; font-size: 13px;">
+            <div class="admin-card-title">
+              <i class="fa-solid fa-list-check text-brand"></i>
+              <span>Customer Inquiries &amp; Quote Submissions</span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <!-- Search and Filter -->
+              <input type="text" id="input-search-inquiries" class="form-control" placeholder="Search by name, email, phone..." style="width: 240px; padding: 8px 12px; font-size: 13px;">
+
+              <select id="select-filter-status" class="form-control" style="width: 150px; padding: 8px 12px; font-size: 13px;">
                 <option value="all">All Inquiries</option>
-                <option value="contact">Contact Forms</option>
-                <option value="quote">Quote Estimates</option>
-                <option value="new">Status: New</option>
-                <option value="handled">Status: Handled</option>
+                <option value="new">New Requests</option>
+                <option value="handled">Handled</option>
               </select>
 
-              <button type="button" class="btn btn-secondary btn-sm" id="btn-export-csv" onclick="window.exportInquiriesCSV()">
-                <i class="fa-solid fa-file-export"></i> Export CSV
+              <button type="button" class="btn btn-primary btn-sm" id="btn-sync-cloud" onclick="window.syncInquiriesFromBackend(false)">
+                <i class="fa-solid fa-rotate"></i> Sync Cloud
               </button>
 
-              <button type="button" class="btn btn-outline btn-sm" onclick="window.clearHandledInquiries()" title="Clear handled inquiries">
+              <button type="button" class="btn btn-outline btn-sm" onclick="window.openSupabaseBackendModal()">
+                <i class="fa-solid fa-sliders"></i> Database Setup
+              </button>
+
+              <button type="button" class="btn btn-outline btn-sm" onclick="window.exportInquiriesCsv()">
+                <i class="fa-solid fa-file-csv"></i> Export CSV
+              </button>
+
+              <button type="button" class="btn btn-outline btn-sm" onclick="window.clearHandledInquiries()">
                 <i class="fa-solid fa-trash-can"></i> Clear Handled
               </button>
             </div>
           </div>
 
           <div class="admin-table-wrapper">
-            <table class="admin-table">
+            <table class="admin-table" id="table-inquiries">
               <thead>
                 <tr>
+                  <th style="width: 110px;">Status</th>
+                  <th style="width: 100px;">Type</th>
                   <th>Client Name</th>
-                  <th>Type</th>
                   <th>Contact Info</th>
-                  <th>Subject / Scope</th>
-                  <th>Submitted At</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th>Subject / Project</th>
+                  <th style="width: 150px;">Date &amp; Time</th>
+                  <th style="width: 160px; text-align: right;">Actions</th>
                 </tr>
               </thead>
-              <tbody id="inquiries-tbody">
-                <!-- Dynamically populated by js/admin.js -->
+              <tbody id="inquiries-table-body">
+                <!-- Populated via admin.js -->
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 2: PROJECTS & DEDICATED GALLERIES -->
-      <section id="section-projects" style="display: none;">
+      <!-- ================================================================== -->
+      <!-- TAB 2: PROJECTS & PHOTO GALLERIES                                  -->
+      <!-- ================================================================== -->
+      <section id="section-projects" class="admin-section" style="display: none;">
         <div class="admin-card">
           <div class="admin-card-header">
-            <h3 class="admin-card-title">Portfolio Projects &amp; Dedicated Galleries</h3>
-            
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-              <input type="text" id="projects-admin-search" class="form-control" placeholder="Search projects..." style="width: 220px; padding: 8px 12px; font-size: 13px;">
-              
-              <select id="projects-admin-category-filter" class="form-control" style="width: 180px; padding: 8px 12px; font-size: 13px;">
-                <option value="all">All Categories</option>
-                <option value="Banks">BANKS</option>
-                <option value="Commercial">Commercial</option>
-                <option value="Residential">Residential</option>
-                <option value="Embassies">EMBASSIES</option>
-                <option value="Government Projects">Government Projects</option>
-              </select>
+            <div class="admin-card-title">
+              <i class="fa-solid fa-layer-group text-brand"></i>
+              <span>Official Projects Portfolio</span>
+            </div>
 
-              <button type="button" class="btn btn-primary btn-sm" id="btn-add-new-project" onclick="window.openNewProjectModal()">
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <input type="text" id="input-search-projects" class="form-control" placeholder="Search projects by title, client..." style="width: 260px; font-size: 13px;">
+              <button type="button" class="btn btn-primary btn-sm" onclick="window.openProjectModal()">
                 <i class="fa-solid fa-plus"></i> Add New Project
               </button>
-
-              <button type="button" class="btn btn-outline btn-sm" onclick="window.restoreDefaultProjects()" title="Restore all 14 official verified projects">
-                <i class="fa-solid fa-rotate-left"></i> Restore 14 Default Projects
-              </button>
             </div>
           </div>
 
           <div class="admin-card-body">
-            <div class="admin-projects-grid" id="admin-projects-grid-container">
-              <!-- Dynamically populated by js/admin.js -->
+            <div class="admin-projects-grid" id="projects-grid-container">
+              <!-- Populated via admin.js -->
             </div>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 3: SERVICES & CAPABILITIES -->
-      <section id="section-services" style="display: none;">
+      <!-- ================================================================== -->
+      <!-- TAB 3: SERVICES & CAPABILITIES                                     -->
+      <!-- ================================================================== -->
+      <section id="section-services" class="admin-section" style="display: none;">
         <div class="admin-card">
           <div class="admin-card-header">
-            <h3 class="admin-card-title">Woodwork Services &amp; Capabilities</h3>
-            <button type="button" class="btn btn-primary btn-sm" onclick="window.openNewServiceModal()">
-              <i class="fa-solid fa-plus"></i> Add Service
+            <div class="admin-card-title">
+              <i class="fa-solid fa-hammer text-brand"></i>
+              <span>Woodwork Services &amp; Capabilities</span>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-sm" onclick="window.openServiceModal()">
+              <i class="fa-solid fa-plus"></i> Add New Service
             </button>
           </div>
+
           <div class="admin-card-body">
-            <div class="admin-services-grid" id="admin-services-grid-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;">
-              <!-- Dynamically populated by js/admin.js -->
+            <div class="admin-projects-grid" id="services-grid-container">
+              <!-- Populated via admin.js -->
             </div>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 4: FREQUENTLY ASKED QUESTIONS -->
-      <section id="section-faqs" style="display: none;">
+      <!-- ================================================================== -->
+      <!-- TAB 4: FREQUENTLY ASKED QUESTIONS (FAQS)                          -->
+      <!-- ================================================================== -->
+      <section id="section-faqs" class="admin-section" style="display: none;">
         <div class="admin-card">
           <div class="admin-card-header">
-            <h3 class="admin-card-title">Frequently Asked Questions (FAQs)</h3>
-            <button type="button" class="btn btn-primary btn-sm" onclick="window.openNewFaqModal()">
-              <i class="fa-solid fa-plus"></i> Add FAQ
+            <div class="admin-card-title">
+              <i class="fa-solid fa-circle-question text-brand"></i>
+              <span>Client FAQs &amp; Clarifications</span>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-sm" onclick="window.openFaqModal()">
+              <i class="fa-solid fa-plus"></i> Add New FAQ
             </button>
           </div>
-          <div class="admin-card-body">
-            <div id="admin-faqs-list" style="display: flex; flex-direction: column; gap: 12px;">
-              <!-- Dynamically populated by js/admin.js -->
-            </div>
+
+          <div class="admin-card-body" id="faqs-list-container">
+            <!-- Populated via admin.js -->
           </div>
         </div>
       </section>
 
-      <!-- SECTION 5: BUSINESS & CONTACT SETTINGS -->
-      <section id="section-settings" style="display: none;">
-        <div class="admin-card" style="max-width: 800px;">
+      <!-- ================================================================== -->
+      <!-- TAB 5: COMPANY & BUSINESS INFO                                     -->
+      <!-- ================================================================== -->
+      <section id="section-settings" class="admin-section" style="display: none;">
+        <div class="admin-card">
           <div class="admin-card-header">
-            <h3 class="admin-card-title"><i class="fa-solid fa-building"></i> Company Information &amp; Operating Hours</h3>
-            <button type="button" class="btn btn-primary btn-sm" onclick="window.saveBusinessSettings()">
-              <i class="fa-solid fa-floppy-disk"></i> Save Info
-            </button>
+            <div class="admin-card-title">
+              <i class="fa-solid fa-building text-brand"></i>
+              <span>Company Information &amp; Official Contact Channels</span>
+            </div>
           </div>
+
           <div class="admin-card-body">
-            <form id="form-business-settings" onsubmit="return false;">
-              <div class="form-row">
+            <form id="form-company-settings" onsubmit="event.preventDefault(); window.saveCompanySettings();">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
                 <div class="form-group">
-                  <label class="form-label">Workshop Location</label>
-                  <input type="text" id="setting-location" class="form-control" value="Nadhmi Abdul Hadi St., Amman, Jordan">
+                  <label class="form-label">Official Business Name (English)</label>
+                  <input type="text" id="setting-company-name" class="form-control" value="Art Touch for Wood Works">
                 </div>
+
                 <div class="form-group">
-                  <label class="form-label">Primary Phone Contact</label>
+                  <label class="form-label">Official Business Name (Arabic)</label>
+                  <input type="text" id="setting-company-name-ar" class="form-control" value="Ù„Ù…Ø³Ø© ÙÙ† Ù„Ø£Ø¹Ù…Ø§Ù„ Ø§Ù„Ø®Ø´Ø¨">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Official Telephone Hotline</label>
                   <input type="text" id="setting-phone" class="form-control" value="+962 (6) 222 3 707">
                 </div>
-              </div>
 
-              <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label">Operating Days</label>
-                  <input type="text" id="setting-days" class="form-control" value="Sunday - Thursday">
+                  <label class="form-label">Plant Operations &amp; Estimation Email</label>
+                  <input type="email" id="setting-email" class="form-control" value="info@arttouchwood.com">
                 </div>
-                <div class="form-group">
-                  <label class="form-label">Operating Hours (Jordan Local Time)</label>
-                  <input type="text" id="setting-hours" class="form-control" value="09:00 AM - 06:00 PM">
-                </div>
-              </div>
 
-              <div class="form-group">
-                <label class="form-label">General Contact Email</label>
-                <input type="email" id="setting-email-general" class="form-control" value="info@arttouchjo.com">
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">General Manager Email</label>
-                  <input type="email" id="setting-email-gm" class="form-control" value="m.shaheen@arttouchjo.com">
+                <div class="form-group" style="grid-column: 1 / -1;">
+                  <label class="form-label">Factory &amp; Head Office Physical Location</label>
+                  <input type="text" id="setting-location" class="form-control" value="King Abdullah II Industrial Estate, Sahab, Amman, Jordan">
                 </div>
-                <div class="form-group">
-                  <label class="form-label">CEO &amp; Plant Manager Email</label>
-                  <input type="email" id="setting-email-ceo" class="form-control" value="m.maghari@arttouchjo.com">
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
 
-        <!-- Security & PIN Management Card -->
-        <div class="admin-card" style="max-width: 800px; margin-top: 24px;">
-          <div class="admin-card-header">
-            <h3 class="admin-card-title"><i class="fa-solid fa-shield-halved" style="color: #A88734;"></i> Security &amp; PIN Access</h3>
-            <span id="active-pin-badge" style="font-size: 12px; font-weight: 600; padding: 4px 10px; background: #ECFDF5; border: 1px solid #A7F3D0; color: #047857; border-radius: 20px;">
-              <i class="fa-solid fa-lock"></i> PIN Protected
-            </span>
-          </div>
-          <div class="admin-card-body">
-            <p style="font-size: 13px; color: var(--color-admin-text-muted); margin-bottom: 16px;">
-              Manage the PIN required to unlock this control center. Keep this PIN confidential among authorized staff.
-            </p>
-
-            <form id="form-security-settings" onsubmit="return false;">
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Current PIN</label>
-                  <div style="position: relative;">
-                    <input type="password" id="input-current-pin" class="form-control" placeholder="Current PIN (Default: 7707)" autocomplete="current-password" style="padding-right: 40px;">
-                    <button type="button" class="btn-toggle-pin-visibility" onclick="window.togglePinVisibility('input-current-pin', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #9CA3AF; cursor: pointer;" title="Show/Hide PIN">
-                      <i class="fa-solid fa-eye"></i>
-                    </button>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">New PIN</label>
-                  <div style="position: relative;">
-                    <input type="password" id="input-new-pin" class="form-control" placeholder="Enter new PIN" autocomplete="new-password" style="padding-right: 40px;">
-                    <button type="button" class="btn-toggle-pin-visibility" onclick="window.togglePinVisibility('input-new-pin', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #9CA3AF; cursor: pointer;" title="Show/Hide PIN">
-                      <i class="fa-solid fa-eye"></i>
-                    </button>
-                  </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                  <label class="form-label">Factory Working Hours</label>
+                  <input type="text" id="setting-hours" class="form-control" value="Saturday â€“ Thursday: 8:00 AM â€“ 5:30 PM (Friday Closed)">
                 </div>
               </div>
 
-              <div id="security-alert-msg" style="display: none; padding: 12px 16px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; font-weight: 500;"></div>
-
-              <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                <button type="button" class="btn btn-primary btn-sm" id="btn-update-pin" onclick="window.updateSecurityPin()">
-                  <i class="fa-solid fa-key"></i> Save New PIN
-                </button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="window.resetPinToDefault()">
-                  <i class="fa-solid fa-rotate-left"></i> Reset to Default (7707)
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="window.lockAdminControlCenter()" title="Lock immediately to test your PIN">
-                  <i class="fa-solid fa-lock"></i> Lock App Now
+              <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Business Information
                 </button>
               </div>
             </form>
@@ -485,363 +442,157 @@
         </div>
       </section>
 
-      <!-- SECTION 6: PUBLISH & DEPLOYMENT CENTER -->
-      <section id="section-sync" style="display: none;">
-        
-        <!-- Main Publishing Control Card -->
-        <div class="admin-card" style="margin-bottom: 24px; border-top: 4px solid var(--color-brand);">
-          <div class="admin-card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-            <div>
-              <h3 class="admin-card-title" style="font-size: 17px;"><i class="fa-solid fa-cloud-arrow-up text-brand"></i> Live Website Deployment Center</h3>
-              <p style="font-size: 12px; color: var(--color-admin-text-muted); margin: 2px 0 0 0;">
-                Push all draft projects, services, FAQs, and contact settings to the live GitHub Pages website in one atomic commit.
-              </p>
+      <!-- ================================================================== -->
+      <!-- TAB 6: 1-CLICK LIVE PUBLISHING TO GITHUB PAGES                     -->
+      <!-- ================================================================== -->
+      <section id="section-sync" class="admin-section" style="display: none;">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div class="admin-card-title">
+              <i class="fa-solid fa-rocket text-brand"></i>
+              <span>Live Website Deployment (GitHub Pages)</span>
             </div>
-            <div style="display: flex; gap: 10px;">
-              <a href="https://wrd2gore.github.io/art-touch-woodworks/" target="_blank" class="btn btn-outline btn-sm">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Website Gåù
-              </a>
-              <button type="button" class="btn btn-primary btn-sm" onclick="window.publishToLiveWebsite()" style="box-shadow: 0 2px 6px rgba(168, 135, 52, 0.3);">
-                <i class="fa-solid fa-rocket"></i> Publish Changes Now
-              </button>
-            </div>
+            <span class="badge badge-brand"><i class="fa-solid fa-globe"></i> Production Pipeline</span>
           </div>
 
           <div class="admin-card-body">
-            <!-- Changes Summary Grid -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
-              <div style="background: #F9FAFB; border: 1px solid var(--color-admin-border); border-radius: 8px; padding: 14px 18px;">
-                <div style="font-size: 11px; color: var(--color-admin-text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Projects Ready</div>
-                <div style="font-size: 20px; font-weight: 700; color: var(--color-admin-text); margin-top: 4px;" id="sync-sum-projects">14 Projects</div>
-              </div>
-              <div style="background: #F9FAFB; border: 1px solid var(--color-admin-border); border-radius: 8px; padding: 14px 18px;">
-                <div style="font-size: 11px; color: var(--color-admin-text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Services Ready</div>
-                <div style="font-size: 20px; font-weight: 700; color: var(--color-admin-text); margin-top: 4px;" id="sync-sum-services">6 Divisions</div>
-              </div>
-              <div style="background: #F9FAFB; border: 1px solid var(--color-admin-border); border-radius: 8px; padding: 14px 18px;">
-                <div style="font-size: 11px; color: var(--color-admin-text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Client FAQs</div>
-                <div style="font-size: 20px; font-weight: 700; color: var(--color-admin-text); margin-top: 4px;" id="sync-sum-faqs">5 FAQs</div>
-              </div>
-              <div style="background: #F9FAFB; border: 1px solid var(--color-admin-border); border-radius: 8px; padding: 14px 18px;">
-                <div style="font-size: 11px; color: var(--color-admin-text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">GitHub Authorization</div>
-                <div style="font-size: 13px; font-weight: 700; color: #059669; margin-top: 6px;"><i class="fa-solid fa-circle-check"></i> Connected &amp; Ready</div>
-              </div>
-            </div>
+            <p style="font-size: 14px; color: var(--color-text-body); margin-bottom: 20px; line-height: 1.6;">
+              When you make changes to projects, services, FAQs, or company info in this Control Center, click <strong>Publish Live to Website</strong>. This creates an authenticated, verified commit directly to the <code>main</code> branch with automatic cache-busting, updating the public website in under 60 seconds.
+            </p>
 
-            <!-- Live Status Bar -->
-            <div style="background: #F3F4F6; border-radius: 6px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 12px;">
-              <div>
-                <span style="color: var(--color-admin-text-muted);">Target Branches:</span>
-                <strong style="color: var(--color-admin-text); margin-left: 4px;">main &amp; master</strong>
-                <span style="margin: 0 8px; color: #CBD5E1;">&bull;</span>
-                <span style="color: var(--color-admin-text-muted);">Repository:</span>
-                <strong style="color: var(--color-admin-text); margin-left: 4px;">wrd2gore/art-touch-woodworks</strong>
-              </div>
-              <div>
-                <span style="color: var(--color-admin-text-muted);">Live URL:</span>
-                <a href="https://wrd2gore.github.io/art-touch-woodworks/" target="_blank" style="color: var(--color-brand); font-weight: 600; text-decoration: underline; margin-left: 4px;">
-                  wrd2gore.github.io/art-touch-woodworks Gåù
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Draft vs Live Synchronization Breakdown -->
-        <div class="admin-card" style="margin-bottom: 24px;">
-          <div class="admin-card-header">
-            <h3 class="admin-card-title"><i class="fa-solid fa-scale-balanced"></i> Draft vs. Live Content Synchronization</h3>
-          </div>
-          <div class="admin-card-body" style="padding: 20px;">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-              <!-- Live State Column -->
-              <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 8px; padding: 16px;">
-                <div style="font-size: 13px; font-weight: 700; color: #065F46; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-                  <i class="fa-solid fa-globe"></i> CURRENT LIVE WEBSITE
-                </div>
-                <div style="font-size: 13px; color: #047857; line-height: 1.7;" id="live-summary-box">
-                  <div><strong>Live Projects:</strong> <span id="live-sum-projects">14 verified projects</span></div>
-                  <div><strong>Live Services:</strong> <span id="live-sum-services">6 core services</span></div>
-                  <div><strong>Live FAQs:</strong> <span id="live-sum-faqs">5 client FAQs</span></div>
-                  <div><strong>Live Phone:</strong> <span id="live-sum-phone">+962 (6) 222 3 707</span></div>
-                </div>
-              </div>
-
-              <!-- Draft State Column -->
-              <div style="background: #FFFDF9; border: 1px solid #FDE68A; border-radius: 8px; padding: 16px;">
-                <div style="font-size: 13px; font-weight: 700; color: #92400E; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-                  <i class="fa-solid fa-pen-ruler"></i> YOUR WORKSPACE / DRAFT
-                </div>
-                <div style="font-size: 13px; color: #78350F; line-height: 1.7;" id="draft-summary-box">
-                  <div><strong>Draft Projects:</strong> <span id="draft-sum-projects">14 projects</span></div>
-                  <div><strong>Draft Services:</strong> <span id="draft-sum-services">6 services</span></div>
-                  <div><strong>Draft FAQs:</strong> <span id="draft-sum-faqs">5 FAQs</span></div>
-                  <div><strong>Draft Phone:</strong> <span id="draft-sum-phone">+962 (6) 222 3 707</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Publish History Card -->
-        <div class="admin-card" style="margin-bottom: 24px;">
-          <div class="admin-card-header">
-            <div>
-              <h3 class="admin-card-title"><i class="fa-solid fa-clock-rotate-left"></i> Publish History</h3>
-              <p style="font-size: 12px; color: var(--color-admin-text-muted); margin: 2px 0 0 0;">
-                Log of published deployments, commit hashes, and verification statuses.
+            <div style="background: var(--color-bg-card-subtle); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 20px; margin-bottom: 24px;">
+              <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 12px; color: var(--color-text-main);">
+                <i class="fa-solid fa-key text-brand"></i> GitHub Access Token (Securely Stored in Windows DPAPI)
+              </h3>
+              <p style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 16px;">
+                Your GitHub token is encrypted via Windows DPAPI (<code>safeStorage</code>) and never committed or exposed publicly.
               </p>
-            </div>
-            <button type="button" class="btn btn-outline btn-xs" onclick="window.clearPublishHistory()">
-              <i class="fa-solid fa-trash"></i> Clear Log
-            </button>
-          </div>
-          <div class="admin-table-wrapper">
-            <table class="admin-table">
-              <thead>
-                <tr>
-                  <th>Date &amp; Time</th>
-                  <th>Changed Content</th>
-                  <th>GitHub Commit</th>
-                  <th>Deployment Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="publish-history-tbody">
-                <!-- Dynamically populated by js/admin.js -->
-              </tbody>
-            </table>
-          </div>
-        </div>
 
-        <!-- Direct Export / Backup -->
-        <div class="admin-card">
-          <div class="admin-card-header">
-            <h3 class="admin-card-title"><i class="fa-solid fa-code"></i> Live Database Backup (js/data.js)</h3>
-            <div style="display: flex; gap: 10px;">
-              <button type="button" class="btn btn-secondary btn-sm" onclick="window.downloadDataJs()">
-                <i class="fa-solid fa-download"></i> Download data.js Backup
-              </button>
-              <button type="button" class="btn btn-outline btn-sm" onclick="window.copyDataJsCode()">
-                <i class="fa-solid fa-copy"></i> Copy Code
-              </button>
+              <div style="display: flex; gap: 12px; align-items: center; max-width: 600px;">
+                <input type="password" id="input-github-token" class="form-control" placeholder="ghp_... or github_pat_..." style="font-family: var(--font-mono); font-size: 13px;">
+                <button type="button" class="btn btn-primary btn-sm" id="btn-save-token" onclick="window.saveAndTestGithubToken()">
+                  <i class="fa-solid fa-shield-check"></i> Save &amp; Test Token
+                </button>
+              </div>
+              <div id="token-status-message" style="margin-top: 8px; font-size: 12px;"></div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div class="form-group">
+                <label class="form-label">Custom Commit Note (Optional)</label>
+                <input type="text" id="input-commit-note" class="form-control" placeholder="e.g. Added 2 luxury villa woodwork projects and updated contact phone">
+              </div>
+
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <button type="button" class="btn btn-primary" id="btn-trigger-publish" onclick="window.startLivePublish()" style="padding: 14px 28px; font-size: 15px;">
+                  <i class="fa-solid fa-rocket"></i> Publish Live to Website Now
+                </button>
+
+                <button type="button" class="btn btn-outline" onclick="window.refreshMasterDataFromLocal()">
+                  <i class="fa-solid fa-rotate-left"></i> Discard Unsaved Changes
+                </button>
+              </div>
             </div>
           </div>
         </div>
-
       </section>
 
     </div>
   </main>
 
-  <!-- MODAL 5: Live Publishing Progress & Live CDN Verification -->
-  <div class="admin-modal-overlay" id="modal-publish-progress" role="dialog" aria-modal="true">
-    <div class="admin-modal" style="max-width: 580px;">
-      <div class="admin-modal-header">
-        <h3 class="admin-modal-title" id="publish-progress-modal-title">
-          <i class="fa-solid fa-cloud-arrow-up text-brand"></i> Publishing to Live Website
-        </h3>
-        <button type="button" class="btn-close admin-modal-close" id="btn-close-publish-modal" onclick="window.closeModal('modal-publish-progress')">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      <div class="admin-modal-body" style="padding: 24px;">
-        
-        <!-- Live Publishing Step List -->
-        <div class="publish-steps-list" id="publish-steps-list" style="display: flex; flex-direction: column; gap: 14px;">
-          
-          <div class="publish-step-row" id="step-row-1" style="display: flex; align-items: center; gap: 12px; font-size: 14px;">
-            <div class="step-icon-box" id="step-icon-1" style="width: 28px; height: 28px; border-radius: 50%; background: #F3F4F6; color: #9CA3AF; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">1</div>
-            <div class="step-text" style="flex: 1;"><strong>Preparing changes...</strong> <span class="step-desc" style="display: block; font-size: 12px; color: var(--color-admin-text-muted);">Packaging projects, services, FAQs, and business data</span></div>
-            <div class="step-status" id="step-status-1"><i class="fa-solid fa-circle-notch fa-spin text-brand" style="display: none;"></i></div>
-          </div>
-
-          <div class="publish-step-row" id="step-row-2" style="display: flex; align-items: center; gap: 12px; font-size: 14px;">
-            <div class="step-icon-box" id="step-icon-2" style="width: 28px; height: 28px; border-radius: 50%; background: #F3F4F6; color: #9CA3AF; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">2</div>
-            <div class="step-text" style="flex: 1;"><strong>Compiling static website files...</strong> <span class="step-desc" style="display: block; font-size: 12px; color: var(--color-admin-text-muted);">Compiling projects.html, services.html, index.html & js/data.js</span></div>
-            <div class="step-status" id="step-status-2"></div>
-          </div>
-
-          <div class="publish-step-row" id="step-row-3" style="display: flex; align-items: center; gap: 12px; font-size: 14px;">
-            <div class="step-icon-box" id="step-icon-3" style="width: 28px; height: 28px; border-radius: 50%; background: #F3F4F6; color: #9CA3AF; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">3</div>
-            <div class="step-text" style="flex: 1;"><strong>Updating GitHub repository...</strong> <span class="step-desc" style="display: block; font-size: 12px; color: var(--color-admin-text-muted);">Pushing database to main and master branches</span></div>
-            <div class="step-status" id="step-status-3"></div>
-          </div>
-
-          <div class="publish-step-row" id="step-row-4" style="display: flex; align-items: center; gap: 12px; font-size: 14px;">
-            <div class="step-icon-box" id="step-icon-4" style="width: 28px; height: 28px; border-radius: 50%; background: #F3F4F6; color: #9CA3AF; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">4</div>
-            <div class="step-text" style="flex: 1;"><strong>Creating commit...</strong> <span class="step-desc" id="commit-sha-text" style="display: block; font-size: 12px; color: var(--color-admin-text-muted);">Generating verified Git SHA</span></div>
-            <div class="step-status" id="step-status-4"></div>
-          </div>
-
-          <div class="publish-step-row" id="step-row-5" style="display: flex; align-items: center; gap: 12px; font-size: 14px;">
-            <div class="step-icon-box" id="step-icon-5" style="width: 28px; height: 28px; border-radius: 50%; background: #F3F4F6; color: #9CA3AF; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">5</div>
-            <div class="step-text" style="flex: 1;"><strong>Deploying website...</strong> <span class="step-desc" style="display: block; font-size: 12px; color: var(--color-admin-text-muted);">Triggering GitHub Pages CDN deployment</span></div>
-            <div class="step-status" id="step-status-5"></div>
-          </div>
-
-          <div class="publish-step-row" id="step-row-6" style="display: flex; align-items: center; gap: 12px; font-size: 14px;">
-            <div class="step-icon-box" id="step-icon-6" style="width: 28px; height: 28px; border-radius: 50%; background: #F3F4F6; color: #9CA3AF; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">6</div>
-            <div class="step-text" style="flex: 1;"><strong>Verifying live website...</strong> <span class="step-desc" id="verify-live-text" style="display: block; font-size: 12px; color: var(--color-admin-text-muted);">Testing live public URL response</span></div>
-            <div class="step-status" id="step-status-6"></div>
-          </div>
-
-        </div>
-
-        <!-- Result Box (Success / Error) -->
-        <div id="publish-result-banner" style="display: none; margin-top: 20px; padding: 16px; border-radius: 6px; font-size: 13px; line-height: 1.5;"></div>
-
-      </div>
-      <div class="admin-modal-footer" id="publish-modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
-        <span id="publish-timer-label" style="font-size: 12px; color: var(--color-admin-text-muted);"></span>
-        <div style="display: flex; gap: 8px;">
-          <button type="button" class="btn btn-outline btn-sm" onclick="window.closeModal('modal-publish-progress')">
-            Close
-          </button>
-          <a href="https://wrd2gore.github.io/art-touch-woodworks/projects.html" target="_blank" class="btn btn-outline btn-sm" id="btn-view-published-site" style="display: none;">
-            <i class="fa-solid fa-globe"></i> Open Live Site
-          </a>
-          <button type="button" class="btn btn-primary btn-sm" id="btn-done-publish" onclick="window.closeModal('modal-publish-progress')" style="display: none;">
-            Done
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL 1: Project Editor & Dedicated Gallery Manager -->
+  <!-- ==================================================================== -->
+  <!-- MODAL: PROJECT EDITOR                                                -->
+  <!-- ==================================================================== -->
   <div class="admin-modal-overlay" id="modal-project-editor" role="dialog" aria-modal="true">
-    <div class="admin-modal">
+    <div class="admin-modal" style="max-width: 760px;">
       <div class="admin-modal-header">
-        <h3 class="admin-modal-title" id="project-modal-title">Edit Project</h3>
-        <button type="button" class="btn-close admin-modal-close" onclick="window.closeModal('modal-project-editor')"><i class="fa-solid fa-xmark"></i></button>
+        <h2 class="admin-modal-title" id="modal-project-title">Edit Project</h2>
+        <button type="button" class="admin-modal-close" onclick="window.closeModal('modal-project-editor')">&times;</button>
       </div>
       <div class="admin-modal-body">
-        <form id="form-project-editor" onsubmit="window.saveProjectFromModal(event); return false;">
+        <form id="form-project-editor" onsubmit="event.preventDefault(); window.saveProjectForm();">
           <input type="hidden" id="edit-project-id">
           
-          <div class="form-row">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
             <div class="form-group">
-              <label class="form-label">Project Title <span class="req">*</span></label>
-              <input type="text" id="edit-project-title" class="form-control" placeholder="e.g. Bank al Etihad" required>
+              <label class="form-label">Project Title (English) <span class="req">*</span></label>
+              <input type="text" id="edit-project-title" class="form-control" required>
             </div>
             <div class="form-group">
-              <label class="form-label">Category <span class="req">*</span></label>
-              <select id="edit-project-category" class="form-control" required>
-                <option value="Banks">BANKS</option>
-                <option value="Commercial">Commercial</option>
-                <option value="Residential">Residential</option>
-                <option value="Embassies">EMBASSIES</option>
-                <option value="Government Projects">Government Projects</option>
+              <label class="form-label">Project Title (Arabic) <span class="req">*</span></label>
+              <input type="text" id="edit-project-title-ar" class="form-control" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select id="edit-project-category" class="form-control">
+                <option value="residential">Residential</option>
+                <option value="commercial">Commercial</option>
+                <option value="doors">Luxury Doors</option>
+                <option value="fit-out">Interior Fit-Out</option>
+                <option value="custom">Bespoke Furniture</option>
               </select>
             </div>
-          </div>
-
-          <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Location</label>
-              <input type="text" id="edit-project-location" class="form-control" placeholder="e.g. Amman, Jordan">
+              <label class="form-label">Client Name</label>
+              <input type="text" id="edit-project-client" class="form-control">
             </div>
             <div class="form-group">
-              <label class="form-label">Date Completed / Year</label>
-              <input type="text" id="edit-project-date" class="form-control" placeholder="e.g. 2023">
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Area (sqm)</label>
-              <input type="text" id="edit-project-area" class="form-control" placeholder="e.g. 200 sqm">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Cover Image Path</label>
-              <input type="text" id="edit-project-cover" class="form-control" placeholder="images/projects/.../01.png">
+              <label class="form-label">Year Completed</label>
+              <input type="text" id="edit-project-year" class="form-control" value="2026">
             </div>
           </div>
 
           <div class="form-group">
-            <label class="form-label">Description</label>
-            <textarea id="edit-project-desc" class="form-control" rows="2" placeholder="Describe the architectural woodwork, materials, or scope..."></textarea>
+            <label class="form-label">Primary Hero Image URL</label>
+            <input type="text" id="edit-project-image" class="form-control" placeholder="images/portfolio/..." required>
           </div>
 
-          <!-- Dedicated Gallery Photo Array Manager -->
-          <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--color-admin-border);">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-              <label class="form-label" style="margin: 0;">Dedicated Gallery Photos</label>
-              <span id="gallery-manager-count" style="font-size: 12px; color: var(--color-brand); font-weight: 600;">0 photos</span>
-            </div>
-            <p style="font-size: 12px; color: var(--color-admin-text-muted); margin-bottom: 12px;">
-              Add photo image paths (e.g. <code>images/projects/project-01/01.png</code>).
-            </p>
+          <div class="form-group">
+            <label class="form-label">Project Description (English)</label>
+            <textarea id="edit-project-desc" class="form-control" rows="3"></textarea>
+          </div>
 
-            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-              <input type="text" id="new-photo-url-input" class="form-control" placeholder="images/projects/.../02.png" style="font-size: 13px;">
-              <button type="button" class="btn btn-secondary btn-sm" onclick="window.addGalleryPhotoFromInput()" style="white-space: nowrap;">
-                <i class="fa-solid fa-plus"></i> Add Photo
-              </button>
-            </div>
-
-            <div class="gallery-manager-grid" id="gallery-manager-photos-list">
-              <!-- Dynamically populated by js/admin.js -->
-            </div>
+          <div class="form-group">
+            <label class="form-label">Project Description (Arabic)</label>
+            <textarea id="edit-project-desc-ar" class="form-control" rows="3"></textarea>
           </div>
         </form>
       </div>
       <div class="admin-modal-footer">
         <button type="button" class="btn btn-outline btn-sm" onclick="window.closeModal('modal-project-editor')">Cancel</button>
         <button type="submit" form="form-project-editor" class="btn btn-primary btn-sm">
-          <i class="fa-solid fa-check"></i> Save Project &amp; Gallery
+          <i class="fa-solid fa-check"></i> Save Project
         </button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 2: Inquiry Full Detail Viewer -->
-  <div class="admin-modal-overlay" id="modal-inquiry-detail" role="dialog" aria-modal="true">
-    <div class="admin-modal">
-      <div class="admin-modal-header">
-        <h3 class="admin-modal-title">Customer Request Details</h3>
-        <button type="button" class="btn-close admin-modal-close" onclick="window.closeModal('modal-inquiry-detail')"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="admin-modal-body" id="modal-inquiry-body">
-        <!-- Dynamically populated by js/admin.js -->
-      </div>
-      <div class="admin-modal-footer" id="modal-inquiry-footer">
-        <button type="button" class="btn btn-secondary btn-sm" onclick="window.closeModal('modal-inquiry-detail')">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL 3: Service Editor Modal -->
+  <!-- ==================================================================== -->
+  <!-- MODAL: SERVICE EDITOR                                                -->
+  <!-- ==================================================================== -->
   <div class="admin-modal-overlay" id="modal-service-editor" role="dialog" aria-modal="true">
     <div class="admin-modal">
       <div class="admin-modal-header">
-        <h3 class="admin-modal-title" id="service-modal-title">Edit Service</h3>
-        <button type="button" class="btn-close admin-modal-close" onclick="window.closeModal('modal-service-editor')"><i class="fa-solid fa-xmark"></i></button>
+        <h2 class="admin-modal-title" id="modal-service-title">Edit Woodwork Service</h2>
+        <button type="button" class="admin-modal-close" onclick="window.closeModal('modal-service-editor')">&times;</button>
       </div>
       <div class="admin-modal-body">
-        <form id="form-service-editor" onsubmit="window.saveServiceFromModal(event); return false;">
+        <form id="form-service-editor" onsubmit="event.preventDefault(); window.saveServiceForm();">
           <input type="hidden" id="edit-service-id">
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Service Title <span class="req">*</span></label>
-              <input type="text" id="edit-service-title" class="form-control" placeholder="e.g. Architectural Joinery" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">FontAwesome Icon Class</label>
-              <input type="text" id="edit-service-icon" class="form-control" placeholder="fa-solid fa-tree">
-            </div>
-          </div>
-
           <div class="form-group">
-            <label class="form-label">Short Description</label>
-            <textarea id="edit-service-desc" class="form-control" rows="3" placeholder="Brief summary of what this woodwork service delivers..."></textarea>
+            <label class="form-label">Service Title (English) <span class="req">*</span></label>
+            <input type="text" id="edit-service-title" class="form-control" required>
           </div>
-
           <div class="form-group">
-            <label class="form-label">Key Features (One per line)</label>
-            <textarea id="edit-service-features" class="form-control" rows="4" placeholder="3D acoustic wall paneling&#10;Custom wood ceiling systems&#10;Concealed pivot doors"></textarea>
+            <label class="form-label">Service Title (Arabic)</label>
+            <input type="text" id="edit-service-title-ar" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="edit-service-desc" class="form-control" rows="3"></textarea>
           </div>
         </form>
       </div>
@@ -854,25 +605,25 @@
     </div>
   </div>
 
-  <!-- MODAL 4: FAQ Editor Modal -->
+  <!-- ==================================================================== -->
+  <!-- MODAL: FAQ EDITOR                                                    -->
+  <!-- ==================================================================== -->
   <div class="admin-modal-overlay" id="modal-faq-editor" role="dialog" aria-modal="true">
     <div class="admin-modal">
       <div class="admin-modal-header">
-        <h3 class="admin-modal-title" id="faq-modal-title">Edit FAQ</h3>
-        <button type="button" class="btn-close admin-modal-close" onclick="window.closeModal('modal-faq-editor')"><i class="fa-solid fa-xmark"></i></button>
+        <h2 class="admin-modal-title" id="modal-faq-title">Edit FAQ</h2>
+        <button type="button" class="admin-modal-close" onclick="window.closeModal('modal-faq-editor')">&times;</button>
       </div>
       <div class="admin-modal-body">
-        <form id="form-faq-editor" onsubmit="window.saveFaqFromModal(event); return false;">
-          <input type="hidden" id="edit-faq-index">
-          
+        <form id="form-faq-editor" onsubmit="event.preventDefault(); window.saveFaqForm();">
+          <input type="hidden" id="edit-faq-id">
           <div class="form-group">
-            <label class="form-label">Question <span class="req">*</span></label>
-            <input type="text" id="edit-faq-q" class="form-control" placeholder="e.g. How do I request a custom quotation?" required>
+            <label class="form-label">Question (English) <span class="req">*</span></label>
+            <input type="text" id="edit-faq-q" class="form-control" required>
           </div>
-
           <div class="form-group">
-            <label class="form-label">Answer <span class="req">*</span></label>
-            <textarea id="edit-faq-a" class="form-control" rows="4" placeholder="Detailed response for customers..." required></textarea>
+            <label class="form-label">Answer (English) <span class="req">*</span></label>
+            <textarea id="edit-faq-a" class="form-control" rows="4" required></textarea>
           </div>
         </form>
       </div>
@@ -885,9 +636,143 @@
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="js/data.js"></script>`r`n  <script src="js/components.js"></script>
-  
+  <!-- ==================================================================== -->
+  <!-- MODAL: INQUIRY DETAILS & ACTIONS                                     -->
+  <!-- ==================================================================== -->
+  <div class="admin-modal-overlay" id="modal-inquiry-detail" role="dialog" aria-modal="true">
+    <div class="admin-modal" style="max-width: 620px;">
+      <div class="admin-modal-header">
+        <h2 class="admin-modal-title" id="modal-inquiry-title">Customer Inquiry Details</h2>
+        <button type="button" class="admin-modal-close" onclick="window.closeModal('modal-inquiry-detail')">&times;</button>
+      </div>
+      <div class="admin-modal-body" id="modal-inquiry-body">
+        <!-- Dynamically rendered via admin.js -->
+      </div>
+      <div class="admin-modal-footer" id="modal-inquiry-footer">
+        <!-- Action buttons rendered via admin.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================================================================== -->
+  <!-- MODAL: SUPABASE DATABASE CONFIGURATION                               -->
+  <!-- ==================================================================== -->
+  <div class="admin-modal-overlay" id="modal-supabase-config" role="dialog" aria-modal="true">
+    <div class="admin-modal" style="max-width: 680px;">
+      <div class="admin-modal-header">
+        <h2 class="admin-modal-title"><i class="fa-solid fa-database text-brand"></i> Supabase Inquiries Hub Configuration</h2>
+        <button type="button" class="admin-modal-close" onclick="window.closeModal('modal-supabase-config')">&times;</button>
+      </div>
+      <div class="admin-modal-body">
+        <p style="font-size: 13px; color: var(--color-text-body); margin-bottom: 16px; line-height: 1.5;">
+          Connect your free Supabase database for real-time contact form inquiries with Row-Level Security (RLS). The public website uses the <strong>INSERT-only anon key</strong>, while the desktop app uses the <strong>Service Key</strong> (stored in Windows DPAPI) to read customer submissions.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">Supabase Project URL <span class="req">*</span></label>
+          <input type="url" id="cfg-supabase-url" class="form-control" placeholder="https://xyzcompany.supabase.co" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Supabase Anon Public Key (Insert-Only)</label>
+          <input type="text" id="cfg-supabase-anon-key" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Supabase Service Role Secret Key (Read &amp; Manage Access) <span class="req">*</span></label>
+          <input type="password" id="cfg-supabase-service-key" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required>
+          <small style="display: block; margin-top: 4px; font-size: 11px; color: var(--color-text-muted);">
+            Stored encrypted on your local machine using Windows DPAPI (<code>safeStorage</code>).
+          </small>
+        </div>
+
+        <div style="background: var(--color-bg-card-subtle); border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 14px; margin-top: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="font-size: 12px; color: var(--color-text-main);">1-Click PostgreSQL Schema &amp; RLS Policy SQL</strong>
+            <button type="button" class="btn btn-outline btn-xs" onclick="window.copySupabaseSqlSnippet()">
+              <i class="fa-solid fa-copy"></i> Copy SQL
+            </button>
+          </div>
+          <p style="font-size: 11px; color: var(--color-text-muted); margin: 0;">
+            Copy and run this in your Supabase SQL Editor to create the <code>inquiries</code> table with RLS enabled.
+          </p>
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn btn-outline btn-sm" onclick="window.closeModal('modal-supabase-config')">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="window.saveSupabaseConfigFromModal()">
+          <i class="fa-solid fa-shield-check"></i> Save Credentials
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================================================================== -->
+  <!-- MODAL: LIVE PUBLISH PROGRESS (6-Step Architecture)                   -->
+  <!-- ==================================================================== -->
+  <div class="admin-modal-overlay" id="modal-publish-progress" role="dialog" aria-modal="true">
+    <div class="admin-modal" style="max-width: 580px;">
+      <div class="admin-modal-header">
+        <h2 class="admin-modal-title"><i class="fa-solid fa-rocket text-brand"></i> Publishing Live to Website</h2>
+        <button type="button" class="admin-modal-close" id="btn-close-publish-modal" onclick="window.closeModal('modal-publish-progress')" style="display: none;">&times;</button>
+      </div>
+      <div class="admin-modal-body">
+        <div style="display: flex; flex-direction: column; gap: 14px;" id="publish-steps-list">
+          <div class="publish-step" id="pub-step-1" style="display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: var(--radius-sm); background: var(--color-bg-card-subtle); border: 1px solid var(--color-border);">
+            <div class="step-icon" style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; background: var(--color-border); color: var(--color-text-main);">1</div>
+            <div style="flex: 1; font-size: 13px; color: var(--color-text-main);">Preparing Master Data &amp; Cache-Busting Multi-File Trees</div>
+            <div class="step-status"><i class="fa-solid fa-spinner fa-spin" style="color: var(--color-brand);"></i></div>
+          </div>
+
+          <div class="publish-step" id="pub-step-2" style="display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: var(--radius-sm); background: var(--color-bg-card-subtle); border: 1px solid var(--color-border);">
+            <div class="step-icon" style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; background: var(--color-border); color: var(--color-text-main);">2</div>
+            <div style="flex: 1; font-size: 13px; color: var(--color-text-main);">Local Workspace Synchronization</div>
+            <div class="step-status"><i class="fa-solid fa-circle text-muted" style="font-size: 8px;"></i></div>
+          </div>
+
+          <div class="publish-step" id="pub-step-3" style="display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: var(--radius-sm); background: var(--color-bg-card-subtle); border: 1px solid var(--color-border);">
+            <div class="step-icon" style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; background: var(--color-border); color: var(--color-text-main);">3</div>
+            <div style="flex: 1; font-size: 13px; color: var(--color-text-main);">Generating Atomic Multi-File Git Tree on GitHub</div>
+            <div class="step-status"><i class="fa-solid fa-circle text-muted" style="font-size: 8px;"></i></div>
+          </div>
+
+          <div class="publish-step" id="pub-step-4" style="display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: var(--radius-sm); background: var(--color-bg-card-subtle); border: 1px solid var(--color-border);">
+            <div class="step-icon" style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; background: var(--color-border); color: var(--color-text-main);">4</div>
+            <div style="flex: 1; font-size: 13px; color: var(--color-text-main);">Creating Verified Commit &amp; Pushing to Main Branch</div>
+            <div class="step-status"><i class="fa-solid fa-circle text-muted" style="font-size: 8px;"></i></div>
+          </div>
+
+          <div class="publish-step" id="pub-step-5" style="display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: var(--radius-sm); background: var(--color-bg-card-subtle); border: 1px solid var(--color-border);">
+            <div class="step-icon" style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; background: var(--color-border); color: var(--color-text-main);">5</div>
+            <div style="flex: 1; font-size: 13px; color: var(--color-text-main);">Triggering GitHub Pages Edge CDN Build</div>
+            <div class="step-status"><i class="fa-solid fa-circle text-muted" style="font-size: 8px;"></i></div>
+          </div>
+
+          <div class="publish-step" id="pub-step-6" style="display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: var(--radius-sm); background: var(--color-bg-card-subtle); border: 1px solid var(--color-border);">
+            <div class="step-icon" style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; background: var(--color-border); color: var(--color-text-main);">6</div>
+            <div style="flex: 1; font-size: 13px; color: var(--color-text-main);">Verifying Live Global Deployment CDN</div>
+            <div class="step-status"><i class="fa-solid fa-circle text-muted" style="font-size: 8px;"></i></div>
+          </div>
+        </div>
+
+        <div id="publish-complete-banner" style="display: none; margin-top: 20px; padding: 16px; border-radius: var(--radius-md); background: var(--color-badge-handled-bg); border: 1px solid var(--color-badge-handled-border); text-align: center;">
+          <i class="fa-solid fa-circle-check" style="font-size: 32px; color: var(--color-badge-handled-text); margin-bottom: 8px; display: block;"></i>
+          <h3 style="font-size: 16px; font-weight: 700; color: var(--color-badge-handled-text); margin-bottom: 4px;">Website Published Successfully!</h3>
+          <p style="font-size: 13px; color: var(--color-badge-handled-text); margin-bottom: 12px;">Your changes are now LIVE on the official public website.</p>
+          <button type="button" class="btn btn-primary btn-sm" onclick="if(window.artTouchElectron && window.artTouchElectron.openExternal){window.artTouchElectron.openExternal('https://wrd2gore.github.io/art-touch-woodworks/');}else{window.open('https://wrd2gore.github.io/art-touch-woodworks/','_blank');}">
+            <i class="fa-solid fa-globe"></i> Open Live Website
+          </button>
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn btn-outline btn-sm" id="btn-dismiss-publish" onclick="window.closeModal('modal-publish-progress')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Desktop Application Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/components.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/admin.js"></script>
 </body>

@@ -1,5 +1,5 @@
 /**
- * ART TOUCH CONTROL CENTER — ELECTRON MAIN PROCESS
+ * ART TOUCH CONTROL CENTER - ELECTRON MAIN PROCESS
  * Secure Desktop Management, Supabase Inquiries Hub & 1-Click GitHub Live Publisher
  */
 
@@ -655,9 +655,9 @@ function createMainWindow() {
     height: 900,
     minWidth: 1120,
     minHeight: 720,
-    title: 'Art Touch Control Center — Management & Live Publishing',
+    title: 'Art Touch Control Center - Management & Live Publishing',
     icon: fs.existsSync(iconPath) ? iconPath : undefined,
-    backgroundColor: '#090D12',
+    backgroundColor: '#0A0D12',
     show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -674,7 +674,7 @@ function createMainWindow() {
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
     console.error(`[Main Process] Window load failed: ${errorCode} - ${errorDescription} (${validatedURL})`);
     dialog.showErrorBox(
-      'Art Touch Control Center — Load Error',
+      'Art Touch Control Center - Load Error',
       `Failed to load application interface:\n\nError Code: ${errorCode}\nDescription: ${errorDescription}\nTarget: ${validatedURL}\n\nPlease check installation integrity.`
     );
   });
