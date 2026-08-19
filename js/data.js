@@ -8,15 +8,26 @@
 
 const ArtTouchData = {
   // Master Version & Build Signature for CDN Verification
-  version: "2026.08.18.1930",
-  buildId: "build-at-msyvpogr-uw45",
-  publishedAt: "2026-08-18T16:30:32.007Z",
-  totalProjects: 13,
+  version: "2026.08.18.1439",
+  buildId: "build-at-mt00rpn3-yyz5",
+  publishedAt: "2026-08-19T11:39:50.799Z",
+  totalProjects: 14,
   totalServices: 6,
   totalFaqs: 5,
 
   // 1. Projects Database (14 Verified Authentic Projects with Photo Galleries)
   projects: [
+  {
+    "id": "qaia-government-services-center",
+    "category": "Government Projects",
+    "title": "QAIA Government Services Center",
+    "location": "Amman - QAIA Airport",
+    "dateCompleted": "2023",
+    "area": "200 sqm",
+    "coverImage": "images/projects/government-projects/qaia-government-services-center/01.png",
+    "description": "Custom architectural woodwork and joinery for the QAIA Government Services Center at Queen Alia International Airport.",
+    "gallery": []
+  },
   {
     "id": "water-awareness-center",
     "category": "Government Projects",
