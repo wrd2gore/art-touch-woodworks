@@ -1,0 +1,478 @@
+/* ==========================================================================
+   ART TOUCH WOODWORKS — CLEAN ARCHITECTURAL COMPONENTS
+   Matches Official Art Touch Visual Design & Screenshot Standards
+   ========================================================================== */
+
+/* 1. Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-primary {
+  background: var(--color-brand);
+  color: #FFFFFF;
+  border: 1px solid var(--color-brand);
+}
+
+.btn-primary:hover {
+  background: var(--color-brand-hover);
+  border-color: var(--color-brand-hover);
+}
+
+.btn-secondary {
+  background: #333333;
+  color: #FFFFFF;
+  border: 1px solid #333333;
+}
+
+.btn-secondary:hover {
+  background: #111111;
+  border-color: #111111;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-text-main);
+  border: 1px solid var(--color-border);
+}
+
+.btn-outline:hover {
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+
+.btn-outline-white {
+  background: transparent;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.btn-outline-white:hover {
+  background: #FFFFFF;
+  color: #111111;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: var(--text-xs);
+}
+
+.btn-lg {
+  padding: 14px 28px;
+  font-size: var(--text-base);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* 2. Authentic Project Cards (Matches Screenshots media_1787015479807.png & media_1787015494968.png) */
+.authentic-project-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  transition: transform var(--transition-fast);
+}
+
+.authentic-project-card:hover {
+  transform: translateY(-4px);
+}
+
+.project-thumb-box {
+  width: 100%;
+  aspect-ratio: 16/10;
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 20px;
+  box-shadow: var(--shadow-xs);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.project-thumb-box img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transition: transform var(--transition-normal);
+}
+
+.authentic-project-card:hover .project-thumb-box {
+  border-color: #D1D5DB;
+  box-shadow: var(--shadow-sm);
+}
+
+.authentic-project-card:hover .project-thumb-box img {
+  transform: scale(1.03);
+}
+
+/* Authentic Dark Charcoal Pill Button Below Project Thumb */
+.project-pill-btn {
+  display: block;
+  width: 100%;
+  max-width: 340px;
+  background-color: #333333;
+  color: #FFFFFF;
+  text-align: center;
+  padding: 10px 16px;
+  border-radius: 3px;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: background-color var(--transition-fast);
+}
+
+.authentic-project-card:hover .project-pill-btn {
+  background-color: #111111;
+}
+
+/* 3. Category Showcase Grid Cards (Homepage) */
+.category-showcase-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2xl) var(--space-xl);
+  text-decoration: none;
+  box-shadow: var(--shadow-xs);
+  transition: all var(--transition-fast);
+}
+
+.category-showcase-card:hover {
+  border-color: var(--color-brand);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+}
+
+.category-card-icon {
+  font-size: 32px;
+  color: var(--color-brand);
+  margin-bottom: var(--space-md);
+}
+
+.category-card-title {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 6px;
+}
+
+.category-card-desc {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* 4. Filter Tabs & Search Bar */
+.filter-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: var(--space-2xl);
+}
+
+.filter-btn {
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: all var(--transition-fast);
+}
+
+.filter-btn:hover {
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+
+.filter-btn.active {
+  background: #333333;
+  color: #FFFFFF;
+  border-color: #333333;
+}
+
+.form-control {
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  color: var(--color-text-main);
+  font-size: var(--text-sm);
+  transition: border-color var(--transition-fast);
+}
+
+.form-control:focus {
+  border-color: var(--color-brand);
+  outline: none;
+}
+
+.form-group {
+  margin-bottom: var(--space-lg);
+}
+
+.form-label {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-main);
+  margin-bottom: 6px;
+}
+
+.form-label .req {
+  color: var(--color-brand);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+@media (max-width: 640px) {
+  .form-row { grid-template-columns: 1fr; }
+}
+
+/* 5. Authentic Leadership & Contact Cards */
+.leader-card {
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  box-shadow: var(--shadow-xs);
+  transition: transform var(--transition-fast);
+}
+
+.leader-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 6. Live Hours Status Pill */
+.live-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-open .status-dot {
+  background: var(--color-success);
+}
+
+.status-open {
+  color: var(--color-success);
+}
+
+.status-closed .status-dot {
+  background: var(--color-error);
+}
+
+.status-closed {
+  color: var(--color-error);
+}
+
+/* 7. Lightbox Modal (Clean Fullscreen) */
+.lightbox-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: var(--z-lightbox);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-fast);
+  padding: var(--space-xl);
+}
+
+.lightbox-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.lightbox-header {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+}
+
+.lightbox-counter {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.lightbox-close {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.lightbox-close:hover {
+  background: var(--color-brand);
+}
+
+.lightbox-body {
+  width: 100%;
+  max-width: 1100px;
+  height: 75vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.lightbox-body img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.lightbox-nav:hover {
+  background: var(--color-brand);
+}
+
+.lightbox-prev { left: -60px; }
+.lightbox-next { right: -60px; }
+
+@media (max-width: 1200px) {
+  .lightbox-prev { left: 16px; }
+  .lightbox-next { right: 16px; }
+}
+
+/* Toast */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: var(--z-toast);
+}
+
+.toast {
+  background: #333333;
+  color: #FFFFFF;
+  padding: 12px 18px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toast-success { border-left: 4px solid var(--color-success); }
+.toast-error { border-left: 4px solid var(--color-error); }
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-main);
+  cursor: pointer;
+  font-size: 15px;
+  transition: all var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--color-brand-light);
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+  transform: scale(1.05);
+}

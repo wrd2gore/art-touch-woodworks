@@ -3,7 +3,7 @@
  * Secure Desktop Management, Supabase Inquiries Hub & 1-Click GitHub Live Publisher
  */
 
-const { app, BrowserWindow, ipcMain, safeStorage, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, safeStorage, shell, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
@@ -26,6 +26,14 @@ function getAuthStorePath() {
 
 function getSupabaseStorePath() {
   return path.join(app.getPath('userData'), 'supabase_auth.dat');
+}
+
+function getWritableWorkspacePath() {
+  const p = path.join(app.getPath('userData'), 'workspace');
+  if (!fs.existsSync(p)) {
+    try { fs.mkdirSync(p, { recursive: true }); } catch (e) {}
+  }
+  return p;
 }
 
 function storeEncryptedToken(token) {
@@ -240,7 +248,7 @@ async function executePublishPipeline(payload, onProgress) {
 
   const buildId = targetBuildId || `build-at-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
   const message = commitMessage || `Update website content via Art Touch Control Center [Build: ${buildId}]`;
-  const rootDir = path.join(__dirname, '..');
+  const workspacePath = getWritableWorkspacePath();
 
   // Step 1: Preparing changes with automatic cache-busting
   onProgress({ step: 1, state: 'active', message: 'Preparing multi-file commit tree with cache-busting...' });
@@ -251,16 +259,33 @@ async function executePublishPipeline(payload, onProgress) {
   if (dataJsContent) {
     treeItems.push({ path: 'js/data.js', mode: '100644', type: 'blob', content: dataJsContent });
     try {
-      fs.writeFileSync(path.join(rootDir, 'js', 'data.js'), dataJsContent, 'utf-8');
+      fs.writeFileSync(path.join(workspacePath, 'data.js'), dataJsContent, 'utf-8');
+    } catch (e) {}
+
+    // If running in development workspace, also sync to local folder if present
+    try {
+      const devDataPath = path.join(__dirname, '..', 'js', 'data.js');
+      if (fs.existsSync(path.dirname(devDataPath))) {
+        fs.writeFileSync(devDataPath, dataJsContent, 'utf-8');
+      }
     } catch (e) {}
   }
 
   // 1b. js/projects.js (Make sure public projects.js uses clean single-source-of-truth)
-  const projectsJsPath = path.join(rootDir, 'js', 'projects.js');
-  if (fs.existsSync(projectsJsPath)) {
-    const projectsJsContent = fs.readFileSync(projectsJsPath, 'utf-8');
-    treeItems.push({ path: 'js/projects.js', mode: '100644', type: 'blob', content: projectsJsContent });
-  }
+  try {
+    let projJsContent = '';
+    const localProjJs = path.join(__dirname, 'renderer', 'js', 'projects.js');
+    const repoProjJs = path.join(__dirname, '..', 'js', 'projects.js');
+    if (fs.existsSync(repoProjJs)) {
+      projJsContent = fs.readFileSync(repoProjJs, 'utf-8');
+    } else if (fs.existsSync(localProjJs)) {
+      projJsContent = fs.readFileSync(localProjJs, 'utf-8');
+    }
+
+    if (projJsContent) {
+      treeItems.push({ path: 'js/projects.js', mode: '100644', type: 'blob', content: projJsContent });
+    }
+  } catch (e) {}
 
   // 1c. Scan and update all public HTML files with cache-busting query parameter js/data.js?v=BUILD_ID
   const publicHtmlFiles = [
@@ -270,7 +295,6 @@ async function executePublishPipeline(payload, onProgress) {
   ];
 
   for (const htmlFile of publicHtmlFiles) {
-    const filePath = path.join(rootDir, htmlFile);
     let content = '';
 
     if (htmlFile === 'projects.html' && projectsHtmlContent) {
@@ -279,8 +303,11 @@ async function executePublishPipeline(payload, onProgress) {
       content = servicesHtmlContent;
     } else if (htmlFile === 'index.html' && indexHtmlContent) {
       content = indexHtmlContent;
-    } else if (fs.existsSync(filePath)) {
-      content = fs.readFileSync(filePath, 'utf-8');
+    } else {
+      const repoHtmlPath = path.join(__dirname, '..', htmlFile);
+      if (fs.existsSync(repoHtmlPath)) {
+        content = fs.readFileSync(repoHtmlPath, 'utf-8');
+      }
     }
 
     if (content) {
@@ -290,9 +317,12 @@ async function executePublishPipeline(payload, onProgress) {
         `<script src="js/data.js?v=${buildId}"></script>`
       );
 
-      // Save locally
+      // Save locally if dev repo exists
       try {
-        fs.writeFileSync(filePath, stampedContent, 'utf-8');
+        const repoHtmlPath = path.join(__dirname, '..', htmlFile);
+        if (fs.existsSync(repoHtmlPath)) {
+          fs.writeFileSync(repoHtmlPath, stampedContent, 'utf-8');
+        }
       } catch (e) {}
 
       // Add to commit tree
@@ -563,15 +593,22 @@ function registerIpcHandlers() {
     }
   });
 
-  // Local master data file reading / writing
+  // Local master data file reading / writing (with safe workspace caching)
   ipcMain.handle('data:readLocalMaster', async () => {
     try {
-      const filePath = path.join(__dirname, '..', 'js', 'data.js');
-      if (fs.existsSync(filePath)) {
-        const content = fs.readFileSync(filePath, 'utf-8');
+      const workspaceFile = path.join(getWritableWorkspacePath(), 'data.js');
+      if (fs.existsSync(workspaceFile)) {
+        const content = fs.readFileSync(workspaceFile, 'utf-8');
         return { success: true, content };
       }
-      return { success: false, error: 'File not found' };
+
+      const bundledFile = path.join(__dirname, 'renderer', 'js', 'data.js');
+      if (fs.existsSync(bundledFile)) {
+        const content = fs.readFileSync(bundledFile, 'utf-8');
+        return { success: true, content };
+      }
+
+      return { success: false, error: 'Data file not found' };
     } catch (err) {
       return { success: false, error: err.message };
     }
@@ -579,8 +616,8 @@ function registerIpcHandlers() {
 
   ipcMain.handle('data:saveLocalMaster', async (_event, dataJsContent) => {
     try {
-      const filePath = path.join(__dirname, '..', 'js', 'data.js');
-      fs.writeFileSync(filePath, dataJsContent, 'utf-8');
+      const workspaceFile = path.join(getWritableWorkspacePath(), 'data.js');
+      fs.writeFileSync(workspaceFile, dataJsContent, 'utf-8');
       return { success: true };
     } catch (err) {
       return { success: false, error: err.message };
@@ -611,13 +648,15 @@ function registerIpcHandlers() {
 // ============================================================================
 
 function createMainWindow() {
+  const iconPath = path.join(__dirname, '..', 'art-touch.ico');
+
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 900,
     minWidth: 1120,
     minHeight: 720,
     title: 'Art Touch Control Center — Management & Live Publishing',
-    icon: path.join(__dirname, '..', 'art-touch.ico'),
+    icon: fs.existsSync(iconPath) ? iconPath : undefined,
     backgroundColor: '#090D12',
     show: false,
     webPreferences: {
@@ -631,6 +670,22 @@ function createMainWindow() {
 
   mainWindow.setMenuBarVisibility(false);
 
+  // Failure visibility: Catch navigation or load failures
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    console.error(`[Main Process] Window load failed: ${errorCode} - ${errorDescription} (${validatedURL})`);
+    dialog.showErrorBox(
+      'Art Touch Control Center — Load Error',
+      `Failed to load application interface:\n\nError Code: ${errorCode}\nDescription: ${errorDescription}\nTarget: ${validatedURL}\n\nPlease check installation integrity.`
+    );
+  });
+
+  // Console message forwarding from Renderer to Main Process Node console
+  mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    const levelNames = ['LOG', 'WARN', 'ERROR', 'INFO'];
+    const lvl = levelNames[level] || 'LOG';
+    console.log(`[Renderer ${lvl}] ${message} (${path.basename(sourceId || '')}:${line})`);
+  });
+
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('https:') || url.startsWith('http:') || url.startsWith('mailto:') || url.startsWith('tel:')) {
       shell.openExternal(url);
@@ -638,7 +693,9 @@ function createMainWindow() {
     return { action: 'deny' };
   });
 
-  mainWindow.loadFile(path.join(__dirname, '..', 'admin.html'));
+  const adminHtmlPath = path.join(__dirname, 'renderer', 'admin.html');
+  console.log('[Main Process] Loading UI from:', adminHtmlPath);
+  mainWindow.loadFile(adminHtmlPath);
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();

@@ -15,16 +15,12 @@ build/
 .env
 .env.*
 auth.dat
+supabase_auth.dat
 secure_auth.enc
 
-# Local Admin & Desktop Control Center Files (Not served publicly)
-admin.html
-js/admin.js
-css/admin.css
+# Temporary scripts & IDE files
 *.ps1
 *.bat
-
-# Temporary IDE & System files
 .tempmediaStorage/
 .user_uploaded/
 .system_generated/

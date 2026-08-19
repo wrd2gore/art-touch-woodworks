@@ -1,0 +1,212 @@
+/* ==========================================================================
+   ART TOUCH WOODWORKS — REFINED ARCHITECTURAL DESIGN TOKENS
+   Clean, Elegant, Luxury Architectural Aesthetic with Universal Dark Theme
+   ========================================================================== */
+
+:root {
+  /* Brand Identity (Refined Architectural Warm Gold & Deep Wood) */
+  --color-brand: #A88734;
+  --color-brand-hover: #BF9C3E;
+  --color-brand-active: #8F7128;
+  --color-brand-light: #FBF8EE;
+  --color-brand-muted: rgba(168, 135, 52, 0.08);
+
+  /* Charcoal & Neutrals */
+  --color-dark: #1F2428;
+  --color-dark-hover: #2F363D;
+  --color-dark-surface: #181C20;
+  --color-pill-bg: #2C2C2C;
+  --color-pill-hover: #111111;
+
+  /* Clean Light Canvas */
+  --color-bg: #FFFFFF;
+  --color-bg-alt: #F9FAFB;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-card: #FFFFFF;
+  --color-bg-subtle: #F3F4F6;
+
+  /* Subtle Hairline Borders */
+  --color-border: #E5E7EB;
+  --color-border-light: #F0F2F5;
+  --color-border-hover: #D1D5DB;
+  --color-border-dark: #333333;
+
+  /* High-Legibility Typography */
+  --color-text-main: #111827;
+  --color-text-body: #374151;
+  --color-text-muted: #6B7280;
+  --color-text-dim: #9CA3AF;
+  --color-text-white: #FFFFFF;
+  --color-text-white-muted: rgba(255, 255, 255, 0.75);
+
+  /* Status */
+  --color-success: #059669;
+  --color-success-bg: #ECFDF5;
+  --color-error: #DC2626;
+  --color-error-bg: #FEF2F2;
+
+  /* Typography Families */
+  --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+  /* Font Sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.875rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 3rem;
+  --text-5xl: clamp(2.5rem, 5vw, 4rem);
+
+  /* Spacing */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4.5rem;
+  --space-4xl: 6rem;
+
+  /* Radii */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.12);
+
+  /* Layout */
+  --container-sm: 640px;
+  --container-md: 860px;
+  --container-lg: 1120px;
+  --container-xl: 1280px;
+  --header-height: 80px;
+
+  /* Transitions */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 150ms var(--ease-out-expo);
+  --transition-normal: 250ms var(--ease-out-expo);
+
+  /* Z-Index */
+  --z-header: 1000;
+  --z-drawer: 1100;
+  --z-modal: 1200;
+  --z-lightbox: 1300;
+  --z-toast: 1400;
+
+  /* Theme Indicator */
+  color-scheme: light;
+}
+
+/* ==========================================================================
+   UNIVERSAL DARK THEME DEFINITION ([data-theme="dark"])
+   ========================================================================== */
+
+[data-theme="dark"] {
+  /* Brand Accents in Dark Mode (Vibrant architectural champagne gold) */
+  --color-brand: #C59B27;
+  --color-brand-hover: #DFB83E;
+  --color-brand-active: #A88734;
+  --color-brand-light: rgba(197, 155, 39, 0.15);
+  --color-brand-muted: rgba(197, 155, 39, 0.1);
+
+  /* Dark Theme Surfaces */
+  --color-dark: #0D1117;
+  --color-dark-hover: #161B22;
+  --color-dark-surface: #161B22;
+  --color-pill-bg: #21262D;
+  --color-pill-hover: #30363D;
+
+  /* Deep High-End Dark Canvas */
+  --color-bg: #090D12;
+  --color-bg-alt: #0F141C;
+  --color-bg-surface: #141A24;
+  --color-bg-card: #171E2A;
+  --color-bg-subtle: #1C2433;
+
+  /* Dark Theme Borders */
+  --color-border: #2B3545;
+  --color-border-light: #222B38;
+  --color-border-hover: #414F66;
+  --color-border-dark: #6B7280;
+
+  /* Dark Theme Typography */
+  --color-text-main: #F9FAFB;
+  --color-text-body: #E5E7EB;
+  --color-text-muted: #9CA3AF;
+  --color-text-dim: #6B7280;
+  --color-text-white: #FFFFFF;
+  --color-text-white-muted: rgba(255, 255, 255, 0.85);
+
+  /* Status Colors */
+  --color-success: #10B981;
+  --color-success-bg: rgba(16, 185, 129, 0.15);
+  --color-error: #EF4444;
+  --color-error-bg: rgba(239, 68, 68, 0.15);
+
+  /* Dark Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.65);
+
+  color-scheme: dark;
+}
+
+/* Automatic OS dark preference support when user has not set an explicit override */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-brand: #C59B27;
+    --color-brand-hover: #DFB83E;
+    --color-brand-active: #A88734;
+    --color-brand-light: rgba(197, 155, 39, 0.15);
+    --color-brand-muted: rgba(197, 155, 39, 0.1);
+
+    --color-dark: #0D1117;
+    --color-dark-hover: #161B22;
+    --color-dark-surface: #161B22;
+    --color-pill-bg: #21262D;
+    --color-pill-hover: #30363D;
+
+    --color-bg: #090D12;
+    --color-bg-alt: #0F141C;
+    --color-bg-surface: #141A24;
+    --color-bg-card: #171E2A;
+    --color-bg-subtle: #1C2433;
+
+    --color-border: #2B3545;
+    --color-border-light: #222B38;
+    --color-border-hover: #414F66;
+    --color-border-dark: #6B7280;
+
+    --color-text-main: #F9FAFB;
+    --color-text-body: #E5E7EB;
+    --color-text-muted: #9CA3AF;
+    --color-text-dim: #6B7280;
+    --color-text-white: #FFFFFF;
+    --color-text-white-muted: rgba(255, 255, 255, 0.85);
+
+    --color-success: #10B981;
+    --color-success-bg: rgba(16, 185, 129, 0.15);
+    --color-error: #EF4444;
+    --color-error-bg: rgba(239, 68, 68, 0.15);
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.65);
+
+    color-scheme: dark;
+  }
+}
